@@ -1,0 +1,34 @@
+<?php
+$this->headLink()->appendStylesheet($this->assetUrl('css/page-blocks.css', 'Omeka'));
+$this->htmlElement('body')->appendAttribute('class', 'page');
+$this->pageTitle($page->title(), 2);
+$showPagePagination = $this->siteSetting('show_page_pagination', true);
+
+$nav = $site->publicNav();
+$container = $nav->getContainer();
+$activePage = $nav->findActive($container);
+?>
+
+<?php if($page->title() != 'Home'):?>
+<section class="section breadcrumb-section white-section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="<?php echo $site->url();?>">Home</a></li>
+        <?php if($activePage['depth'] !== 0):?>
+          <li><?php echo $nav->breadcrumbs()->setSeparator('</li><li>');?></li>
+        <?php else:?>
+          <li><?php echo $page->title();?></li>
+        <?php endif;?>
+      </ul>
+    </nav>
+  </div>
+</section>
+<?php endif;?>
+
+<?php //$this->trigger('view.show.before'); ?>
+<?php echo $this->content; ?>
+<?php //$this->trigger('view.show.after'); ?>
+<?php if ($showPagePagination): ?>
+<?php echo $this->sitePagePagination(); ?>
+<?php endif; ?>

@@ -1,0 +1,6 @@
+*/files*
+*/config*
+*/.git*
+/files
+files
+build&push.bat

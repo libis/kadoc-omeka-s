@@ -1,0 +1,89 @@
+<?php
+$alignmentClass = $block->dataValue('alignment', 'left');
+$thumbnailType = $block->dataValue('thumbnail_type', 'square');
+$text =  $block->dataValue('text','');
+$span =  $block->dataValue('span',4);
+$last =  $block->dataValue('last','');
+$title =  $block->dataValue('title','');
+$showTitleOption = $block->dataValue('show_title_option', 'item_title');
+?>
+<div class="tiles-block span-<?php echo $span;?>">
+  <div class="item-wrapper">
+
+<?php if (!$attachments):?>
+    <?php if($title):
+      echo "<h3 class='top-title'>".$title."</h3>";
+    endif;?>
+    <div class="text-no-image">
+      <?php
+        if($text):
+          echo $text;
+        endif;
+      ?>
+
+      <?php foreach ($this->resources as $resource):?>
+          <?php $heading = $resource->value('dcterms:title');?>
+          <div class="tile-person">
+            <?php
+              $media = $resource->media();
+              if($media):
+                $mediaurl = $media[0]->thumbnailUrl('square');
+              else:
+                $mediaurl = "";
+              endif;
+
+              $url = $resource->url();
+            ?>
+
+            <div class="image">
+              <img src="<?php echo  $mediaurl;?>">
+            </div>
+            <div class="name">
+              <span><a href="<?php echo $url;?>"><?php echo $heading;?></a></span>
+            </div>
+          </div>
+      <?php endforeach; ?>
+
+      <?php if($block->dataValue('link')):?>
+        <div class="tile-more">
+          <a href="<?php echo $block->page()->site()->url().$block->dataValue('link');?>">Read more</a>
+        </div>
+      <?php endif;?>
+    </div>
+<?php endif;?>
+
+<?php foreach($attachments as $attachment):
+    if($title):
+      echo "<h3 class='top-title'>".$title."</h3>";
+    endif;
+    echo '<div class="item resource">';
+
+    $item = $attachment->item();
+    if ($item):
+        $media = $attachment->media() ?: $item->primaryMedia();
+        if ($media):?>
+          <?php if($span >= '6'):
+              $thumbnailType = 'large';
+          endif;?>
+          <?php $mediaurl = $media->thumbnailUrl($thumbnailType);?>
+          <a href="<?php echo $block->page()->site()->url().$block->dataValue('link');?>">
+            <div class="tiles-img" style="background:url(<?php echo $mediaurl;?>) no-repeat center center;">
+          </div></a>
+        <?php endif;?>
+    <?php endif;?>
+    <div class="text-image">
+        <?php if ($text):?>
+           <?php echo $text;?>
+        <?php endif;?>
+        <div class="tile-more">
+            <a href="<?php echo $block->page()->site()->url().$block->dataValue('link');?>">Read more</a>
+        </div>
+    </div>
+    </div>
+    <?php break;
+endforeach;
+?>
+</div></div>
+<?php if($last):?>
+  <div class="last" style="clear:both"></div>
+<?php endif;?>

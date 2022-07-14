@@ -1,0 +1,48 @@
+/* main: style.scss */
+$family-primary: 'Raleway', sans-serif;
+$family-secondary: 'Source Sans Pro', sans-serif;
+$primary: #3b9c7c;
+$yellow: #F2DB3A;
+$success: $yellow;
+$succes: $yellow;
+$blue: #0189B3;
+$info: $blue;
+$red: #F93E32;
+$bg: #ECDA73;
+$text: #333;
+$link: $primary;
+$navbar-item-color: #fff;
+$section-padding: 3rem 1.5rem 3rem 1.5rem;
+$navbar-height:4rem;
+$border: #b3b3b3;
+$navbar-breakpoint: 0;
+//$body-background-color: #f1f1f1;
+
+//card
+$card-shadow: none;
+$card-header-background-color: transparent !default
+$card-header-padding: 0.75rem 1rem !default
+$card-header-shadow: none;
+$card-header-weight: 600 !default
+$card-content-background-color: transparent !default
+$card-content-padding: 1.5rem !default
+$card-footer-background-color: transparent !default
+$card-footer-padding: 0.75rem !default
+$card-footer-border-top: 1px solid $border;
+
+$column-gap: 1rem;
+
+//box
+$box-radius: 0px;
+$box-shadow: none;
+$box-background-color: #f0f0f0;
+$box-color: $text;
+$box-padding: 1.5rem !default;
+
+//$modal-background-background-color:rgba($primary,0.3);
+
+//form
+$control-radius:0;
+$input-radius:0;
+
+@import "../../../../node_modules/bulma/bulma.sass";

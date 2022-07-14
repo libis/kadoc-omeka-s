@@ -1,0 +1,49 @@
+<?php
+  $escape = $this->plugin('escapeHtml');
+  $url = '';
+  $siteTitle = $block->page()->site()->title();
+  if($attachments):
+    $media = $attachments[0]->media();
+
+    $url = '';
+    if($media):
+      $url = $media->thumbnailUrl('large');
+      //$url = str_replace('http:', '', $url);
+    endif;
+  endif;
+  //$url = $this->assetUrl("img/banner.jpg");
+?>
+
+<section class="section ">
+  <div class="container" >
+  <div class="image-overlay" style="padding:2rem;background:url(<?php echo $url;?>) no-repeat center center;background-size: cover;">
+      
+    <div class="columns">
+        <div class="column is-5">
+          <div class="primary-block content">
+            <?php if($block->dataValue('sec_title')):?>
+                <h2 class="subtitle is-size-6"><?php echo $block->dataValue('sec_title');?></h2>
+            <?php endif;?>
+            <?php if($block->dataValue('title')):?>
+              <h1 class="title is-family-secondary is-1"><span><?php echo $block->dataValue('title');?></span></h1>
+            <?php endif;?>
+            <div class="image-only-text">
+              <?php echo $block->dataValue('text');?>
+              <?php if($block->dataValue('link')):?>
+              <div class="link has-text-right" style="padding-top:2rem;">
+                <a class="button is-primary" href="<?php echo $block->dataValue('link');?>">
+                  <span><?php echo $block->dataValue('link_text');?></span>
+                  <span class="icon is-small">
+                    <i class="fas fa-angle-right"></i>
+                  </span>
+                </a>
+              </div>
+              <?php endif;?>
+            </div>
+            
+          </div>
+        </div>    
+      </div>         
+    </div>
+  </div>
+ </section>

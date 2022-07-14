@@ -1,0 +1,67 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+$labelInfo = $this->setting('property_label_information');
+$not = array('Title','Description','Samenvatting','Fase 1','Fase 2',
+'Fase 3','projectUrl','logoUrl','Gerelateerd erfgoed','Source',
+'Date','Schooljaar','Meer info','Cultuurkuur','Adres','Contact',
+'Bewaard erfgoed','Erfgoedwerking','Type Collectie',
+'Straatnaam','Huisnummer','Postcode','Gemeente','Ondersteuningsaanbod'
+);
+
+?>
+<div class="value-block">
+<?php foreach ($values as $term => $propertyData): ?>
+  <?php if(!in_array($propertyData['property']->label(),$not)):?>
+    <span class="value-piece">
+        <span class="is-family-secondary value-title">
+        <?php if ($propertyData['alternate_label']): ?>
+          <?php if(substr($propertyData['alternate_label'], -1) == '?'):?>
+            <?php echo $escape($propertyData['alternate_label']); ?>
+          <?php else: ?>
+            <?php echo $escape($propertyData['alternate_label']); ?>:
+          <?php endif; ?>
+        <?php else: ?>
+        <?php echo $escape($translate($propertyData['property']->label())); ?>:
+        <?php endif; ?>
+        <?php if ('term' === $labelInfo): ?>
+        <span class="field-term">(<?php echo $escape($propertyData['property']->term()); ?>):</span>
+        <?php elseif ('vocab' === $labelInfo): ?>
+        <span class="field-term">(<?php echo $escape($propertyData['property']->vocabulary()->label()); ?>):</span>
+        <?php endif; ?>
+      </span>
+
+      <span class="values <?php echo $escape($translate($propertyData['property']->label()));?>">
+        <?php $i=0;?>
+        <?php foreach ($propertyData['values'] as $value): ?>
+
+            <?php
+            $valueType = $value->type();
+            $class = ['value'];
+            if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
+                $class[] = 'resource';
+                $class[] = $escape($value->valueResource()->resourceName());
+            } elseif ('uri' == $valueType) {
+                $class[] = 'uri';
+            }
+            if (!$value->isPublic()) {
+                $class[] = 'private';
+            }
+            ?>
+            <?php if($i > 0):?>
+              <?php echo ',&nbsp;';?>
+            <?php endif;?>
+            <span class="<?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
+                <?php if ($language = $value->lang()): ?>
+                <span class="language"><?php echo $language; ?></span>
+                <?php endif; ?>
+                <?php echo $value->asHtml(); ?>
+            </span>
+
+            <?php $i++;?>
+        <?php endforeach; ?>
+      </span>
+<?php endif;?>
+</span>
+<?php endforeach; ?>
+</div>

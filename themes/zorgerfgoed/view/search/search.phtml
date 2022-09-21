@@ -117,7 +117,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
             <?php    
                 $facets_temp = $query->getActiveFacets(); 
                 $type_multi = array(
-                    "collectie" => "Erfgoedcollectiescollecties",
+                    "collectie" => "Erfgoedcollecties",
                     "proeftuin" => "Proeftuinen"
                 );
                 if(isset($facets_temp["schema:genre"])):
@@ -129,7 +129,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
                         }
                     endforeach;    
                 else:
-                    $title = $itemSetsCount." resultaten";    
+                    $title = $itemSetsCount." erfgoedcollecties";    
                 endif;   
             ?>     
             <?= $partial('search/resource-list', [
@@ -145,7 +145,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
                 $facets_temp = $query->getActiveFacets(); 
                 $template_multi = array(
                     "Erfgoed" => "Erfgoed",
-                    "Historische organisatie" => "Historische organisaties",
+                    "Organisatie" => "Organisaties",
                     "Nieuwsbericht" => "Nieuwsberichten"
                 );
                 if(isset($facets_temp["resource_template_id"])):

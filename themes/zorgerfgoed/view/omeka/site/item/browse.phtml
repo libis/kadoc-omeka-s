@@ -8,6 +8,13 @@ $itemSetShow = isset($itemSet);
 if ($itemSetShow):
     $this->htmlElement('body')->appendAttribute('class', 'item-set');
     $query['item_set_id'] = $itemSet->id();
+   
+    $template = $itemSet->resourceTemplate();
+    if($template):
+      $type = $template->label();
+    else:
+      $type = "";
+    endif;
 endif;
 $news= false;
 $template_id = '';
@@ -42,7 +49,11 @@ $sortHeadings = [
       <ul>
         <li><a href="<?php echo $site->url();?>">Home</a></li>
         <?php if ($itemSetShow):?>
-          <li><a href="<?php echo $site->url();?>/collecties"><?php echo $translate('Item set'); ?></a></li>
+          <?php if($type == "Expositie" || $type == "Erfgoed"):?>
+            <li><a href="<?php echo $site->url();?>/collecties">Erfgoedcollecties</a></li>
+          <?php else:?>
+            <li><a href="<?php echo $site->url();?>/page/proeftuinen">Proeftuinen</a></li>
+          <?php endif;?>  
           <li><?php echo $itemSet->displayTitle(); ?></li>
         <?php elseif ($news):?>
           <li><?php echo sprintf($this->translate('Nieuws')); ?></li>
@@ -57,6 +68,11 @@ $sortHeadings = [
   <div class="container">
     <?php if ($itemSetShow): ?>
         <h1 class="title is-2 is-family-secondary"><?php echo $itemSet->displayTitle(); ?></h1>
+        <?php if($itemSet->value('schema:alternateName')): ?>
+          <h2 class="subtitle is-3 is-family-secondary">
+            <?php echo $itemSet->value('schema:alternateName');?>
+          </h2>
+        <?php endif;?> 
         <div class="columns">
           <div class="column is-4">
             <?php
@@ -75,6 +91,16 @@ $sortHeadings = [
           </div>
           <div class="column">
             <div class="content text-box">
+            <?php if($itemSet->value('schema:abstract')):?>
+              <div style="font-size:1rem;margin-bottom:1rem;">
+                <?php echo $itemSet->value('schema:abstract');?>                 
+              </div>      
+            <?php endif;?> 
+            <?php if($itemSet->value('schema:description')):?>
+              <div style="font-size:1rem;margin-bottom:1rem;">
+                <?php echo $itemSet->value('schema:description');?>                 
+              </div>      
+            <?php endif;?>   
               <div class="metadata">
                   <?php echo $itemSet->displayValues(); ?>
               </div>
@@ -130,7 +156,7 @@ $sortHeadings = [
             <div class="card equal-height">
               <a class="card-link-wrapper" href="<?php echo $item->url();?>">
                 <div class="card-bg card-bg-img-2"
-                  style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#666;background-size: cover;"
+                  style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color: #25356A;background-size: cover;"
                   >
                 </div>
                 <header class="card-header">
@@ -205,7 +231,7 @@ $sortHeadings = [
       <?php if ($itemSetShow): ?>
         <div class="has-text-right">
           <a href="<?php echo $site->url().'/objecten?q=&facet[item_set_id][0]='.$itemSet->id();?>" class="button is-white is-outlined">
-            <span><?php echo "Bekijk alle objecten uit deze collectie";?></span>
+            <span><?php echo "Ontdek meer";?></span>
             <span class="icon is-small">
               <i class="fas fa-angle-right"></i>
             </span>

@@ -19,6 +19,8 @@ endif;
         <li><a href="<?php echo $site->url();?>">Home</a></li>
         <?php if($type == 'Nieuwsbericht'):?>
         <li><a href="<?php echo $site->url()."/item/browse?resource_template_id=27";?>">Nieuws</a></li>
+        <?php elseif($type == 'Actor (organisatie)'):?>
+        <li><a href="<?php echo $site->url()."/page/project";?>">Partner</a></li>
         <?php else:?>              
             <li><a href="<?php echo $site->url();?>/objecten?facet[resource_template_id][]=<?php echo $type;?>"><?php echo $type;?></a></li>  
         <?php endif;?>
@@ -29,7 +31,20 @@ endif;
 </section>
 <section class="section">
   <div class="container">
-    <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle(); ?></h1>
+    <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle(); ?>
+    <?php 
+    if($item->value('schema:dateCreated')):?>
+      <?php echo ", ".$item->value('schema:dateCreated').' - ';                 
+      if($item->value('schema:dissolutionDate')):
+        echo $item->value('schema:dissolutionDate');             
+      endif;?>
+    <?php endif;?>
+    </h1>
+    <?php if($item->value('schema:alternateName')): ?>
+      <div class="subtitle is-3 is-family-secondary">
+        <?php echo $item->value('schema:alternateName');?>
+      </div>
+    <?php endif;?>  
     <?php if($type == 'Nieuws'):?>
       <!--<h2 class="subtitle is-6"><?php echo date('d-m-Y',strtotime($item->value('dcterms:date'))); ?></h2>-->
     <?php endif;?>
@@ -41,36 +56,32 @@ endif;
   <section class="section">
     <div class="container">
       <div class="columns">
-        <?php if (!$embedMedia && $itemMedia): ?>
-          <div class="column is-4">
-            <?php if(sizeof($itemMedia) > 1):?>
-              <div class="slider-for">
-                <?php foreach($itemMedia as $media):?>
-                  <div class="has-text-centered">
-                    <?php $url = str_replace('http:', '', $media->thumbnailUrl('large'));?>
-                      <img src="<?php echo $url;?>">
-                    <?php if($media->value('dcterms:title')):?>
-                      <figcaption>
-                        <?php echo $media->value('dcterms:title');?>
-                      </figcaption>
-                    <?php endif;?>
-                  </div>
-                <?php endforeach;?>
-              </div>
-            <?php else: ?>
-              <div class="beeld">
-                <?php $url = str_replace('http:', '', $itemMedia[0]->thumbnailUrl('large'));?>
-                <img src="<?php echo $url;?>">
-                <?php if($itemMedia[0]->value('dcterms:title')):?>
-                  <figcaption>
-                    <?php echo $itemMedia[0]->value('dcterms:title');?>
-                </figcaption>
-                <?php endif;?>
-              </div>
-            <?php endif;?>
-          </div>
-         <?php endif; ?>
-         <div class="column is-7">
+        <div class="column">
+          <?php
+            $itemMedia = $resource->media();
+            $sortedMedia = $this->SortMedia($itemMedia);
+            $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
+            $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
+            ?>
+            <?php if (isset($lightMedia)): ?>
+                <?php echo $this->LightGalleryOutput($lightMedia); ?>
+            <?php endif; ?>
+            <?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
+              <div class="column is-4"> 
+                <div id="other-media" class="property">
+                    <h4><?php echo $this->translate('Other Media'); ?></h4>
+                    <div class="values">
+                        <?php foreach($otherMedia as $media): ?>
+                        <div class="value">
+                            <?php echo $media->linkPretty(); ?>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+              </div>  
+          <?php endif; ?>
+        </div>
+        <div class="column is-7">
            <div class="text-box content">
            <?php $date =  $item->value('schema:datePublished');?>
            <?php if($date):?>
@@ -98,39 +109,43 @@ endif;
   <section class="section">
     <div class="container" style="margin-bottom:1.5rem;">
       <div class="columns">
-        <?php if (!$embedMedia && $itemMedia): ?>
-          <div class="column is-4">
-            <div class="slide-wrap">
-               <div class="slider-for">
-                  <?php foreach($itemMedia as $media):?>
-                    <div class="has-text-centered">
-                      <?php $url = str_replace('http:', '', $media->thumbnailUrl('medium'));?>
-                      <?php $link = $url;?>
-                      <a target="_blank" href="<?php echo $link;?>"><img src="<?php echo $url;?>"></a>
+      <?php
+        $itemMedia = $resource->media();
+        $sortedMedia = $this->SortMedia($itemMedia);
+        $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
+        $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
+        ?>
+
+        <div class="column is-4"> 
+        <?php if (isset($lightMedia)): ?>
+            <?php echo $this->LightGalleryOutput($lightMedia); ?>
+        <?php endif; ?>
+        <?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
+         
+            <div id="other-media" class="property">
+                <h4><?php echo $this->translate('Other Media'); ?></h4>
+                <div class="values">
+                    <?php foreach($otherMedia as $media): ?>
+                    <div class="value">
+                        <?php echo $media->linkPretty(); ?>
                     </div>
-                  <?php endforeach;?>               
-               </div>
-                  <?php if(sizeof($itemMedia) > 1):?>
-                  <div class="slider-nav" role="toolbar">
-                      <?php foreach($itemMedia as $media):?>
-                        <div class="beeld-nav">
-                          <?php $url = str_replace('http:', '', $media->thumbnailUrl('square')); ?>
-                          <img src="<?php echo $url;?>">
-                        </div>
-                      <?php endforeach;?>
-                  </div>               
-                  <?php endif;?>              
+                    <?php endforeach; ?>
+                </div>
             </div>
-          
-            <?php if($item->value('dcterms:isVersionOf') && $type == "Object KP"):?>
-                  <figcaption>
-                    <?php echo $item->value('dcterms:isVersionOf');?>
-                  </figcaption>
-            <?php endif;?>    
-         </div>
-       <?php endif;?>
+        <?php endif; ?>
+        
+        </div>  
+       
        <div class="column">
          <div class="text-box" style="height:100%;margin-bottom:0;">
+              
+            <?php if($item->value('schema:abstract')):?>
+              <div style="font-size:1rem;margin-bottom:1rem;">
+                <?php echo $item->value('schema:abstract');?>  
+                <hr>
+              </div>      
+            <?php endif;?>  
+
            <?php echo $item->displayValues(); ?>
            <?php $itemSets = $item->itemSets(); ?>
            <?php if (count($itemSets) > 0): ?>
@@ -145,24 +160,7 @@ endif;
                </div>
              </div>
            <?php endif; ?>
-           <?php if ($viewerlink): ?>
-            <br>
-            <a target="_blank" title="persistente uri" class="button is-primary" href="<?php echo $viewerlink;?>">
-              <span class="icon">
-                <i class="fas fa-images"></i>
-              </span>
-              <span>Bekijk het object in de viewer</span>
-            </a>
-           <?php endif; ?>
-           <hr>
-           <div style="text-align:right;">
-              <a target="_blank" class="button is-text is-small" href="<?php echo $site->url().'/'.$item->value('dcterms:identifier');?>">
-              <span class="icon">
-                  <i class="fas fa-link"></i>
-              </span>
-              <span><?php echo $site->url().'/'.$item->value('dcterms:identifier');?></span>
-              </a>
-           </div> 
+          
          </div>
        </div>
      </div>

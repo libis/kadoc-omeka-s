@@ -306,11 +306,11 @@ figcaption{
 }
 
 .zorg-hero{
-  color:white;
+  //color:white;
 
   .content{
     padding:1rem;
-    background: rgba($primary,1);
+    background: white;
   }
 
   .hero-overlay{
@@ -321,6 +321,24 @@ figcaption{
     padding:2rem;
   }
 }
+
+//map
+.marker-cluster {
+  color: $primary !important;
+}
+
+.marker-cluster-small,.marker-cluster-medium {
+  background-color: rgba($primary, 0.6) !important;
+
+  div {
+    background-color: rgba($primary, 0.6) !important;  
+
+    span{
+      color: white !important;
+    }
+  }
+}
+
 
 //card
 .card{
@@ -392,6 +410,11 @@ figcaption{
   }
 }
 
+//browse-block
+h2.title{
+  color: white;
+}
+
 .text-box{
   padding: 1.5rem;
   background: white;
@@ -401,12 +424,14 @@ figcaption{
   h4{
     line-height: 1.5 !important;
   }
+
+  //browse-block
+  h2.title{
+    color: #333;
+  }
 }
 
-//browse-block
-h2.title{
-  color: white;
-}
+
 
 .browse-text{
   padding: 2rem 2rem 1rem 2rem;
@@ -501,6 +526,10 @@ h2.title{
   margin-bottom: 2rem;
 }
 
+.resource-metadata .creator a{
+  border-bottom:2px solid rgba($primary,1);
+}
+
 //text-image block
 .text-image-block{
 
@@ -548,9 +577,14 @@ h2.title{
 
 .metadata{
   font-size: 0.9rem;
+  padding-top: 1rem;
 
   .column{
-    padding: 0.5rem 0.75rem;
+    padding: 0.3rem 0.75rem;
+
+    h4{
+      margin-bottom: 0 !important;
+    }
   }
 
   .title{
@@ -729,6 +763,12 @@ h2.title{
         font-size: 0.9rem;
         font-family: $family-secondary;
       }
+
+      .showSearch{
+        .icon{
+          padding-left: 0.5rem;
+        }
+      }
     }
 
     .logo{
@@ -781,6 +821,11 @@ h2.title{
     h1.title{
       color:white;
     }
+
+    h2.subtitle{
+      color:white;
+      font-weight: 500;
+    }
 }
 .items-section{
   h2{
@@ -807,6 +852,11 @@ h2.title{
     padding: 2rem;
     background: white;
   }
+}
+
+figcaption{
+  font-weight: bold;
+  color:#fff;
 }
 
 //page

@@ -215,11 +215,15 @@ endif;
 
       <div class="column is-three-quarter">
           <?php if ($response->getTotalResults()): ?>
-              <?= $partial('search/results-header', [
-                  'query' => $query,
-                  'response' => $response,
-                  'sortOptions' => $sortOptions,
-              ]) ?>
+             
+            <?= $partial('search/results-header', [
+                'searchPage' => $searchPage,
+                'query' => $query,
+                'response' => $response,
+                'itemSet' => $itemSet,
+                'documentCount' => $documentCount,
+                'pagination' => $pagination,
+            ]) ?>
               <?php $itemSetsCount = $response->getResourceTotalResults('item_sets'); ?>
             <?= $partial('search/resource-list', [
                 'site' => $site,

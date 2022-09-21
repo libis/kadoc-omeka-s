@@ -17,23 +17,27 @@ $notalt = array('Collectie ID','Referenties object','Beeld','Beeld copyright');
     else:
       continue;
     endif;
+    $comment = '';
+    $comment = $property->alternateComment();
   ?>  
   <?php if(!in_array($propertyData['property']->label(),$not) && !in_array($propertyData['alternate_label'],$notalt)):?>
   <div class="columns ">
-    <div class="column is-3" style="padding-top:0.3rem;padding-bottom:0.3rem;">
-      <h4 class="title is-6" style="font-size:0.9rem;">
-      <?php if ($propertyData['alternate_label']): ?>
-      <?php echo $escape($propertyData['alternate_label']); ?>
-      <?php else: ?>
-      <?php echo $escape($translate($propertyData['property']->label())); ?>
-      <?php endif; ?>
-      <?php if ('term' === $labelInfo): ?>
-      <span class="field-term">(<?php echo $escape($propertyData['property']->term()); ?>)</span>
-      <?php elseif ('vocab' === $labelInfo): ?>
-      <span class="field-term">(<?php echo $escape($propertyData['property']->vocabulary()->label()); ?>)</span>
-      <?php endif; ?>
-      </h4>
-    </div>
+    <?php if($comment != 'no label'):?>
+      <div class="column is-3" style="padding-top:0.3rem;padding-bottom:0.3rem;">        
+          <h4 class="title is-6" style="font-size:0.9rem;">
+          <?php if ($propertyData['alternate_label']): ?>
+          <?php echo $escape($propertyData['alternate_label']); ?>
+          <?php else: ?>
+          <?php echo $escape($translate($propertyData['property']->label())); ?>
+          <?php endif; ?>
+          <?php if ('term' === $labelInfo): ?>
+          <span class="field-term">(<?php echo $escape($propertyData['property']->term()); ?>)</span>
+          <?php elseif ('vocab' === $labelInfo): ?>
+          <span class="field-term">(<?php echo $escape($propertyData['property']->vocabulary()->label()); ?>)</span>
+          <?php endif; ?>
+          </h4>        
+      </div>
+    <?php endif;?>
     <div class="column is-7" style="padding-top:0.3rem;padding-bottom:0.3rem;">
       <div class="values" style="font-size:0.9rem;">
       <?php $i=0;?>
@@ -52,192 +56,14 @@ $notalt = array('Collectie ID','Referenties object','Beeld','Beeld copyright');
           }
           ?>
 
-            <div class="<?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
+            <div class="<?php echo $propertyData['property']->term(); ?> <?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
                 <?php if ($language = $value->lang()): ?>
-                <span class="language"><?php echo $language; ?></span>
+                <!--<span class="language"><?php echo $language; ?></span>-->
                 <?php endif; ?>
 
-                <?php if($propertyData['alternate_label'] == 'Thema'):?>
-                  <a target="_blank" href="/nl/item-set?fulltext_search=&property[0][joiner]=and&property[0][property]=8&property[0][type]=eq&property[0][text]=<?php echo $value->asHtml(); ?>&resource_class_id[]=&resource_template_id[]=&submit=Zoeken"><?php echo $value->asHtml(); ?></a>
-                <?php elseif($propertyData['alternate_label'] == 'Referenties'):?>
-                  <?php $ref_e = explode("$$",$value->__toString());?>
-                  <?php if(isset($ref_e[1])):?>
-                      <a target="_blank" href="<?php echo $ref_e[1]; ?>"><?php echo $ref_e[0]; ?></a>
-                  <?php else:?>
-                      <?php echo $ref_e[0]; ?>
-                  <?php endif;?>
-                <?php elseif($propertyData['alternate_label'] == 'Datering'):?>
-                  <?php 
-                    $datum = explode(' / ',$value->asHtml());
-                    if(isset($datum[1])):
-                      if($datum[1] != $datum[0]):
-                        echo $datum[0].' - '.$datum[1];
-                      else:
-                        echo $datum[0];   
-                      endif;
-                    else:
-                      echo $datum[0];    
-                    endif;  
-                  ?>
-                <?php elseif($propertyData['alternate_label'] == 'Afmetingen'):?>
-                  <?php 
-                    $text = str_replace("()","",$value->asHtml());
-                    $text = str_replace("("," (",$text);
-                    $texts = explode(';',$text);
-                    if(sizeof($texts) > 1):
-                      echo '<i> - '.strtolower(str_replace("Note: ","",$texts[0])).'</i><br style="margin-bottom:0.5rem;">';
-                      if (strpos($texts[1], ': 0') === false):
-                        echo strtolower($texts[1]);   
-                      endif;  
-                    else:
-                      if (strpos($text, 'Note') !== false):
-                        echo '<i> - '.strtolower(str_replace("Note: ","",$text)).'</i>';   
-                      elseif (strpos($text, ': 0') === false):
-                        echo strtolower($text);   
-                      endif;                        
-                    endif;              
-                  ?>  
-                <?php elseif($propertyData['alternate_label'] == 'Materiaal'):?>
-                  <?php if(strpos($value->asHtml(), '$$') !== false):?>
-                    <?php $text = explode('$$',$value->asHtml());?>
-                    <a href="<?php echo '/s/nl/objecten?q=&facet[dcterms_medium_ss][0]='.$text[0]; ?>"><?php echo $text[0]; ?></a>
-                    <a target="_blank" href="<?php echo $text[1].$text[2]; ?>"><i class="fas fa-info-circle"></i></a>
-                  <?php else:?>
-                    <a href="<?php echo '/s/nl/objecten?q=&facet[dcterms_medium_ss][0]='.$value->asHtml(); ?>"><?php echo $value->asHtml(); ?></a>
-                  <?php endif;?> 
-                <?php elseif($propertyData['alternate_label'] == 'Plaats vervaardiging'):?>
-                  <?php if(strpos($value->asHtml(), '$$') !== false):?>
-                    <?php $text = explode('$$',$value->asHtml());?>
-                   <?php echo $text[0]; ?>
-                    <a target="_blank" href="<?php echo 'https://www.geonames.org/'.$text[2]; ?>"><i class="fas fa-info-circle"></i></a>
-                  <?php else:?>
-                    <?php echo $value->asHtml(); ?>
-                  <?php endif;?>   
-                <?php elseif($propertyData['alternate_label'] == 'Licentie'):?>
-                  <?php if(strpos($value->asHtml(), 'Limitatief gebruik') !== false):?>
-                    Zie gebruiksvoorwaarden: <a target="_blank" href="<?php echo "/nl/page/gebruiksvoorwaarden#limitatief"; ?>">Limitatief gebruik</a>
-                  <?php else:?>
-                    <?php echo $value->asHtml(); ?>
-                  <?php endif;?>
-                <?php elseif($propertyData['alternate_label'] == 'Periode'):?>
-                  <?php if(strpos($value->asHtml(), '$$') !== false):?>
-                    <?php $text = explode('$$',$value->asHtml());?>
-                   <?php echo $text[0]; ?>
-                    <a target="_blank" href="<?php echo $text[1].$text[2]; ?>"><i class="fas fa-info-circle"></i></a>
-                  <?php else:?>
-                    <?php echo $value->asHtml(); ?>
-                  <?php endif;?>
-                <?php elseif($propertyData['alternate_label'] == 'Onderwerp: wie'):?>
-                  <?php if(strpos($value->asHtml(), '$$') !== false):?>
-                    <?php $text = explode('$$',$value->asHtml());?>
-                   <?php echo $text[0]; ?>
-                    <a target="_blank" href="<?php echo $text[1].$text[2]; ?>"><i class="fas fa-info-circle"></i></a>
-                  <?php else:?>
-                    <?php echo $value->asHtml(); ?>
-                  <?php endif;?>   
-                  <?php elseif($propertyData['alternate_label'] == 'Opschrift'):?>        
-                    <?php if(strpos($value->asHtml(), 'rtf1') !== false):?>       
-                      <?php $text = preg_replace('"{\*?\\\\.+(;})|\\s?\\\[A-Za-z0-9]+|\\s?{\\s?\\\[A-Za-z0-9‹]+\\s?|\\s?}\\s?"', '', $value->asHtml());?>                   
-                      <?php $text = strip_tags($text);?>
-                      <?php 
-                      $plain = $value->asHtml();
-                      // we have to remove all line breaks, otherwise
-                      // the RTF>TXT regexp below doesn't work correctly.
-                      $plain = preg_replace( '/\r|\n/', '', $plain);
-
-                      // RTF>TXT (https://stackoverflow.com/a/42525858/357546)
-                      $plain = preg_replace('"{\*?\\\\.+(;})|\\s?\\\[A-Za-z0-9]+|\\s?{\\s?\\\[A-Za-z0-9‹]+\\s?|\\s?}\\s?"', '', $plain);
-                      // special characters; for a full list, see:
-                      // https://www.oreilly.com/library/view/rtf-pocket-guide/9781449302047/ch04.html
-
-                     
-                      $plain = urldecode($plain);
-
-                      $plain = str_replace("&#039;","",$plain);
-                   
-                      $plain = str_replace("\\3f", '?', $plain);
-                      $plain = str_replace("\\80", '€', $plain);
-                      $plain = str_replace("\\a8", '¨', $plain);
-                      $plain = str_replace("\\ab", '«', $plain);
-                      $plain = str_replace("\\ae", '®', $plain);
-                      $plain = str_replace("\\b0", '°', $plain);
-                      $plain = str_replace("\\bb", '»', $plain);
-                      $plain = str_replace("\\c4", 'Ä', $plain);
-                      $plain = str_replace("\\c9", 'É', $plain);
-                      $plain = str_replace("\\d6", 'Ö', $plain);
-                      $plain = str_replace("\\dc", 'Ü', $plain);
-                      $plain = str_replace("\\df", 'ß', $plain);
-                      $plain = str_replace("\\e0", 'à', $plain);
-                      $plain = str_replace("\\e2", 'â', $plain);
-                      $plain = str_replace("\\e4", 'ä', $plain);
-                      $plain = str_replace("\\e7", 'ç', $plain);
-                      $plain = str_replace("\\e8", 'è', $plain);
-                      $plain = str_replace("\\e9", 'é', $plain);
-                      $plain = str_replace("\\ea", 'ê', $plain);
-                      $plain = str_replace("\\eb", 'ë', $plain);
-                      $plain = str_replace("\\ee", 'î', $plain);
-                      $plain = str_replace("\\f4", 'ô', $plain);
-                      $plain = str_replace("\\f6", 'ö', $plain);
-                      $plain = str_replace("\\f8", 'ø', $plain);
-                      $plain = str_replace("\\fb", 'û', $plain);
-                      $plain = str_replace("\\fc", 'ü', $plain);
-                      $plain = str_replace("\\b0", '°', $plain);
-             
-                      $plain = preg_replace('/^-0 /', '', $plain);
-
-                      echo $plain;  
-                      ?>
-                      <?php //echo $text;?>
-                    <?php else:?>
-                    <?php echo  $value->asHtml(); ?>
-                    <?php endif;?>           
-                <?php elseif($propertyData['alternate_label'] == 'Onderwerp: wat'):?>
-                  <?php if(strpos($value->asHtml(), '$$') !== false):?>
-                    <?php $text = explode('$$',$value->asHtml());?>
-                   <?php echo $text[0]; ?>
-                    <a target="_blank" href="<?php echo $text[1].$text[2]; ?>"><i class="fas fa-info-circle"></i></a>
-                  <?php else:?>
-                    <?php echo $value->asHtml(); ?>
-                  <?php endif;?>           
-                <?php elseif($propertyData['alternate_label'] == 'Objectnaam'):?>   
-                  
-                  <a href="<?php echo '/s/nl/objecten?q=&facet[dcterms_alternative_ss][0]='.$value->asHtml(); ?>"><?php echo $value->asHtml(); ?></a>
-                <?php elseif($propertyData['alternate_label'] == 'Gerelateerde objecten'):?>
-                  <?php 
-                  $objecten = $value->asHtml();
-                  $objecten = explode(";",$objecten);
-                  $rel_arr = [];
-                  foreach($objecten as $object):               
-               
-                    $query = 'property[0][joiner]=and&property[0][property]=10&property[0][type]=eq&property[0][text]='.$object.'&item_set_id[]=&site_id=';
-                    parse_str($query,$query);
-
-                    $rel = $items = $this->api()->searchOne('items',$query);
-                    $rel = $rel->getContent();
-                    if($rel):
-                      $rel_arr[$rel->displayTitle().rand()] = '<div><a href="'.$rel->url().'">'.$rel->displayTitle().'</a></div>';
-                    endif;
-                  endforeach;
-                  ksort($rel_arr);
-                  foreach($rel_arr as $key=>$value):
-                    echo $value;
-                  endforeach;  
-                  ?>  
-                <?php elseif($propertyData['alternate_label'] == 'Vervaardiger'):?>
-                  <?php if(strpos($value->asHtml(), '$$') !== false):?>
-                    <?php $text = explode('$$',$value->asHtml());?>
-                    <?php 
-                      $medval = $values['dcterms:creator']['values'][$i]->asHtml();
-                    ?>
-                    <a href="<?php echo '/s/nl/objecten?q=&facet[dcterms_creator_ss][0]='.$medval; ?>"><?php echo $text[0]; ?></a>
-                      <?php if(sizeof($text) == 3):?>
-                        <a target="_blank" href="<?php echo $text[1].$text[2]; ?>"><i class="fas fa-info-circle"></i></a>
-                      <?php elseif(sizeof($text) == 2  && $text[1]):?>
-                        <a target="_blank" href="<?php echo $text[1]; ?>"><i class="fas fa-info-circle"></i></a>
-                      <?php endif;?>  
-                  <?php else:?>
-                    <?php echo $value->asHtml(); ?>
-                  <?php endif;?>                  
+                <?php if($propertyData['alternate_label'] == 'Trefwoorden'):?>
+                  <a target="_blank" href="https://slimerfgoed.be/s/zorgerfgoed/collecties?facet%5Bschema%3Agenre%5D%5B%5D=collectie&facet%5Bschema%3Akeywords%5D%5B%5D=<?php echo $value->asHtml(); ?>"><?php echo $value->asHtml(); ?></a>
+                                
                 <?php elseif (strpos($value->asHtml(), 'http') !== false && strpos($value->asHtml(), 'uri-value-link') === false):?>
                   <a target="_blank" href="<?php echo $value->asHtml(); ?>"><?php echo $value->asHtml(); ?></a>
                 <?php else:?>

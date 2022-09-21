@@ -15,22 +15,8 @@ $translate = $this->plugin('translate');
   </div>
   <div class="level-right">
     <div class="level-item">
-        <form class="search-results-sort">
-            <?php
-            if ($sortOptions):
-                $sortOptions = array_map([$this, 'translate'], $sortOptions);
-                $sortSelect = new Zend\Form\Element\Select('sort');
-                $sortSelect
-                    ->setValueOptions($sortOptions)
-                    ->setValue($query->getSort())
-                    ->setLabel($translate('Sort by'));
-            endif;
-            ?>
-            <?php if (!empty($sortSelect)): ?>
-            <?= $this->formLabel($sortSelect) ?>
-            <?= $this->formSelect($sortSelect) ?>
-            <?php endif; ?>
-        </form>
+    <?= $this->searchSortSelector($query, $searchPage->subSetting('sort', 'fields')) ?>
+    
     </div>
     <!--<div class="level-item">
         <a class="button search-view-type search-view-type-list" href="#">

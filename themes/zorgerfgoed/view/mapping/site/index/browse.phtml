@@ -12,7 +12,7 @@ $query['mapping_basemap_provider'] = $query['mapping_basemap_provider'] ?? '';
 ?>
 
 <div id="mapping-map" style="height:100vh;margin:0 auto;">
-    <a class="kaart-button button is-primary" href="/s/zorgerfgoed/objecten?facet[resource_template_id][]=Historische organisatie">
+    <a class="kaart-button button is-primary" href="/s/zorgerfgoed/objecten?facet[resource_template_id][]=Organisatie">
         <span>Bekijk een lijst van alle organisaties</span>
         <span class="icon is-small">
         <i class="fas fa-angle-right" aria-hidden="true"></i>
@@ -33,12 +33,19 @@ $query['mapping_basemap_provider'] = $query['mapping_basemap_provider'] ?? '';
     data-marker-lat="<?php echo $this->escapeHtml($marker->lat()); ?>"
     data-marker-lng="<?php echo $this->escapeHtml($marker->lng()); ?>"
 >
+    <?php 
+        $media = $marker->item()->primaryMedia();
+    ?>
     <?php if ($marker->label()): ?>
     <!--<h3><?php echo $this->escapeHtml($marker->label()); ?></h3>-->
     <?php endif; ?>
-    <?php if ($marker->media()): ?>
-    <img src="<?php echo $this->escapeHtml($marker->media()->thumbnailUrl('medium')); ?>">
-    <?php endif; ?>
+    <?php if ($media):?>
+        <?php if($media->getControllerName() == "media"):?>
+            <img src="<?php echo $media->thumbnailUrl('medium');?>">
+        <?php elseif($media->getControllerName() == "asset"):?>
+            <img src="<?php echo $media->assetUrl();?>">
+        <?php endif;?>    
+    <?php endif;?>
     <h4 class="title is-6">
         <?php echo $marker->item()->link($marker->item()->displayTitle(), null, ['target' => '_blank']); ?>
     </h4>

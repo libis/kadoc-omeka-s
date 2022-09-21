@@ -16,6 +16,7 @@ foreach ($this->resources as $resource):
     $body = $bodyTerm ? $resource->value($bodyTerm) : $resource->displayDescription();
 ?>
     <li class="<?php echo $this->resourceType; ?> resource">
+       
         <?php echo $resource->linkRaw($this->thumbnail($resource, 'medium', ['title' => $heading])); ?>
         <h4><?php echo $resource->link($heading); ?></h4>
         <?php if ($body): ?>

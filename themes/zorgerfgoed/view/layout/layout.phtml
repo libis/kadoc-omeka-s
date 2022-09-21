@@ -22,7 +22,7 @@ $userBar = $this->userBar();
 
 $url = $this->serverUrl(true);
 //echo 'url:'.$url;
-if (strpos($url, 'page/home') !== false || $url == "http://www.blendeff.be/" || $url == "http://blendeff.be/") {
+if (strpos($url, 'page/home') !== false) {
     $home = true;
 }else{
   $home = false;
@@ -104,13 +104,13 @@ if (strpos($url, 'page/home') !== false || $url == "http://www.blendeff.be/" || 
                 'maxDepth' => $this->themeSetting('nav_depth') - 1
             ]);
           ?>
-          <div class="navbar-item">
-              <button class="button is-primary is-small is-outlined showSearch">
+          <li class="search-button" style="text-align:left;">
+              <a class="showSearch">
                 <span>Zoeken</span><span class="icon is-small">
                   <i class="fas fa-search "></i>
                 </span>
-              </button>
-          </div>
+              </a>
+          </li>
         </div>
         <div class="column">
           <div class="main-area"><?php echo $this->content; ?></div>    
@@ -189,6 +189,8 @@ if (strpos($url, 'page/home') !== false || $url == "http://www.blendeff.be/" || 
     $(".burger-menu-close").click(function() {
        $(".burger-menu").removeClass("is-active");
     });
+
+    $(".search-button").appendTo(".left-nav .navigation");
   });
   </script>
 

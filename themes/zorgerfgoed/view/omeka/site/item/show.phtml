@@ -16,13 +16,13 @@ endif;
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><a href="<?php echo $site->url();?>">Home</a></li>
+        <li><a href="/">Home</a></li>
         <?php if($type == 'Nieuwsbericht'):?>
-        <li><a href="<?php echo $site->url()."/item/browse?resource_template_id=27";?>">Nieuws</a></li>
+        <li><a href="<?php echo "/s/zorgerfgoed/item/browse?resource_template_id=27";?>">Nieuws</a></li>
         <?php elseif($type == 'Actor (organisatie)'):?>
-        <li><a href="<?php echo $site->url()."/page/project";?>">Partner</a></li>
+        <li><a href="<?php echo "/page/project";?>">Partner</a></li>
         <?php else:?>              
-            <li><a href="<?php echo $site->url();?>/objecten?facet[resource_template_id][]=<?php echo $type;?>"><?php echo $type;?></a></li>  
+            <li><a href="/s/zorgerfgoed/objecten?facet[resource_template_id][]=<?php echo $type;?>"><?php echo $type;?></a></li>  
         <?php endif;?>
         <li><?php echo $item->displayTitle(); ?></li>
       </ul>

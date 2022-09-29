@@ -1,17 +1,16 @@
 <?php
 $item = $marker->item();
 $media = $item->primaryMedia();
-        
+$mediaUrl = $item->thumbnailDisplayUrl('medium');
+if(!$mediaUrl):
+    $mediaUrl= "";
+endif;        
 ?>
 <?php if ($marker->label()): ?>
 <!--<h3><?php echo $this->escapeHtml($marker->label()); ?></h3>-->
 <?php endif; ?>
-<?php if ($media):?>
-    <?php if($media->getControllerName() == "media"):?>
-        <img src="<?php echo $media->thumbnailUrl('medium');?>">
-    <?php elseif($media->getControllerName() == "asset"):?>
-        <img src="<?php echo $media->assetUrl();?>">
-    <?php endif;?>    
+<?php if ($mediaUrl):?>
+        <img src="<?php echo $mediaUrl;?>">
 <?php endif;?>
 <h4 class="title is-6">
     <?php echo $item->link($item->displayTitle(), null, ['target' => '_blank']); ?>

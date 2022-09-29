@@ -28,9 +28,9 @@ $links = array(
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><a href="<?php echo $site->url();?>">Home</a></li>
+        <li><a href="/">Home</a></li>
 
-        <li><a href="<?php echo $site->url().$links[$type][0];?>"><?php echo $type;?></a></li>
+        <li><a href="<?php echo "/s/start".$links[$type][0];?>"><?php echo $type;?></a></li>
         <li><?php echo $item->displayTitle(); ?></li>
       </ul>
     </nav>

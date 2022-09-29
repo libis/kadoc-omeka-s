@@ -50,20 +50,11 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') 
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):
         $resourceType = $resource->resourceName();
-        $media = $resource->primaryMedia();
-        $thumbnail = $media ? $thumbnailHelper($media, 'square') : $defaultThumbnail;
-        $mediaUrl= "/application/asset/thumbnails/default.png?v=3.2.0";
-        if($media):
-            $mediaUrl = $media->thumbnailUrl('medium');
-        endif;
-        if($resourceType == "item_sets"):
-            $thumbnail = $resource->thumbnail();            
-            if(!$thumbnail && $media):
-              $mediaUrl = $media->thumbnailUrl('medium');  
-            endif;    
+        $mediaUrl = $resource->thumbnailDisplayUrl('square');        
+        if(!$mediaUrl):
+            $mediaUrl= "/application/asset/thumbnails/default.png?v=3.2.0";
         endif;    
-
-        
+               
         $heading = $headingTerm ? $resource->value($headingTerm, $headingOptions) : $resource->displayTitle(null, $headingOptions);
         $body = $bodyTerm ? $resource->value($bodyTerm, $bodyOptions) : $resource->displayDescription(null, $bodyOptions);
         $template = $resource->resourceTemplate();

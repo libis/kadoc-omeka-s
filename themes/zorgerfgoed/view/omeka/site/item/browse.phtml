@@ -47,12 +47,12 @@ $sortHeadings = [
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><a href="<?php echo $site->url();?>">Home</a></li>
+        <li><a href="/">Home</a></li>
         <?php if ($itemSetShow):?>
           <?php if($type == "Expositie" || $type == "Erfgoed"):?>
-            <li><a href="<?php echo $site->url();?>/collecties">Erfgoedcollecties</a></li>
+            <li><a href="/s/zorgerfgoed/collecties">Erfgoedcollecties</a></li>
           <?php else:?>
-            <li><a href="<?php echo $site->url();?>/page/proeftuinen">Proeftuinen</a></li>
+            <li><a href="/page/proeftuinen">Proeftuinen</a></li>
           <?php endif;?>  
           <li><?php echo $itemSet->displayTitle(); ?></li>
         <?php elseif ($news):?>
@@ -230,7 +230,7 @@ $sortHeadings = [
 
       <?php if ($itemSetShow): ?>
         <div class="has-text-right">
-          <a href="<?php echo $site->url().'/objecten?q=&facet[item_set_id][0]='.$itemSet->id();?>" class="button is-white is-outlined">
+          <a href="<?php echo '/s/zorgerfgoed/objecten?q=&facet[item_set_id][0]='.$itemSet->id();?>" class="button is-white is-outlined">
             <span><?php echo "Ontdek meer";?></span>
             <span class="icon is-small">
               <i class="fas fa-angle-right"></i>

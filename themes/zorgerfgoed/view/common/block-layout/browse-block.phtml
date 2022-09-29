@@ -54,14 +54,11 @@ $sitename = $block->page()->site()->title();
           endif;
 
           if($resourceType == 'item-set'):
-            $media = $resource->primaryMedia();
+            //$media = $resource->primaryMedia();
+            $mediaurl = $resource->thumbnailDisplayUrl('square');
             
-            if($media):
-              if($media->getControllerName() == "media"):
-                $mediaurl = str_replace('http:', '', $media->thumbnailUrl('medium'));
-              elseif($media->getControllerName() == "asset"):
-                $mediaurl = str_replace('http:','',$media->assetUrl('medium'));
-              endif;                 
+            if(!$mediaurl):
+              $mediaurl= "";
             endif;
           else:
             $media = $resource->media();

@@ -89,12 +89,12 @@ endif;
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><a href="<?php echo $site->url();?>">Home</a></li>
+        <li><a href="/">Home</a></li>
         <?php if($searchPage->name() == 'Zoek op thema'):?>
-          <li><a href="<?php echo $site->url().'/page/schoolerfgoed';?>">Schoolerfgoed</a></li>
-          <li><a href="<?php echo $site->url().'/item-set';?>">Thema's</a></li>
+          <li><a href="<?php echo '/page/schoolerfgoed';?>">Schoolerfgoed</a></li>
+          <li><a href="<?php echo '/item-set';?>">Thema's</a></li>
         <?php else:?>
-          <li><a href="<?php echo $site->url().'/page/'.strtolower($searchPage->name());?>"><?php echo $searchPage->name();?></a></li>
+          <li><a href="<?php echo '/page/'.strtolower($searchPage->name());?>"><?php echo $searchPage->name();?></a></li>
         <?php endif;?>
         <li><?php echo 'Zoek '.strtolower($subtype); ?></li>
       </ul>

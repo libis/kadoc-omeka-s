@@ -431,7 +431,12 @@ h2.title{
   }
 }
 
-
+.caption {
+  color: white;
+  font-size:0.9rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid $accent;
+}
 
 .browse-text{
   padding: 2rem 2rem 1rem 2rem;

@@ -450,8 +450,8 @@ class MainSearchForm extends Form
     protected function searchResourceType(array $filter): ?ElementInterface
     {
         $element = $filter['type'] === 'MultiCheckbox'
-            ? AdvancedSearchElement\OptionalMultiCheckbox('resource_type')
-            : AdvancedSearchElement\OptionalSelect('resource_type');
+            ? new AdvancedSearchElement\OptionalMultiCheckbox('resource_type')
+            : new AdvancedSearchElement\OptionalSelect('resource_type');
         $element
             ->setAttributes([
                 'id' => 'search-resource-type',

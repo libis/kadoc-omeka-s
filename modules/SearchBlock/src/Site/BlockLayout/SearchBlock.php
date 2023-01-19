@@ -62,6 +62,11 @@ class SearchBlock extends AbstractBlockLayout
       ];
 
       $data = $block ? $block->data() + $defaults : $defaults;
+      if($block):
+        $type = $block->dataValue('type');
+      else:
+        $type = 'beeldbank';
+      endif;  
       $form = new Form();
 
       $form->add([
@@ -77,7 +82,7 @@ class SearchBlock extends AbstractBlockLayout
               ],
           ],
           'attributes' => [
-            'value' => $block->dataValue('type'),
+            'value' => $type,
           ]
       ]);
 

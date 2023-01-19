@@ -78,12 +78,14 @@ $sitename = $block->page()->site()->title();
         ?>
 
       <?php if($this->heading == "Partners"):?>
-        <div class="column is-2">
+        <div class="column is-2 img-col">
+          <div class="img-box">
             <a class="card-link-wrapper" href="<?php echo $url;?>">
               <div style="padding:0.5rem;background:#fff;">
                 <img src="<?php echo  $mediaurl;?>">
               </div>
             </a>
+          </div>
         </div>
         <div class="column is-6">      
           <div class="text-box">
@@ -123,7 +125,7 @@ $sitename = $block->page()->site()->title();
               </header>
               <div class="card-content">
                 <div class="content">
-                  <?php if($resource->value('schema:datePublished')):?>
+                  <?php if($resource->value('schema:datePublished') && $resourceType != 'item-set'):?>
                       <?php 
                         $date = $resource->value('schema:datePublished');
                         $date = date('d-m-Y',strtotime($date));

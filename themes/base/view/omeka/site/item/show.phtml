@@ -146,7 +146,7 @@ $links = array(
                 <?php echo $item->value('locatie:locatiepostcode');?> <?php echo $item->value('locatie:locatiegemeente');?><br />
                 <br />
                 <?php endif;?>
-                <?php $contacts = '';?>
+                <?php $contacts = array();?>
                 <?if($item->value('school:contact')):?>
                   <?php $contacts = $item->value('school:contact', ['all' => true]);?>
                 <?php endif;?>

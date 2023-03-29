@@ -59,7 +59,7 @@ class LightGalleryOutput extends AbstractHelper
                 $videoSrcJson = json_encode($videoSrcObject);
                 $html .=  '<li data-video="' . $escape($videoSrcJson) . '" ' . $mediaCaptionAttribute . 'data-thumb="' . $escape($media->thumbnailUrl('medium')) . '" data-download-url="' . $source . '" class="media resource">';
             } else if ($mediaType == 'application/pdf') {
-                $html .=  '<li data-sub-html="'. $escape('<a href="'. $source .'"><span class="icon-text"><span class="icon"><i class="fas fa-file-pdf"></i></span><span>Download PDF</span></span></a>').'" data-src="' . $escape($media->thumbnailUrl('large')) . '" '. $mediaCaptionAttribute . 'data-src="' . $escape($media->thumbnailUrl('large')) . '" data-thumb="' . $escape($media->thumbnailUrl('medium')) . '" data-download-url="' . $source . '" class="media resource">';
+                $html .=  '<li data-sub-html="'. $escape('<a class="button is-small is-primary" href="'. $source .'"><span class="icon-text"><span class="icon"><i class="fas fa-file-pdf"></i></span><span>Download PDF</span></span></a>').'" data-src="' . $escape($media->thumbnailUrl('large')) . '" '. $mediaCaptionAttribute . 'data-src="' . $escape($media->thumbnailUrl('large')) . '" data-thumb="' . $escape($media->thumbnailUrl('medium')) . '" data-download-url="' . $source . '" class="media resource">';
             } else {
                 $html .=  '<li data-src="' . $source . '" ' . $mediaCaptionAttribute . 'data-thumb="' . $escape($media->thumbnailUrl('medium')) . '" data-download-url="' . $source . '" class="media resource">';
             }

@@ -143,7 +143,12 @@ endif;
               <div style="font-size:1rem;margin-bottom:1rem;">
                 <?php echo $item->value('schema:abstract');?>  
                 <hr>
-              </div>      
+              </div>   
+            <?php elseif($item->value('schema:description')):?>  
+              <div style="font-size:1rem;margin-bottom:1rem;">
+                <?php echo $item->value('schema:description');?>  
+                <hr>
+              </div>  
             <?php endif;?>  
 
            <?php echo $item->displayValues(); ?>

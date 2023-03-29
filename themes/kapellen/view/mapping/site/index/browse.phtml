@@ -1,0 +1,84 @@
+<?php
+$this->headLink()->appendStylesheet($this->assetUrl('vendor/leaflet/leaflet.css', 'Mapping'));
+$this->headScript()->appendFile($this->assetUrl('vendor/leaflet/leaflet.js', 'Mapping'));
+$this->headLink()->appendStylesheet($this->assetUrl('vendor/leaflet.markercluster/MarkerCluster.css', 'Mapping'));
+$this->headLink()->appendStylesheet($this->assetUrl('vendor/leaflet.markercluster/MarkerCluster.Default.css', 'Mapping'));
+$this->headScript()->appendFile($this->assetUrl('vendor/leaflet.markercluster/leaflet.markercluster-src.js', 'Mapping'));
+$this->headScript()->appendFile($this->assetUrl('vendor/leaflet.providers/leaflet-providers.js', 'Mapping'));
+$this->headScript()->appendFile($this->assetUrl('js/control.fit-bounds.js', 'Mapping'));
+$this->headScript()->appendFile($this->assetUrl('js/mapping-browse.js', 'Mapping'));
+$this->headScript()->appendFile($this->assetUrl('js/advanced-search.js', 'Omeka'));
+$query['mapping_basemap_provider'] = $query['mapping_basemap_provider'] ?? '';
+?>
+
+<section class="map-browse-section">
+    <div class="columns">
+        <div class="column is-3">
+            
+            <div class="mapping-search-box">
+                  
+                    <form id="advanced-search" method="get" action="<?php echo $this->escapeHtml($this->url(null, ['action' => 'browse'], true)); ?>">
+                    <?php echo $this->partial(
+                        'common/advanced-search',
+                        ['query' => $this->params()->fromQuery(), 'resourceType' => 'item']
+                    ); ?>
+                    <div id="page-actions">
+                        <input type="submit" name="submit" value="Zoeken">
+                    </div>
+                    </form>
+                    <hr>
+                    <a class="kaart-button" href="/s/kapellen/zoek-kapellen?resource_template_id=Kapel">
+                        <span class="icon-text">
+                            <span>Bekijk een lijst van alle kapellen</span>
+                            <span class="icon is-small">
+                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                            </span>
+                        </span>
+                    </a>
+                    <a class="kaart-button" href="/s/kapellen/contribution/add">
+                        <span class="icon-text">
+                            <span>Voeg een kapel toe</span>
+                            <span class="icon is-small">
+                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                            </span>
+                        </span>
+                    </a>
+                    
+                </div>
+        </div>
+        <div class="column">
+            <div id="mapping-map" style="height:100vh;margin:0 auto;">
+                
+                </div></div>
+    </div>
+</section>
+
+<?php foreach ($markers as $marker): ?>
+<div class="mapping-marker-popup-content" style="display:none;"
+    data-marker-id="<?php echo $this->escapeHtml($marker->id()); ?>"
+    data-marker-lat="<?php echo $this->escapeHtml($marker->lat()); ?>"
+    data-marker-lng="<?php echo $this->escapeHtml($marker->lng()); ?>"
+>
+    <?php 
+        //$media = $marker->item()->primaryMedia();
+        $mediaUrl = $marker->item()->thumbnailDisplayUrl('medium');
+        if(!$mediaUrl):
+            $mediaUrl= "";
+        endif;     
+    ?>
+    <?php if ($marker->label()): ?>
+    <!--<h3><?php echo $this->escapeHtml($marker->label()); ?></h3>-->
+    <?php endif; ?>
+    <?php if ($mediaUrl):?>
+        <img src="<?php echo $mediaUrl;?>">
+    <?php endif;?>
+    <h4 class="title is-6">
+        <?php echo $marker->item()->link($marker->item()->displayTitle(), null, ['target' => '_blank']); ?>
+    </h4>
+    <?php if ($marker->media()): ?>
+    <h4 class="title is-6">
+        <?php echo $marker->media()->link($marker->media()->displayTitle(), null, ['target' => '_blank']); ?>
+    </h4>
+    <?php endif; ?>
+</div>
+<?php endforeach; ?>

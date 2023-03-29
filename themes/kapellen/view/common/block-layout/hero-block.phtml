@@ -1,0 +1,67 @@
+<?php
+  $escape = $this->plugin('escapeHtml');
+  $url = '';
+  $siteTitle = $block->page()->site()->title();
+  if($attachments):
+    $media = $attachments[0]->media();
+
+    $url = '';
+    if($media):
+      $url = $media->originalUrl();
+      $url = str_replace('http:', '', $url);
+    endif;
+  endif;
+?>
+<?php if($url):?>
+<section class="hero is-bold">
+<?php else:?>
+<section class="hero is-bold">
+<?php endif;?>
+  <div class="hero-body">
+      <div class="columns" style="align-items:center;">
+        <div class="column hero-left is-3">
+          <img src="/files/asset/2aff364f40f7e88dbd93f3ccf500cb31c699f8f8.png">            
+        </div>          
+        <div class="column hero-right">          
+          <div class="" style="background:url('<?php echo $url;?>') no-repeat center center;background-size:cover;">
+            <div class="hero-overlay">           
+              <div class="hero-text">
+                <?php if($block->dataValue('sec_title')):?>
+                  <h2 class="subtitle is-size-6"><?php echo $block->dataValue('sec_title');?></h2>
+                <?php endif;?>
+                <h1 class="title is-family-secondary is-2"><span><?php echo $block->dataValue('title');?></span></h1>
+                <?php echo $block->dataValue('text');?>
+                <form class="has-icons-right" action="/s/kapellen/zoek-kapellen" id="hero-search-form">        
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input class="input" type="text" name="q" id="q" placeholder="&#xF002;  Zoek een kapelletje" aria-label="">
+                    </div>
+                    <div class="control">
+                      <button type="submit" class="button">
+                        <span style="border-left:1px solid #6ea5d7;padding-left:1rem;">Zoek</span>
+                        <span class="icon is-small">
+                          <i class="fas fa-caret-right"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </form>   
+                
+                <div class="link">
+                  <a class="button is-primary" href="<?php echo $block->dataValue('link');?>">
+                    <span><?php echo $block->dataValue('link_text');?></span>
+                    <span class="icon is-small">
+                      <i class="fas fa-angle-right"></i>
+                    </span>
+                  </a>
+                </div>
+                
+                </div>
+              </div>  
+            </div>
+          </div>
+        </div>
+      </div>
+        
+  </div>   
+ </section>

@@ -1,0 +1,64 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \Omeka\Entity\User $user
+ * @var \Contribute\Api\Representation\ContributionRepresentation[] $contributions
+ * @var string $space "default" or "guest"
+ */
+
+$plugins = $this->getHelperPluginManager();
+$i18n = $plugins->get('i18n');
+$partial = $plugins->get('partial');
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+$contributionLink = $plugins->get('contributionLink');
+
+$this->vars()->offsetSet('skipContributeCss', false);
+$partial('contribute/site/contribution/asset-include');
+$siteSlug = $this->params()->fromRoute('site-slug');
+
+$this->htmlElement('body')->appendAttribute('class', 'contribution resource browse');
+?>
+
+<?= $this->pageTitle($translate('Contributions'), 2) // @translate ?>
+
+<?php if (count($contributions)): ?>
+<h3><?= sprintf($translate('%d contributions'), count($contributions)) // @translate ?></h3>
+
+<?php $this->trigger('view.browse.before'); ?>
+<ul class="resource-list contribution-list">
+    <?php foreach ($contributions as $contribution): ?>
+    <li class="resource contribution">
+        <?= sprintf('Contribution #%d (%s)', $contribution->id(), $i18n->dateFormat($contribution->created(), 'medium', 'medium')) ?>
+        <h4><?= $hyperlink($contribution->displayTitle(), $contribution->siteUrl($siteSlug, false, 'show', true)) ?></h4>
+        <ul class="contribution-status">
+            <li class="contribution-resource"><?= $contribution->resource() ? $contribution->resource()->linkPretty() : $escape($translate('No resource')) ?></li>
+            <li class="submitted"><?= $escape($contribution->isSubmitted() ? $translate('Is submitted') : $translate('Is not submitted')) ?></li>
+            <li class="reviewed"><?= $escape($contribution->isReviewed() ? $translate('Is reviewed') : $translate('Is not reviewed')) ?></li>
+        </ul>
+        <?php if (!$contribution->isSubmitted()): ?>
+        <ul class="actions" data-message-remove-contribution="<?= $escapeAttr($translate('Are you sure to remove this contribution?')) ?>">
+            <?php if ($contribution->userIsAllowed('update')): ?>
+            <li><a class="o-icon-edit button edit-button edit-contribution" href="<?= $escapeAttr($contribution->siteUrl($siteSlug, 'edit', false, true)) ?>"><?= $escape($translate('Edit')) ?></a></li>
+            <?php endif; ?>
+            <?php if ($contribution->userIsAllowed('delete')): ?>
+            <li><a class="o-icon-delete button delete-button remove-contribution" data-contribution-id="<?= $contribution->id() ?>" data-contribution-url="<?= $escapeAttr($contribution->siteUrl($siteSlug, false, 'delete', true)) ?>" href="#"><?= $escape($translate('Delete')) ?></a></li>
+            <?php endif; ?>
+        </ul>
+        <?php endif; ?>
+    </li>
+    <?php endforeach; ?>
+</ul>
+<?php $this->trigger('view.browse.after'); ?>
+
+<?php else: ?>
+<p class="noresults">
+    <?= $translate('There are no contributions.') // @translate ?>
+</p>
+<?php endif; ?>
+<div>
+    <?= $contributionLink() ?>
+</div>

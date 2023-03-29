@@ -1,0 +1,179 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$siteTitle = $site->title();
+$this->htmlElement('html')->setAttribute('lang', $this->lang());
+$this->headMeta()->setCharset('utf-8');
+$this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
+$this->headTitle($siteTitle)->setSeparator(' · ');
+$this->headTitle()->append($this->setting('installation_title', 'Omeka S'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/style.min.css'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/selectize.css'));
+//$this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
+//$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700italic,700');
+$this->headScript()->prependFile($this->assetUrl('js/default.js'));
+$this->headScript()->prependFile($this->assetUrl('js/slick.js'));
+$this->headScript()->prependFile($this->assetUrl('js/clamp.min.js'));
+$this->headScript()->prependFile($this->assetUrl('js/selectize.js'));
+
+$this->headScript()->prependFile($this->assetUrl('js/global.js', 'Omeka'));
+$this->headScript()->prependFile($this->assetUrl('vendor/jquery/jquery.min.js', 'Omeka'));
+$this->trigger('view.layout');
+$userBar = $this->userBar();
+
+$url = $this->serverUrl(true);
+//echo 'url:'.$url;
+if (strpos($url, 'page/home') !== false) {
+    $home = true;
+}else{
+  $home = false;
+}
+?>
+<?php echo $this->doctype(); ?>
+<?php echo $this->htmlElement('html'); ?>
+    <head>
+       <!-- Add the slick-theme.css if you want default styling -->
+       <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+        <!-- Add the slick-theme.css if you want default styling -->
+        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+       
+        <?php echo $this->headMeta(); ?>
+        <?php echo $this->headTitle(); ?>
+        <?php echo $this->headLink(); ?>
+        <?php echo $this->headStyle(); ?>
+        <?php echo $this->headScript(); ?>
+        <META HTTP-EQUIV="Access-Control-Allow-Origin" CONTENT="http://https://lib.is">
+        <script src="https://kit.fontawesome.com/582fb8c29f.js" crossorigin="anonymous"></script>
+        
+        <script src="https://unpkg.com/colcade@0/colcade.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.cdnfonts.com/css/gill-sans-mt-condensed?styles=15946,15950,15948,15949,15952,15945" rel="stylesheet">
+      </head>
+
+    <?php echo $this->htmlElement('body'); ?>
+    <?php echo $userBar; ?>
+
+    <header>
+      <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="container">
+          <div class="navbar-brand">
+            <?php if(!$home):?>
+            <a class="navbar-item" href="<?php echo $site->url(); ?>">
+            <?php if ($this->themeSetting('logo')): ?>
+                  <img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" alt="<?php echo $escape($siteTitle); ?>" />
+              <?php endif; ?>
+            </a>
+            <?php endif;?>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+          </div>
+          <div class="navbar-menu">
+            <div class="navbar-start">
+              
+            </div>
+            <div class="navbar-end">
+            <div class="navbar-item">
+                <?php
+                  echo $site->publicNav()->menu()->renderMenu(null, [
+                      'maxDepth' => $this->themeSetting('nav_depth') - 1
+                  ]);
+                ?>
+              </div>
+              <div class="navbar-item">
+                  <button class="button is-primary showSearch">
+                    <span class="icon is-small">
+                      <i class="fas fa-search"></i>
+                    </span>
+                  </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+     </div>
+    </header>
+
+    
+        
+          <div class="main-area"><?php echo $this->content; ?></div>    
+      
+
+    <footer class="footer">
+      <div class="container">
+        <nav class="level">
+            <!-- Left side -->
+            <div class="level-left">
+              <div class="level-item">
+                <div class="logos">
+                  <a href="https://kadoc.kuleuven.be/"><img alt="KU Leuven" src="<?php echo $this->assetUrl("img/kadoc.png");?>" /></a>
+                  <!--<a href="//libis.be"><img alt="Libis" src="<?php echo $this->assetUrl("img/libis_gray.png");?>" /></a>-->
+                  <a href="https://www.parcum.be/"><img alt="Parcum" src="<?php echo $this->assetUrl("img/Logo_PARCUM.jpg");?>" /></a>
+                  <a href="https://www.ngi.be/website/"><img alt="NGI" src="<?php echo $this->assetUrl("img/LOGO_NGI.jpg");?>" /></a>
+                  <a href="https://www.vlaanderen.be/"><img alt="Vlaanderen,verbeelding werkt" src="<?php echo $this->assetUrl("img/vlaanderen.png");?>" /></a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right side -->
+            <div class="level-right">
+              <p class="level-item">
+                </p><ul>
+                  <li><a href="/page/disclaimer">Disclaimer</a></li>
+                </ul><p></p>
+
+            </div>
+          </nav>
+          <p style="font-size:0.9rem;">© KU Leuven, built by <a href="//libis.be">LIBIS</a></p>
+      </div>
+    </footer>
+
+    <div class="search-menu modal">
+      <div class="modal-background"></div>
+        <div class="modal-content">
+          <?php echo $this->partial('common/search-form'); ?>
+        </div>
+        <button class="search-menu-close modal-close is-large"></button>
+     </div>
+
+     <div class="burger-menu modal">
+       <div class="modal-background"></div>
+         <div class="modal-content">
+           <!-- Any other Bulma elements you want -->
+           <?php echo $this->partial('common/search-form'); ?>
+           <?php
+             echo $site->publicNav()->menu()->renderMenu(null, [
+                 'maxDepth' => $this->themeSetting('nav_depth') - 1
+             ]);
+           ?>
+         </div>
+         <button class="burger-menu-close modal-close is-large"></button>
+      </div>
+  </body>
+  <script>
+  $(document).ready(function() {
+    // Check for click events on the navbar burger icon
+    $(".navbar-burger").click(function() {
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        //$(".navbar-burger").toggleClass("is-active");
+        $(".burger-menu").toggleClass("is-active");
+    });
+
+    $(".showSearch").click(function() {
+    $(".search-menu").addClass("is-active");
+    });
+
+    $(".search-menu-close").click(function() {
+       $(".search-menu").removeClass("is-active");
+    });
+    $(".burger-menu-close").click(function() {
+       $(".burger-menu").removeClass("is-active");
+    });
+
+    $(".search-button").appendTo(".left-nav .navigation");
+  });
+  </script>
+
+</html>

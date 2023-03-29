@@ -10,13 +10,29 @@ try {
 
 var map = L.map('mapping-map');
 var markers = L.markerClusterGroup();
-var baseMaps = {
-    'Default': defaultProvider,
-    'Streets': L.tileLayer.provider('OpenStreetMap.Mapnik'),
-    'Grayscale': L.tileLayer.provider('CartoDB.Positron'),
-    'Satellite': L.tileLayer.provider('Esri.WorldImagery'),
-    'Terrain': L.tileLayer.provider('Esri.WorldShadedRelief')
-};
+var baseMaps;
+if(window.location.href.indexOf("kapellen") > -1) {
+    baseMaps = {
+        'Default': L.tileLayer.wms("https://cartoweb.wms.ngi.be/service", {
+            layers: "topo",
+            styles: "",
+            format: 'image/png',
+            transparent: true,
+        }),
+        'Streets': L.tileLayer.provider('OpenStreetMap.Mapnik'),
+        'Grayscale': L.tileLayer.provider('CartoDB.Positron'),
+        'Satellite': L.tileLayer.provider('Esri.WorldImagery'),
+        'Terrain': L.tileLayer.provider('Esri.WorldShadedRelief')
+    };
+}else{
+    baseMaps = {        
+        'Default': defaultProvider,
+        'Streets': L.tileLayer.provider('OpenStreetMap.Mapnik'),
+        'Grayscale': L.tileLayer.provider('CartoDB.Positron'),
+        'Satellite': L.tileLayer.provider('Esri.WorldImagery'),
+        'Terrain': L.tileLayer.provider('Esri.WorldShadedRelief')
+    };
+}
 
 $('.mapping-marker-popup-content').each(function() {
     var popup = $(this).clone().show();
@@ -25,6 +41,7 @@ $('.mapping-marker-popup-content').each(function() {
     marker.bindPopup(popup[0]);
     markers.addLayer(marker);
 });
+
 
 map.addLayer(baseMaps['Default']);
 map.addLayer(markers);

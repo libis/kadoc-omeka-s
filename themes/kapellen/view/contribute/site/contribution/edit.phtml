@@ -1,0 +1,114 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \Omeka\Entity\User|null $user
+ * @var \Contribute\Form\ContributeForm $form
+ * @var \Contribute\Api\Representation\ContributionRepresentation|null $contribution
+ * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation|null $resource
+ * @var array $fields
+ * @var \Omeka\Api\Representation\ResourceTemplateRepresentation $templateMedia A sub template for media may have no fields.
+ * @var array $fieldsByMedia
+ * @var array $fieldsMediaBase
+ * @var string $action "add" or "edit" or "show"
+ * @var string $mode "read" (for template select or for show readonly form before submit) or "write"
+ * @var string $space "default" or "guest"
+ */
+
+$plugins = $this->getHelperPluginManager();
+$setting = $plugins->get('setting');
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$contributionForm = $plugins->get('contributionForm');
+
+$this->htmlElement('body')->appendAttribute('class', 'edit items ' . $this->params()->fromRoute('resource') . ' resource');
+
+if ($form) $form->prepare();
+
+$mapLabels = [
+    'contributions' => 'item',
+    'items' => 'item',
+    'media' => 'media',
+    'item_sets' => 'item set',
+];
+
+if($resource):
+  $template = $resource->resourceTemplate();
+  if($template):
+    $type = $template->label();
+  else:
+    $type = "";
+  endif;
+endif;  
+?>
+<section class="section breadcrumb-section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="/">Home</a></li>
+          <?php if($resource):?>       
+            <li><a href="/s/kapellen/objecten?facet[resource_template_id][]=<?php echo $type;?>"><?php echo $type;?></a></li>  
+            <li><a href="<?php echo $resource->url(); ?>"><?php echo $resource->displayTitle(); ?></a></li>
+            <li>Aanpassing <?php echo $type;?></li>
+          <?php else:?>
+            <li>Voeg een kapel toe</li>
+          <?php endif;?>
+        
+      </ul>
+    </nav>
+  </div>
+<div class="contribute-resource conbribute-add container <?= $space && $space !== 'default' ? $space : '' ?>">
+  <?php if($resource):?>       
+    <h1 class="title is-2 is-family-secondary"><?php echo $resource->displayTitle(); ?></h1>
+    <div class="subtitle is-4 is-family-secondary">Aanpassing <?php echo $type;?></div>
+    
+  <?php else:?>
+    <h1 class="title is-2 is-family-secondary">Voeg een kapel toe</h1>
+    
+  <?php endif;?>        
+    
+    <div class="messages">
+        <?= $this->messages() ?>
+    </div>
+
+    <?php if (count($fields) && $form):
+        // The two lists of fields are merged in one form by default.
+        $this->trigger("view.$action.before");
+        echo $contributionForm([
+            'site' => $site,
+            'user' => $user,
+            'form' => $form,
+            'contribution' => $contribution,
+            'resource' => $resource,
+            'fields' => $fields,
+            'templateMedia' => $templateMedia,
+            'fieldsByMedia' => $fieldsByMedia,
+            'fieldsMediaBase' => $fieldsMediaBase,
+            'action' => $action,
+            'mode' => $mode,
+            'space' => $space,
+            'submitLabel' => $action === 'add' && $setting('contribute_allow_update') !== 'no' ? $translate('Add') : $translate('Submit'),
+            'cancelLabel' => $translate('Cancel'),
+            'isMainForm' => true,
+            'skipContributeCss' => false,
+        ]);
+        $this->trigger("view.$action.after");
+
+    elseif ($action === 'add' && $form): // First step form to select a resource template.
+        if ($mode === 'read') {
+            $form->remove('submit');
+            echo $this->form($form);
+        } else {
+            $form->get('submit')->setValue('Select'); // @translate
+            echo $this->form($form);
+        }
+
+    else: ?>
+    <div class="messages">
+        <p><?= $translate('A template with fields is required to submit a document. Ask the administrator for more information.') ?></p>
+    </div>
+
+    <?php endif; ?>
+
+</div>
+    </section>

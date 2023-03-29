@@ -1,0 +1,217 @@
+<?php
+use Laminas\Http\Client;
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+$this->htmlElement('body')->appendAttribute('class', 'item resource show');
+$embedMedia = $this->siteSetting('item_media_embed', false);
+$itemMedia = $item->media();
+$template = $item->resourceTemplate();
+if($template):
+  $type = $template->label();
+else:
+  $type = "";
+endif;
+?>
+<section class="section breadcrumb-section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <?php if($type == 'Nieuwsbericht'):?>
+        <li><a href="<?php echo "/s/zorgerfgoed/item/browse?resource_template_id=27";?>">Nieuws</a></li>
+        <?php elseif($type == 'Actor (organisatie)'):?>
+        <li><a href="<?php echo "/page/project";?>">Partner</a></li>
+        <?php else:?>              
+            <li><a href="/s/kapellen/objecten?facet[resource_template_id][]=<?php echo $type;?>"><?php echo $type;?></a></li>  
+        <?php endif;?>
+        <li><?php echo $item->displayTitle(); ?></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container">
+    <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle(); ?>
+    <?php 
+    if($item->value('schema:dateCreated')):?>
+      <?php echo ", ".$item->value('schema:dateCreated');?>     
+    <?php endif;?>
+    </h1>
+    <?php if($item->value('schema:alternateName')): ?>
+      <div class="subtitle is-4 is-family-secondary">
+        <?php echo $item->value('schema:alternateName');?>
+      </div>
+    <?php endif;?>  
+  </div>
+</section>
+
+
+<?php if($type == 'Nieuwsbericht'):?>
+  <section class="section">
+    <div class="container">
+      <div class="columns">
+        <div class="column">
+          <?php
+            $itemMedia = $resource->media();
+            $sortedMedia = $this->SortMedia($itemMedia);
+            $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
+            $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
+            ?>
+            <?php if (isset($lightMedia)): ?>
+                <?php echo $this->LightGalleryOutput($lightMedia); ?>
+            <?php endif; ?>
+            <?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
+              <div class="column is-4"> 
+                <div id="other-media" class="property">
+                    <h4><?php echo $this->translate('Other Media'); ?></h4>
+                    <div class="values">
+                        <?php foreach($otherMedia as $media): ?>
+                        <div class="value">
+                            <?php echo $media->linkPretty(); ?>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+              </div>  
+          <?php endif; ?>
+        </div>
+        <div class="column is-7">
+           <div class="text-box content">
+           <?php $date =  $item->value('schema:datePublished');?>
+           <?php if($date):?>
+            <?php $date = new DateTime($date->asHtml());?>
+            <div style="margin-bottom:0.6rem;color:#666;">
+              <?php echo $date->format('d-m-Y');?>
+            </div>            
+            <?php endif;?> 
+            <?php echo $item->value('schema:description');?>
+            <?php $links = $item->value('schema:citation', array('all' => true));?>
+            <?php if($links):?>
+              <?php foreach($links as $link):?>
+                <div style="margin-top:0.6rem;">
+                  <?php echo $link->asHtml();?>
+                </div>
+              <?php endforeach;?>
+            <?php endif;?>       
+           </div>
+         </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<?php else:?>
+  <section class="section item-section">
+    <div class="container" style="margin-bottom:1.5rem;">      
+      <?php
+        $itemMedia = $resource->media();
+        $sortedMedia = $this->SortMedia($itemMedia);
+        $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
+        $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
+      ?>
+      <?php if (isset($lightMedia)): ?>
+          <?php echo $this->LightGalleryOutput($lightMedia); ?>
+      <?php endif; ?>
+      <?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
+      
+          <div id="other-media" class="property">
+              <h4><?php echo $this->translate('Other Media'); ?></h4>
+              <div class="values">
+                  <?php foreach($otherMedia as $media): ?>
+                  <div class="value">
+                      <?php echo $media->linkPretty(); ?>
+                  </div>
+                  <?php endforeach; ?>
+              </div>
+          </div>
+      <?php endif; ?>        
+
+      <div class="columns">
+        <div class="column is-9">
+                 
+          <?php if($item->value('schema:abstract')):?>
+            <div class="content description">
+              <?php echo $item->value('schema:abstract');?>
+            </div>  
+          <?php endif;?>  
+
+          <div class="tabs is-centered">
+            <ul>
+              <li class="tab"><a href="#Identificatie">Identificatie</a></li>
+              <li class="tab"><a href="#Ontstaan">Ontstaan en tradities</a></li>
+              <li class="tab"><a href="#Exterieur">Exterieur</a></li>
+              <li class="tab"><a href="#Interieur">Interieur</a></li>
+              <li class="tab"><a href="#Beheer">Beheer en toestand</a></li>
+              <li class="tab"><a href="#Bronnen">Bronnen en links</a></li>
+              <li class="tab"><a href="#Slot">Tot slot</a></li>
+            </ul>
+          </div>
+          <div id="Identificatie" class="tab-pane animated">  
+            <?php echo $item->displayValues(); ?>              
+          </div>
+
+          <?php //$this->trigger('view.show.after'); ?>
+          <?php
+            $plugins = $this->getHelperPluginManager();
+            $hasNext = $plugins->has('previousResource');
+          ?>
+          <?php if ($hasNext): ?>
+            <div class="previous-next-items">
+                <?php if ($previous = $this->previousResource($resource)): ?>
+                <?= $previous->link($translate('Previous item'), null, ['class' => 'previous-item']) ?>
+                <?php endif; ?>
+                <?php if ($next = $this->nextResource($resource)): ?>
+                <?= $next->link($translate('Next item'), null, ['class' => 'next-item']) ?>
+                <?php endif; ?>
+            </div>
+          <?php endif; ?>
+        </div>
+        <div class="column">
+          <div class="content description">
+            <?php echo $this->partial('mapping/index/show', ['item' => $resource]);?>
+            <h3 class="is-5 title">Weet jij meer over deze kapel?</h3>
+            <a class="is-primary button" href="<?php echo $resource->url();?>/edit">Geef extra informatie</a>        
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>  
+<?php endif;?>
+
+<?php
+$page = $this->params()->fromQuery('page', 1);
+$property = $this->params()->fromQuery('property');
+$subjectValues = $item->subjectValues();
+?>
+
+<script>
+  $(document).ready(function(){
+    $('.slider-for').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: false,
+      fade: true,
+      centerMode: true
+    });
+    $('.slider-nav').slick({
+      slidesToShow: 10,
+      slidesToScroll: 1,
+      asNavFor: '.slider-for',
+      focusOnSelect: true
+    });
+
+    $('.slide-wrap').on('contextmenu', 'img', function(e){ 
+      return false; 
+    });
+
+    $('li.tab:first').addClass('is-active');
+    $('.tab-pane:first').addClass('is-active');
+
+    $('li.tab').click(function() {
+      var hash = $(this).children('a').eq(0).attr('href');
+      $('.tab-pane').removeClass('is-active');
+      $(hash).addClass('is-active');
+      $('li.tab').removeClass('is-active');
+      $(this).addClass('is-active');
+      return true;
+    });
+
+  });
+</script>

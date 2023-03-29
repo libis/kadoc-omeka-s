@@ -1,0 +1,130 @@
+<?php
+$translate = $this->plugin('translate');
+?>
+<section class="section carousel-section">
+  <div class="container">    
+    <div class="columns">
+      <div class="column is-6">
+          <?php if ($this->heading): ?>
+            <h2 class="title is-3 is-family-secondary"><?php echo $this->heading; ?></h2>
+            <?php if($block->dataValue('text')):?>
+              <div class="content">
+                <?php echo $block->dataValue('text');?>
+              </div>
+            <?php endif; ?>
+          <?php endif; ?>
+      </div>
+      <div class="column">
+          <div class="has-text-right">
+              <a href="/s/kapellen/zoek-kapellen" class="button is-primary is-inverted">
+                <span><?php echo $this->linkText;?></span>
+                <span class="icon is-small">
+                  <i class="fas fa-angle-right"></i>
+                </span>
+              </a>
+          </div>
+      </div>
+    </div>
+
+    <?php if($block->dataValue('text')):?>
+      <div class="content">
+              <?php echo $block->dataValue('text');?>
+      </div>
+    <?php endif; ?>
+
+    <?php if($this->resources):?>
+    <div class="slider">
+      <?php
+      $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+      $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+
+      foreach ($this->resources as $resource):
+        $heading = $resource->value($headingTerm, ['default' => $translate('[Untitled]')]);
+        $body = $resource->value('dcterms:description');
+        if($resourceType == 'item-set'):
+          $body = $resource->value('dcterms:description');
+        endif;
+        $type = $resource->resourceTemplate();
+        if($type):
+          $type= $type->label();
+        elseif($resourceType == 'item-set'):
+          $type= 'Collection';
+        else:
+          $type= "Object";
+        endif;
+      ?>
+      <div class="slide">
+        <?php
+          $mediaurl = "";
+          $media = $resource->media();              
+          $url = $resource->url();
+        ?>
+
+        <div class="slide-container">       
+          <div class="relative-slide">
+            <?php if($media):?>
+              <img src="<?php echo $media[0]->thumbnailUrl('medium');?>">
+            <?php else:?>                  
+             
+            <?php endif;?>            
+            
+            <div class="slide-content">            
+              <h4 class="title is-4 is-family-secondary">
+                  <a href="<?php echo $resource->url(); ?>"><?php echo $resource->displayTitle();?></a>
+              </h4>                             
+              <div class="content">
+                <?php $body = $resource->value('dcterms:description');?>
+                <?php if ($body): ?>
+                  <?php
+                    if(strlen($body) > 200):
+                      $body = substr($body, 0, 200);
+                      $body = substr($body, 0, strrpos($body, ' ')).' ...';
+                    endif;
+                  ?>
+                  <p>
+                    <?php //echo $body; ?>
+                    Diest
+                  </p>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>             
+        </div>
+      </div>
+    <?php endforeach; ?>
+     
+    </div>
+  <?php endif;?>
+  </div>
+</section>
+<script>
+  $( document ).ready(function() {
+    $(".slider").slick({
+
+      centerMode: true,
+      centerPadding: '15%',
+      ariableWidth: true,
+      slidesToShow: 3,
+      responsive: [
+        {
+          breakpoint: 768,
+          settings: {
+            arrows: true,
+            centerMode: true,
+            centerPadding: '40px',
+            slidesToShow: 3
+          }
+        },
+        {
+          breakpoint: 480,
+          settings: {
+            arrows: false,
+            centerMode: true,
+            centerPadding: '40px',
+            slidesToShow: 1
+          }
+        }
+      ]
+    });  
+  });  
+</script>  

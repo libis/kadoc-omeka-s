@@ -28,10 +28,8 @@ if ($isTimeline) {
     }
 }
 ?>
-<section class="section page-browse-section">
-  <div class="container">
-    <div class="columns">
-      <div class="column is-12">    
+<section class="section page-browse-section" style="padding:0">
+
         <div class="erfgoedkaart <?php echo implode(' ', $mappingBlockClasses); ?>">
             <?php if ($isTimeline): ?>
             <div class='mapping-timeline' style="height: 400px" data-data="<?php echo $this->escapeHtml(json_encode($timelineData)); ?>" data-options="<?php echo $this->escapeHtml(json_encode($timelineOptions)); ?>"></div>
@@ -52,6 +50,5 @@ if ($isTimeline) {
               </span>
             </a>-->
         </div>
-      </div> 
-  </div>
+      
 </section>

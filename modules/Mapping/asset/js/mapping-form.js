@@ -132,6 +132,13 @@ var map = L.map('mapping-map');
 map.setView([20, 0], 2);
 var mapMoved = false;
 var defaultBounds = null;
+if(mappingData == null){
+    var defaultBounds = "3.2958984375000004,50.467994531475696,5.73486328125,51.334043778789415";
+    var bounds = defaultBounds.split(',');
+    var southWest = [bounds[1], bounds[0]];
+    var northEast = [bounds[3], bounds[2]];
+    defaultBounds = [southWest, northEast];
+}    
 if (mappingData && mappingData['o-module-mapping:bounds'] !== null) {
     var bounds = mappingData['o-module-mapping:bounds'].split(',');
     var southWest = [bounds[1], bounds[0]];
@@ -141,6 +148,12 @@ if (mappingData && mappingData['o-module-mapping:bounds'] !== null) {
 
 // Add layers and controls to the map.
 var baseMaps = {
+    'Default': L.tileLayer.wms("https://cartoweb.wms.ngi.be/service", {
+            layers: "topo",
+            styles: "",
+            format: 'image/png',
+            transparent: true,
+        }),
     'Streets': L.tileLayer.provider('OpenStreetMap.Mapnik'),
     'Grayscale': L.tileLayer.provider('CartoDB.Positron'),
     'Satellite': L.tileLayer.provider('Esri.WorldImagery'),
@@ -171,7 +184,7 @@ L.drawLocal.edit.toolbar.buttons.remove = 'Delete markers';
 L.drawLocal.edit.toolbar.buttons.removeDisabled = 'No markers to delete';
 L.drawLocal.edit.handlers.edit.tooltip.text = 'Drag and drop marker to move it.';
 L.drawLocal.edit.handlers.remove.tooltip.text = 'Click on a marker to delete it.';
-map.addLayer(baseMaps['Streets']);
+map.addLayer(baseMaps['Default']);
 map.addLayer(drawnItems);
 map.addControl(layerControl);
 map.addControl(drawControl);
@@ -189,7 +202,7 @@ map.addControl(new L.Control.DefaultView(
     },
     // clear default view callback
     function(e) {
-        defaultBounds = null;
+        defaultBounds = "3.2958984375000004,50.467994531475696,5.73486328125,51.334043778789415";
         $('input[name="o-module-mapping:mapping[o-module-mapping:bounds]"]').val('');
         map.setView([20, 0], 2);
     },

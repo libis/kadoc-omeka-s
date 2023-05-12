@@ -95,7 +95,7 @@
 
 .media-list {
     display: flex;
-    height: 30rem;
+    height: 25rem;
     text-align: left;
     float: right;
     flex-wrap: wrap;
@@ -145,6 +145,12 @@
 
 .media-list{
     float: none;
+}
+
+.lg-sub-html{
+    color: $accent !important;
+    font-size:0.9rem !important;
+    text-align: right !important;
 }
 
 

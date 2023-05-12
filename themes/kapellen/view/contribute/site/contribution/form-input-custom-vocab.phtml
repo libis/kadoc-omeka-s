@@ -116,7 +116,7 @@ if (strlen((string) $val)) {
 
 <div class="<?= implode(' ', $class) ?>" lang="<?= $escape($language) ?>" data-basetype="<?= $customVocabType ?>">
     <?php if ($language): ?>
-    <span class="language"><?= $language ?></span>
+    <!--<span class="language"><?= $language ?></span>-->
     <?php endif; ?>
     <?= str_replace(array_keys($replace), array_values($replace), $selectHtml) ?>
     <ul class="actions">

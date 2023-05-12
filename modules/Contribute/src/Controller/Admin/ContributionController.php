@@ -682,6 +682,7 @@ class ContributionController extends AbstractActionController
         $key = (int) $key;
 
         $resourceData = $contribution->proposalToResourceData($term, $key);
+        
         if (!$resourceData) {
             return $this->jsonErrorUpdate(new Message(
                 $this->translate('Contribution is not valid.') // @translate

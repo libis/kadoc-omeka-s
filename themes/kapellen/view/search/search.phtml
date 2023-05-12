@@ -71,8 +71,8 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><a href="<?php echo $site->url(); ?>">Home</a></li>
-        <li><?php echo $translate("Zoeken"); ?></li>
+        <li><a href="https://kapelletjes.be">Home</a></li>
+        <li><?php echo $searchPage->name();?></li>
       </ul>
     </nav>
   </div>
@@ -93,24 +93,44 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
                 ?>       
             </h1>
         <?php endif;?>    
+
+        <?php if($searchPage->name() == "Inspiratiegids"):?>        
+        <div class="content" style="max-width:800px;">
+            <p>Wil je met kapelletjes aan de slag gaan, maar heb je nog geen concreet idee? Heb je al een concreet idee, maar weet je niet goed waar te beginnen of ben je op zoek naar ondersteuning? In de inspiratiegids vind je prikkelende activiteiten, inspirerende projecten of organisaties die steun verlenen.</p>
+        </div>
+        <?php endif;?>
         
         <?= $this->searchForm($searchPage, null, $skipFormAction) ?>
-        <a class="button is-primary is-outlined" style="margin-top:1rem;" href="/s/kapellen/contribution/add">
-            <span class="icon-text">
-                <span>Voeg een kapel toe</span>
-                <span class="icon is-small">
-                <i class="fas fa-plus" aria-hidden="true"></i>
+
+        <?php if($searchPage->name() == "Kapelletjes in Vlaanderen"):?>
+            <?php $class="color-section-light";?>
+            <a class="button is-primary is-outlined" style="margin-top:1rem;" href="/page/contact">
+                <span class="icon-text">
+                    <span>Voeg een kapel toe</span>
+                    <span class="icon is-small">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    </span>
                 </span>
-            </span>
-        </a>
+            </a>
+            <a class="button is-primary" style="margin-top:1rem;" href="/map-browse">
+                <span class="icon-text">
+                    <span>Kapelletjes op de kaart</span>
+                    <span class="icon is-small">
+                    <i class="fas fa-map" aria-hidden="true"></i>
+                    </span>
+                </span>
+            </a>
+        <?php else:?>    
+            <?php $class="organisaties";?>
+        <?php endif;?>
     </div>
 </section>
-<section class="color-section color-section-light">
+
+<section class="section <?= $class ?>">
     <div class="container">       
         
         <div class="search-results-wrapper columns">
-            <div class="column is-3">
-                <div class="facets">
+            
                      
                 
                     <?= $partial('search/facets', [
@@ -119,9 +139,8 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
                         'response' => $response,
                         'itemSet' => $itemSet,
                     ]) ?>
-                </div>
-            </div>
-            <div class="search-results column is-9">
+             
+            <div class="search-results column">
                 <?= $partial('search/results-header', [
                     'searchPage' => $searchPage,
                     'query' => $query,
@@ -198,13 +217,8 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
                     ]) ?>
                 <?php else: ?>
                     <div class="noresults">
-                        <?php if (empty($query) && !$itemSet): ?>
-                        <?= $translate('Fill a query and get results.') ?>
-                        <?php elseif (empty($query) && $itemSet): ?>
-                        <?= $translate('This item set has no items.') ?>
-                        <?php else: ?>
-                        <?= $translate('Your query returned no results') ?>
-                        <?php endif; ?>
+                        Er werden geen resultaten gevonden.
+                        <br><br>
                     </div>
                 <?php endif; ?>
             </div>   

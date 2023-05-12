@@ -2,10 +2,10 @@
 $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 $labelInfo = $this->setting('property_label_information');
-$not = array('Title','Description','Is Version Of','Is Part Of','Language','Provenance');
-$notalt = array('Collectie ID','Referenties object','Beeld','Beeld copyright','title','description','In de kijker');
+$not = array('Description');
+$notalt = array('Collectie ID','Referenties object','Beeld','Beeld copyright','title','description');
 ?>
-
+<?php $current_group = "Identificatie";?>
 <?php foreach ($templateProperties as $term => $property): ?>
   <?php 
     if($property->isPrivate()):
@@ -17,19 +17,21 @@ $notalt = array('Collectie ID','Referenties object','Beeld','Beeld copyright','t
     else:
       continue;
     endif;
-    $comment = '';
-    $comment = $property->alternateComment();
-    $comment = $property->alternateComment();
+    
+    $group = $propertyData['group'];
   ?>  
-  <?php if($comment):?>
+  <?php if($group):?>
+    <?php if($group != $current_group):?>
     </div>
-    <div id="<?php echo $comment;?>" class="tab-pane animated">
+    <div id="<?php echo $group;?>" class="tab-pane animated">
+    <?php $current_group = $group;?>
+    <?php endif;?>
   <?php endif;?>  
   <?php if(!in_array($propertyData['property']->label(),$not) && !in_array($propertyData['alternate_label'],$notalt)):?>
-    <div class="metadata-line">  
-    <?php if($comment != 'no label'):?>
+    <div class="metadata-line"> 
       <div class="titles">        
           <label class="label">
+          
           <?php if ($propertyData['alternate_label']): ?>
           <?php echo $escape($propertyData['alternate_label']); ?>
           <?php else: ?>
@@ -42,9 +44,8 @@ $notalt = array('Collectie ID','Referenties object','Beeld','Beeld copyright','t
           <?php endif; ?>
           </label>        
       </div>
-    <?php endif;?>
     
-      <div class="values">
+      <div class="values-col">
       <?php $i=0;?>
       <?php foreach ($propertyData['values'] as $value): ?>
           <?php

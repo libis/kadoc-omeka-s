@@ -334,7 +334,7 @@ class ContributionFields extends AbstractHelper
                     if (!$proposal['original']['@resource'] && !$proposal['proposed']['@resource']) {
                         unset($proposals[$term][$key]);
                     }
-                } else {
+                } elseif (isset($proposal['proposed']['@value'])) {
                     $proposal['original']['@value'] = $this->cleanString($proposal['original']['@value']);
                     if ($proposal['original']['@value'] === '' && $proposal['proposed']['@value'] === '') {
                         unset($proposals[$term][$key]);

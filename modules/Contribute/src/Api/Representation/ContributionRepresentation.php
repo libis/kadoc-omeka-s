@@ -335,6 +335,8 @@ class ContributionRepresentation extends AbstractEntityRepresentation
         $contributive = $this->contributiveData();
         $proposal = $this->proposal();
 
+        
+
         // Normalize sub-proposal.
         $isSubTemplate = is_int($indexProposalMedia);
         if ($isSubTemplate) {
@@ -361,6 +363,12 @@ class ContributionRepresentation extends AbstractEntityRepresentation
         $medias = $proposal['media'] ?? [];
         $proposal['template'] = $resourceTemplate;
         $proposal['media'] = [];
+
+        //var_dump($proposal['mapping']);
+
+        $mapping = $proposal['mapping'] ?? [];
+        $proposal['mapping'] = [];
+
 
         foreach ($proposal as $term => $propositions) {
             // Skip special keys.
@@ -672,6 +680,8 @@ class ContributionRepresentation extends AbstractEntityRepresentation
             }
         }
 
+        $proposal["mapping"] = $mapping;
+ 
         return $proposal;
     }
 
@@ -742,9 +752,14 @@ class ContributionRepresentation extends AbstractEntityRepresentation
             $data['store'] = $proposal['file'][0]['proposed']['store'] ?? null;
         }
 
+        if (isset($proposal['mapping']['bounds'][0]['proposed']['@value']) && isset($proposal['mapping']['markers'][0]['proposed']['@value'])):
+            $data['o-module-mapping:mapping'] = $proposal['mapping']['bounds'][0]['proposed']['@value'];
+            $data['o-module-mapping:marker'] = $proposal['mapping']['markers'][0]['proposed']['@value'];
+        endif;    
+
         // Clean data for the special keys.
         $proposalMedias = $isSubTemplate ? [] : ($proposal['media'] ?? []);
-        unset($proposal['template'], $proposal['media']);
+        unset($proposal['template'], $proposal['media'],$proposal['mapping']);
 
         // First loop to keep, update or remove existing values.
         foreach ($existingValues as $term => $propertyData) {

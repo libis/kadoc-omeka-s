@@ -160,6 +160,55 @@ $editRight = $resource->userIsAllowed('update');
                         ?>
                     </div>
                 <?php endif; ?>
+
+               
+                <?php if (isset($proposal["mapping"]) && count($proposal["mapping"])):
+                    // No upper div to simplify admin theme.
+                    ?>
+                    <div class="contribution-medias">
+                        <div class="property">
+                            <h4>Mapping</h4>
+                            <div class="values">
+                                <div>
+                                    <div>
+                                        <span class="mapping">
+                                       <?php
+                                        if (isset($proposal['mapping']['bounds'][0]['proposed']['@value'])):
+                                            echo "<h6>Bounds map</h6>";
+                                            echo $proposal['mapping']['bounds'][0]['proposed']['@value']["o-module-mapping:bounds"];
+                                            endif;
+                                        if (isset($proposal['mapping']['markers'][0]['proposed']['@value'])):
+                                            echo "<h6>Marker Latitude / longitude</h6>";
+                                            foreach($proposal['mapping']['markers'][0]['proposed']['@value'] as $marker):
+                                                echo $marker["o-module-mapping:lat"];
+                                                echo " / ".$marker["o-module-mapping:lng"];                                        
+                                            endforeach;    
+                                        endif;    
+                                        ?>
+                                        
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if ($contribution->isPatch()): // Only patchs should be validated individually. ?>
+                            <span class="single actions">
+                        
+                                <a href="#"
+                                    class="validate-value o-icon-validate-value"
+                                    data-validate-value-url="<?= $escapeAttr($contribution->adminUrl('validate-value')) ?>?term=mapping&key=0"
+                                    data-status="validate-value"
+                                    aria-label="<?= $txt = $escapeAttr(sprintf($translate('Validate this value (%s)'), $translate($process))) ?>"
+                                    title="<?= $txt ?>"></a>
+                        
+                            </span>
+                        <?php endif; ?>
+                        <?php
+                        
+                        //echo $this->partialLoop('common/admin/contribute-list-part', $proposal["mapping"]);
+                        ?>
+                    </div>
+                <?php endif; ?>
             </td>
         </tr>
         <?php endforeach; ?>

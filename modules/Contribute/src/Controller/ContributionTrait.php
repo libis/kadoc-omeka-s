@@ -87,8 +87,23 @@ trait ContributionTrait
         try {
             if ($contributionResource) {
                 $apiOptions['isPartial'] = true;
+
+                //libis - add media in seperate call to prevent deletion of existing media
+                if(!empty($resourceData["o:media"])):
+                    //var_dump($resourceData["o:media"]);
+                    $medias = $resourceData["o:media"];
+                    foreach($medias as $media):
+                        $media["o:item"]["o:id"] = $contributionResource->id();
+                        $response2 = $api->create("media", $media, [], $apiOptions);
+                    endforeach;                   
+                   
+                    unset($resourceData["o:media"]);
+                endif;    
+                
+
                 $response = $api
                     ->update($resourceName, $contributionResource->id(), $resourceData, [], $apiOptions);
+
             } else {
                 // The validator is not the contributor.
                 // The validator will be added automatically for anonymous.

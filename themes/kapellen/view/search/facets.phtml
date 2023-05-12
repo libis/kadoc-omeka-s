@@ -40,7 +40,8 @@ if (!empty($itemSet)) {
 
 $options = $searchPage->setting('facet', []);
 ?>
-
+<div class="column is-3  not-on-mobile-small">
+                <div class="facets">
 
     <h3 class="is-4 title" style="margin:0rem 0 0.3rem 0"><?= $translate('Filters') ?></h3>
 
@@ -84,7 +85,8 @@ $options = $searchPage->setting('facet', []);
         <?php endif; ?>
 
     </form>
-
+        </div>
+        </div>
 
 <script>
     $(document).ready(function(){

@@ -67,7 +67,7 @@ $language = isset($proposed['@value']) ? null : (isset($original['value']) ? $or
 
 <div class="<?= implode(' ', $class) ?>" lang="<?= $escape($language) ?>">
     <?php if ($language): ?>
-    <span class="language"><?= $language ?></span>
+    <!--<span class="language"><?= $language ?></span>-->
     <?php endif; ?>
     <textarea class="form-control input-value" data-value-key="@value" name="<?= $name ?>" aria-labelledby="property-<?= $property ? $property->id() : '__PROPERTYID__' ?>-label"<?= $isRequired ? ' required="required"' : '' ?><?= empty($readonly) ? '' : ' readonly="readonly"' ?>><?= $escape($val) ?></textarea>
     <ul class="actions">

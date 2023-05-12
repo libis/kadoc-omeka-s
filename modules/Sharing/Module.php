@@ -204,7 +204,7 @@ class Module extends AbstractModule
                 break;
             }
         $view->headTitle()->setSeparator(' · ');
-        $pageTitle = $view->headTitle()->renderTitle() . ' · ' . $view->setting('installation_title', 'Omeka S');
+        $pageTitle = $view->headTitle()->renderTitle();
         $view->headMeta()->appendProperty('og:title', $pageTitle);
         $view->headMeta()->appendProperty('og:type', 'website');
         $view->headMeta()->appendProperty('og:url', $view->serverUrl(true));

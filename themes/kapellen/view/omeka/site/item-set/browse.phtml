@@ -12,8 +12,7 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="<?php echo $site->url();?>/page/collectie">Collectie</a></li>
-        <li>Overzicht</li>
+        <li>Collecties</li>
       </ul>
     </nav>
     <h2 class="title is-family-secondary" style="margin-bottom:2rem;">
@@ -28,8 +27,6 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
         endif;
     ?>  
   </div>
-</section>
-<section class="section">
   <div class="container">
     <div class="columns">
       <div class="column is-9">
@@ -82,11 +79,11 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
           <div class="card equal-height">
               <a class="card-link-wrapper" href="<?php echo $itemSet->url();?>">
                 <div class="card-bg card-bg-img-2"
-                  style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#45aab4;background-size: cover;"
+                  style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#70a6d7;background-size: cover;"
                   >
                 </div>
                 <header class="card-header">
-                  <p class="card-header-title title is-5 is-family-secondary">
+                  <p class="card-header-title title is-4 is-family-secondary">
                       <span><?php echo $heading;?></span>
                   </p>
                 </header>

@@ -25,7 +25,7 @@
 /** @var \Omeka\Api\Representation\ResourceTemplateRepresentation $resourceTemplate */
 $resourceTemplate = $proposal['template'] ?? null;
 // Clean data for the special keys.
-unset($proposal['template'], $proposal['media']);
+unset($proposal['template'], $proposal['media'], $proposal['mapping']);
 ?>
 
 <?php if ($isSubProposal): ?>
@@ -53,6 +53,15 @@ unset($proposal['template'], $proposal['media']);
             'alternate_comment' => null,
             'values' => [],
         ];
+    elseif ($term === 'mapping'):
+        $propertyData = [
+            'property' => null,
+            'alternate_label' => $translate('Mapping'),
+            'alternate_comment' => null,
+            'values' => [],
+        ];    
+
+       
     else:
         $property = $api->searchOne('properties', ['term' => $term])->getContent();
         // In the case the property was removed after the contribute.

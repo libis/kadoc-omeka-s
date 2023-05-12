@@ -343,7 +343,9 @@ class ContributionController extends AbstractActionController
                                 $params['resource'] = 'contribution';
                                 $params['id'] = $contribution->id();
                                 $params['space'] = $space;
-                                return $this->forward()->dispatch('Contribute\Controller\Site\Contribution', $params);
+                                //die("test");
+                                return $this->redirect()->toUrl("https://kapelletjes.be/page/bedankt");
+                               // return $this->forward()->dispatch('Contribute\Controller\Site\Contribution', $params);
                             }
                             $message = $this->settings()->get('contribute_message_add');
                             if ($message) {
@@ -352,6 +354,7 @@ class ContributionController extends AbstractActionController
                                 $this->messenger()->addSuccess('Contribution successfully saved!'); // @translate
                                 $this->messenger()->addWarning('Review it before its submission.'); // @translate
                             }
+                            die($contribution->resource());
                             return $contribution->resource()
                                 ? $this->redirect()->toUrl($contribution->resource()->siteUrl())
                                 : $this->redirectContribution($contribution);
@@ -1014,7 +1017,7 @@ class ContributionController extends AbstractActionController
 
     protected function replacePlaceholders($message, ?ContributionRepresentation $contribution): string
     {
-        if (strpos($message, '{') === false || !$contribution) {
+        if ($message === false || !$contribution) {
             return (string) $message;
         }
 
@@ -1059,7 +1062,7 @@ class ContributionController extends AbstractActionController
 
         // TODO Store and add ip.
 
-        return str_replace(array_keys($replace), array_values($replace), $message);
+        return str_replace(array_keys($replace), array_values($replace), $message.'');
     }
 
     protected function filterEmails(?ContributionRepresentation $contribution = null): array
@@ -1158,6 +1161,8 @@ class ContributionController extends AbstractActionController
             return null;
         }
 
+        
+
         // The contribution requires a resource template in allowed templates.
         /** @var \Contribute\Mvc\Controller\Plugin\ContributiveData $contributive */
         $contributive = clone $this->contributiveData($resourceTemplate, $isSubTemplate);
@@ -1169,7 +1174,30 @@ class ContributionController extends AbstractActionController
         $result = [
             'template' => $resourceTemplate->id(),
             'media' => [],
+            'mapping' => []
         ];
+
+        $result['mapping'] = [];
+        if(isset($proposal["o-module-mapping:mapping"])):           
+            $result['mapping']["bounds"][0] = [
+                'original' => [
+                    '@value' => null,
+                ],
+                'proposed' => [
+                    '@value' => $proposal["o-module-mapping:mapping"]
+                ],
+            ];
+        endif;    
+        if(isset($proposal["o-module-mapping:marker"])):           
+            $result['mapping']["markers"][0] = [
+                'original' => [
+                    '@value' => null,
+                ],
+                'proposed' => [
+                    '@value' => $proposal["o-module-mapping:marker"]
+                ],
+            ];
+        endif;    
 
         // File is specific: for media only, one value only, not updatable,
         // not a property and not in resource template.
@@ -1190,6 +1218,8 @@ class ContributionController extends AbstractActionController
         // Clean data for the special keys.
         $proposalMedias = $isSubTemplate ? [] : ($proposal['media'] ?? []);
         unset($proposal['template'], $proposal['media']);
+
+        
 
         foreach ($proposal as &$values) {
             // Manage specific posts.

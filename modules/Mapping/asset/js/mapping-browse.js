@@ -11,7 +11,7 @@ try {
 var map = L.map('mapping-map');
 var markers = L.markerClusterGroup();
 var baseMaps;
-if(window.location.href.indexOf("kapellen") > -1) {
+if(window.location.href.indexOf("kapel") > -1) {
     baseMaps = {
         'Default': L.tileLayer.wms("https://cartoweb.wms.ngi.be/service", {
             layers: "topo",

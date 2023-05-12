@@ -101,6 +101,41 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
                     </div>
                     <?php endif; ?>
                 </div>
+                <?php else:?>
+                    <?php if (!empty($templateMedia)): ?>
+                        <fieldset class="contribute-medias sub-forms" data-next-index-media="<?= count($fieldsByMedia) ?>"<?= $disabled ?>>
+                            <?php // For end user, "media" means "files". // TODO Add other types of media. ?>
+                            <h3 class="title is-5" style="margin-bottom:0.5rem;">Afbeeldingen</h3>
+                            <p style="margin-bottom:0.5rem;">Gelieve enkel afbeeldingen vrij van copyright op te laden.</p>
+                            <?php
+                            $vars->offsetSet('isMainForm', false);
+                            $indexMedia = 0;
+                            foreach ($fieldsByMedia as $fieldsMedia): ?>
+                            <fieldset class="contribute-media sub-form" name="media[<?= $indexMedia ?>]" data-index-media="<?= $indexMedia ?>">
+                                <legend><?= $escape(sprintf($translate('File %s'), $indexMedia + 1)) ?></legend>
+                                <?php
+                                $vars->offsetSet('indexMedia', $indexMedia);
+                                $vars->offsetSet('fieldsMedia', $fieldsMedia);
+                                ?>
+                                <?= $partial('contribute/site/contribution/form') ?>
+                                <ul class="actions">
+                                    <li><button type="button" class="is-small is-primary remove-media button o-icon-delete">Verwijder</button></li>
+                                </ul>
+                            </fieldset>
+                            <?php ++$indexMedia; ?>
+                            <?php endforeach; ?>
+                            <div class="inputs inputs-media">
+                                <button type="button" class="is-small is-primary add-media-new button o-icon-add">Voeg toe</button>
+                            </div>
+                        </fieldset>
+                        <?php
+                        $indexMedia = null;
+                        $fieldsMedia = [];
+                        $vars->offsetSet('isMainForm', true);
+                        $vars->offsetSet('indexMedia', $indexMedia);
+                        $vars->offsetSet('fieldsMedia', $fieldsMedia);
+                        ?>
+                    <?php endif; // End template media. ?>           
                 <?php endif; ?>
 
                 <?php // Display the edited resource, with edited or non-edited fields, plus the non-editable original fields. ?>
@@ -119,32 +154,55 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
                     $vars->offsetSet('templateProperty', $templateProperty);
                     ?>
 
-                <div class="property" data-term="<?= $term ?>">
-                    <?php // Display property label. ?>
-                    <h4 class="label" style="font-weight:bold;margin-top:1rem;font-size:1.1rem;">
-                        <?= isset($field['alternate_label']) ? $escape($field['alternate_label']) : $escape($translate($property->label())) ?>
-                        <?php if (!isset($field['property'])):?>
-                        <?php // Nothing to do (file). ?>
-                        <?php elseif ($labelInfo === 'term'): ?>
-                        <span class="field-term">(<?= $escape($field['property']->term()) ?>)</span>
-                        <?php elseif ($labelInfo === 'vocab'): ?>
-                        <span class="field-term">(<?= $escape($field['property']->vocabulary()->label()) ?>)</span>
-                        <?php endif; ?>
-                    </h4>
+                <div class="property metadata-line" data-term="<?= $term ?>">
+                    <?php // Display property label.
+                    
+                    ?>
+                    <div class="titles">
+                        <h4 class="label" style="font-weight:bold;font-size:1.1rem;padding-right:1rem;">                        
+                            <?= isset($field['alternate_label']) ? $escape($field['alternate_label']) : $escape($translate($property->label())) ?>
+                            <?php if (!isset($field['property'])):?>
+                            <?php // Nothing to do (file). ?>
+                            <?php elseif ($labelInfo === 'term'): ?>
+                            <span class="field-term">(<?= $escape($field['property']->term()) ?>)</span>
+                            <?php elseif ($labelInfo === 'vocab'): ?>
+                            <span class="field-term">(<?= $escape($field['property']->vocabulary()->label()) ?>)</span>
+                            <?php endif; ?>   
+                                                        
+                            <?php if($templateProperty):?>
+                                <?php if($templateProperty->alternateComment()):?>                            
+                                    <span id="<?php echo $field['property']->id();?>" class="open" style="cursor:pointer;"> i </span>                                   
+                                <?php endif;?>                    
+                            <?php endif;?>    
+                        </h4>
+                        <?php if($templateProperty):?>
+                        <?php if($templateProperty->alternateComment()):?>                            
+                        <div class="<?php echo $field['property']->id();?>-tooltip tooltip"> 
+                            <div class="tooltip-content">     
+                            <?= $templateProperty->alternateComment() ?>
+                            <span class="close">X</span>
+                            </div>
+                        </div>                                        
+                        <?php endif;?>                    
+                        <?php endif;?>    
+                    </div>
+
+                    <div class="values-col">
 
                     <?php // Simple display of the value for properties that are not editable or without datatypes. ?>
                     <?php // &&  !count($field['datatypes']);?>        
                     <?php if (!$field['editable'] && !$field['fillable']): ?>
-                    <div class="values">
-                        <?php
-                        foreach ($field['values'] as $value):
-                            
-                            $vars->offsetSet('value', $value);
-                            echo $partial('contribute/site/contribution/form-value');
-                        endforeach; ?>
-                    </div>
+                        <div class="values">
+                            <?php
+                            foreach ($field['values'] as $value):                            
+                                $vars->offsetSet('value', $value);
+                                echo $partial('contribute/site/contribution/form-value');
+                            endforeach;
+                            ?>
+                        </div>
+
                     <?php // Early end this property and continue to next fields. ?>
-                <?= '</div>' ?>
+                        </div></div>        
                         <?php continue;
                         endif; ?>
 
@@ -163,8 +221,7 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
                             $vars->offsetSet('fieldContribution', $fieldContribution);
                             $vars->offsetSet('value', $value);
                             // Check if the value exists or is editable (the value may be empty).
-                            if ($value && !$field['editable']):
-                                
+                            if ($value && !$field['editable']):                                
                                 echo $partial('contribute/site/contribution/form-value');
                             else:
                                 
@@ -210,13 +267,17 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
                     <?php // Add a button to add a new value for fillable properties. ?>
                     <?php // The button is always added to manage value removing: if not fillable, it is hidden here and via js. ?>
                     <?= $partial('contribute/site/contribution/form-value-more') ?>
-
+                    
+                    </div>  
                 </div>
                 <?php endforeach; // Next field/property. ?>
 
         <?php if ($isMainForm): ?>
             </fieldset>
 
+            <?php $item = $resource;?>
+            <?php echo $partial('mapping/index/form');?>
+            <!--
             <?php if (!empty($templateMedia)): ?>
             <fieldset class="contribute-medias sub-forms" data-next-index-media="<?= count($fieldsByMedia) ?>"<?= $disabled ?>>
                 <?php // For end user, "media" means "files". // TODO Add other types of media. ?>
@@ -249,7 +310,7 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
             $vars->offsetSet('indexMedia', $indexMedia);
             $vars->offsetSet('fieldsMedia', $fieldsMedia);
             ?>
-            <?php endif; // End template media. ?>
+            <?php endif; // End template media. ?>-->
 
             <?= $formElement($form->get('template')) ?>
             <?php // These values are designed to be customized for complex workflow, or used with submit or any button. ?>
@@ -309,5 +370,17 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
     </div>
 
     <?php endif; // End isMainForm. ?>
-        </div>
-        </div>  
+    </div>
+  </div>  
+<script> 
+    $(".open").on("click", function(){
+        var tooltip = "."+this.id+"-tooltip .tooltip-content";
+        console.log(tooltip);
+        $(tooltip).addClass("active");
+    });
+    
+    $(".close, .tooltip").on("click", function(){
+        $(".tooltip-content").removeClass("active");
+    });
+
+ </script>

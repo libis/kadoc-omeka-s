@@ -1,16 +1,16 @@
 <?php
 $translate = $this->plugin('translate');
-$searchValue = $this->escapeHtml($this->params()->fromQuery('fulltext_search', ''));
+$searchValue = $this->escapeHtml($this->params()->fromQuery('q', ''));
 ?>
-  <form class="has-icons-right" action="/s/zorgerfgoed/index/search" id="search-form">
+  <form class="has-icons-right" method="GET" action="/s/kapellen/zoek-kapellen" id="search-form">
     <div class="field has-addons">
       <div class="control">
-        <input class="input is-medium" type="search" name="fulltext_search" value="<?php echo $searchValue; ?>"
+        <input class="input is-medium" type="search" data-type-field="q" name="q" value="<?php echo $searchValue; ?>"
             placeholder="<?php echo $translate('Search'); ?>"
             aria-label="<?php echo $translate('Search'); ?>">
       </div>
       <div class="control">
-        <button class="button is-primary is-medium">
+        <button class="button is-primary is-medium" type="submit" name="submit" value="">
           <span class="icon is-large">
             <i class="fas fa-search"></i>
           </span>

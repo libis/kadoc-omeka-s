@@ -17,12 +17,12 @@ endif;
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li><a href="/">Home</a></li>
-        <?php if($type == 'Nieuwsbericht'):?>
-        <li><a href="<?php echo "/s/zorgerfgoed/item/browse?resource_template_id=27";?>">Nieuws</a></li>
-        <?php elseif($type == 'Actor (organisatie)'):?>
-        <li><a href="<?php echo "/page/project";?>">Partner</a></li>
-        <?php else:?>              
-            <li><a href="/s/kapellen/objecten?facet[resource_template_id][]=<?php echo $type;?>"><?php echo $type;?></a></li>  
+        <?php if($type == 'Kapel'):?>
+          <li><a href="<?php echo "/s/kapellen/zoek-kapellen";?>">Kapelletjes</a></li>
+        <?php elseif($type == 'Project'):?>
+          <li><a href="<?php echo "/s/kapellen/inspiratiegids";?>">Inspiratiegids</a></li>
+        <?php elseif($type == 'Actor (organisatie)'):?>              
+          <li><a href="/s/kapellen/organisaties">Organisaties</a></li>  
         <?php endif;?>
         <li><?php echo $item->displayTitle(); ?></li>
       </ul>
@@ -44,7 +44,7 @@ endif;
 </section>
 
 
-<?php if($type == 'Nieuwsbericht'):?>
+<?php if($type == 'Nieuwsbericht' || $type == "Project" || $type == "Organisatie"):?>
   <section class="section">
     <div class="container">
       <div class="columns">
@@ -74,7 +74,7 @@ endif;
           <?php endif; ?>
         </div>
         <div class="column is-7">
-           <div class="text-box content">
+           
            <?php $date =  $item->value('schema:datePublished');?>
            <?php if($date):?>
             <?php $date = new DateTime($date->asHtml());?>
@@ -82,13 +82,63 @@ endif;
               <?php echo $date->format('d-m-Y');?>
             </div>            
             <?php endif;?> 
-            <?php echo $item->value('schema:description');?>
-            <?php $links = $item->value('schema:citation', array('all' => true));?>
-            <?php if($links):?>
-              <?php foreach($links as $link):?>
-                <div style="margin-top:0.6rem;">
-                  <?php echo $link->asHtml();?>
+            <?php if($item->value('schema:abstract')):?>
+                <?php $values = $item->value('schema:abstract',array('all'=>true)); ?>
+                <div class="content">
+                <?php foreach ($values as $value): ?>
+                  <div class="content-value">
+                    <?php echo $value->asHtml(); ?>
+                  </div>      
+                <?php endforeach; ?>
                 </div>
+            <?php endif;?>
+            <?php if($item->value('dcterms:description')):?>
+                <?php $values = $item->value('dcterms:description',array('all'=>true)); ?>
+                <div class="content">
+                <?php foreach ($values as $value): ?>
+                  <div class="content-value">
+                    <?php echo $value->asHtml(); ?>
+                  </div>      
+                <?php endforeach; ?>
+                </div>
+            <?php endif;?>
+            <div class="content">         
+              <?php if($item->value('project:samenvatting')):?>
+              <?php echo $item->value('project:samenvatting')->asHtml();?>
+              <?php endif;?>
+              <?php if($item->value('project:faseEen')):?>
+                <hr>  
+                <h4 class="title is-5 is-family-secondary">Fase 1</h4>
+                <?php echo $item->value('project:faseEen')->asHtml(); ?>
+              <?php endif;?>  
+              <?php if($item->value('project:faseTwee')):?>
+                <hr>
+                <h4 class="title is-5 is-family-secondary">Fase 2</h4>
+                <?php echo $item->value('project:faseTwee')->asHtml(); ?>
+              <?php endif;?>  
+              <?php if($item->value('project:faseDrie')):?>
+                <hr>
+                <h4 class="title is-5 is-family-secondary">Fase 3</h4>
+                <?php echo $item->value('project:faseDrie')->asHtml(); ?>
+              <?php endif;?>
+              <?php if($item->value('project:bewaardErfgoed')):?>
+                <hr>
+                <a class="button is-primary is-outlined" href="<?php echo $item->value('project:bewaardErfgoed');?>">Bewaard erfgoed</a>
+              <?php endif;?>  
+              <?php if($item->value('project:gerelateerdErfgoed')):?>
+                <h4 class="title is-4 is-family-secondary">Bewaard erfgoed</h4>
+                <div class="content values erfgoed">
+                  <?php $values = $item->value('project:gerelateerdErfgoed',array('all'=>true)); ?>
+                  <?php foreach ($values as $value): ?>
+                          <?php echo $value->asHtml(); ?>
+                  <?php endforeach; ?>
+                </div>
+              <?php endif;?>
+            </div>
+            <?php $links = $item->value('activiteit:meerInfo', array('all' => true));?>
+            <?php if($links):?>              
+              <?php foreach($links as $link):?>                
+                <?php echo $link->asHtml();?>
               <?php endforeach;?>
             <?php endif;?>       
            </div>
@@ -124,23 +174,21 @@ endif;
       <?php endif; ?>        
 
       <div class="columns">
-        <div class="column is-9">
+        <div class="column is-8">
                  
-          <?php if($item->value('schema:abstract')):?>
+          <?php if($item->value('schema:description')):?>
             <div class="content description">
-              <?php echo $item->value('schema:abstract');?>
+              <?php echo $item->value('schema:description');?>
             </div>  
           <?php endif;?>  
 
           <div class="tabs is-centered">
             <ul>
               <li class="tab"><a href="#Identificatie">Identificatie</a></li>
-              <li class="tab"><a href="#Ontstaan">Ontstaan en tradities</a></li>
+              <li class="tab"><a href="#Ontstaan-en-tradities">Ontstaan en tradities</a></li>
               <li class="tab"><a href="#Exterieur">Exterieur</a></li>
               <li class="tab"><a href="#Interieur">Interieur</a></li>
-              <li class="tab"><a href="#Beheer">Beheer en toestand</a></li>
-              <li class="tab"><a href="#Bronnen">Bronnen en links</a></li>
-              <li class="tab"><a href="#Slot">Tot slot</a></li>
+              <li class="tab"><a href="#Bronnen-en-links">Bronnen en links</a></li>
             </ul>
           </div>
           <div id="Identificatie" class="tab-pane animated">  
@@ -166,8 +214,8 @@ endif;
         <div class="column">
           <div class="content description">
             <?php echo $this->partial('mapping/index/show', ['item' => $resource]);?>
-            <h3 class="is-5 title">Weet jij meer over deze kapel?</h3>
-            <a class="is-primary button" href="<?php echo $resource->url();?>/edit">Geef extra informatie</a>        
+            <!--<br><p>Heb je meer informatie over deze kapel, of zijn niet alle gegevens correct?</p>
+            <a class="button is-primary" href="<?php echo $item->url().'/edit';?>">Pas deze kapel aan</a>-->
           </div>
         </div>
       </div>
@@ -204,7 +252,17 @@ $subjectValues = $item->subjectValues();
     $('li.tab:first').addClass('is-active');
     $('.tab-pane:first').addClass('is-active');
 
-    $('li.tab').click(function() {
+    $( "li.tab" ).each(function( index ) {
+      var hash = $(this).children('a').eq(0).attr('href');
+      if($(hash).length){
+
+      }else{
+        $( this ).hide();
+      }
+    });
+
+    $('li.tab').click(function(e) {
+      e.preventDefault();
       var hash = $(this).children('a').eq(0).attr('href');
       $('.tab-pane').removeClass('is-active');
       $(hash).addClass('is-active');

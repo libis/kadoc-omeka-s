@@ -1,5 +1,5 @@
 <?php if($block->dataValue('text')):?>
-<div class="section">
+<div class="section text-only-kapel">
 <?php else:?>
 <div class="section" style="padding-bottom:20px;">
 <?php endif?>
@@ -10,19 +10,19 @@
       <div class="columns">
         <?php if($block->dataValue('text') && !$block->dataValue('text2')):?>
           <div class="column">
-            <div class="text-box">
+            <div class="content">
               <?php echo $block->dataValue('text');?>
             </div>
           </div>
         <?php endif;?>
         <?php if($block->dataValue('text') && $block->dataValue('text2')):?>       
           <div class="column">
-            <div class="text-box">
+            <div class="content">
               <?php echo $block->dataValue('text');?>
             </div>
           </div>
           <div class="column">
-            <div class="text-box">
+            <div class="content">
               <?php echo $block->dataValue('text2');?>
             </div>
           </div>

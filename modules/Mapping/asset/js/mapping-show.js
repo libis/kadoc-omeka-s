@@ -6,6 +6,12 @@ var mappingData = mappingMap.data('mapping');
 var map = L.map('mapping-map');
 var markers = new L.FeatureGroup();
 var baseMaps = {
+    'Default': L.tileLayer.wms("https://cartoweb.wms.ngi.be/service", {
+            layers: "topo",
+            styles: "",
+            format: 'image/png',
+            transparent: true,
+        }),
     'Streets': L.tileLayer.provider('OpenStreetMap.Mapnik'),
     'Grayscale': L.tileLayer.provider('CartoDB.Positron'),
     'Satellite': L.tileLayer.provider('Esri.WorldImagery'),
@@ -28,7 +34,7 @@ $('.mapping-marker-popup-content').each(function() {
     markers.addLayer(marker);
 });
 
-map.addLayer(baseMaps['Streets']);
+map.addLayer(baseMaps['Default']);
 map.addLayer(markers);
 map.addControl(new L.Control.Layers(baseMaps));
 map.addControl(new L.Control.FitBounds(markers));

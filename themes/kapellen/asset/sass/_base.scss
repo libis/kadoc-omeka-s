@@ -11,6 +11,31 @@ p{
   }
 }
 
+ul{
+  list-style: disc;
+}
+
+.content{
+ul li::marker {
+  content: "\f054"; /* FontAwesome Unicode */
+  font-family: FontAwesome;
+  color: rgba($primary,0.7);
+  font-size: 0.6rem;
+}  
+
+li{  
+  padding-left: 0.3rem;
+}
+}
+
+.content ol{
+  margin-top:0.5em;
+}
+
+.actions li::marker {
+  content: "";
+}
+
 figcaption{
   font-size: 0.85rem;
   padding: 0.5rem 0;
@@ -88,6 +113,10 @@ figcaption{
   font-family: $family-secondary;
 }
 
+.navbar-burger{
+  height: auto;
+}
+
 //modal-menu
 .field.has-addons .control:not(:last-child){
   width: 100%;
@@ -101,14 +130,26 @@ figcaption{
     border-radius: 0;
   }
 
+  .modal-content{
+    padding:1.5rem;
+  }
+
   .navigation{
     padding-top: 1rem;
+    padding: 1rem;
+    -webkit-column-count: 2;
+    column-count: 2;
+    margin-top: 1rem;
+    list-style: none;
+
+    @media only screen and (max-width: 768px) {
+      column-count: 1;
+    }   
 
     li{
       padding-top: 0.5rem;
       font-family: $family-secondary;
-      font-style: italic;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
 
       ul{
         padding-top: 0;
@@ -130,6 +171,10 @@ figcaption{
   .breadcrumb{
     font-size: 0.9rem;
     margin-bottom: 0.8rem;
+
+    ul, li{
+      padding:0;
+    }
 
     li::before {
       padding:0 0.3em;
@@ -168,13 +213,44 @@ figcaption{
   }
 }
 
+
+.on-mobile{
+  display: none;
+
+  @mixin until($desktop){
+    display: block;
+  }
+
+}
+
+.not-on-mobile{
+  display: block;
+  
+  @media screen and (max-width: 1024px){    
+    display: none !important;
+  }
+}
+
+.not-on-mobile-small{
+  display: block;
+  
+  @media screen and (max-width: 500px){    
+    display: none !important;
+  }
+}
+
+.navbar-brand .on-mobile img{
+  max-width: 290px;
+}
+
 //catches blocks without templates like html & pageTitle
 .no-section{
   h2{
     font-size: 2.5rem;
     font-family: $family-secondary;
   }
-  padding-bottom: 2rem;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .text-only{
@@ -194,6 +270,10 @@ figcaption{
   p:last-of-type{
     margin-bottom: 0;
   }
+}
+
+.text-only-kapel .content{
+  max-width: 800px;;
 }
 
 .description-box{
@@ -232,7 +312,7 @@ figcaption{
   }
 
   .hero-overlay{
-    background: rgba($primary, 0.15);
+    background: rgba($primary, 0.5);
   }
 
   .hero-left{
@@ -240,6 +320,7 @@ figcaption{
     
     img{
       height:350px;
+      padding:1rem;
     }
   }
 
@@ -247,9 +328,10 @@ figcaption{
     background-size: cover;    
   }
 
+
   
   #hero-search-form{    
-    margin: 2rem 0;
+    margin: 2rem 0 1rem 0;
 
     .field{
       background: white;
@@ -307,16 +389,16 @@ figcaption{
     max-width: 700px;
     font-weight:500;
     padding-top: 30%;
-    padding:5rem 2rem 5rem 2rem;
-    max-width:50%;
+    padding:4rem 2rem 4rem 2rem;
+    width:100%;
+    max-width: 500px;
     //background: rgba($primary,0.8);
 
     p{
-      font-size: 1rem;
+      font-size: 1.1rem;
     }
 
     .link{
-      margin-top: 2rem;
       text-align: right;
 
       a{
@@ -354,6 +436,81 @@ figcaption{
   }
 }
 
+//home-block
+.home-block{
+  padding-top:2.5rem !important;
+
+  .home-level{
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba($accent,0.5);
+  }
+  .home-top{    
+    color: $primary;    
+  }
+}
+
+.media + .media {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 1rem;
+}
+
+.home-slider{
+  .slick-list{
+    
+  }
+
+  .slick-track{
+    display: flex !important;
+  }
+
+  .slick-slide{
+      height: inherit !important;
+  }
+
+  .slide-container, .slide, .slick-slide, .slick-slide div{
+    width: 100%;
+   
+  }
+
+  .slide-container{
+    min-height:400px;
+    position: relative;
+    background-size: cover !important;
+
+
+    .slide-content{
+      bottom: 0rem;
+      color:white;
+
+      .subtitle{
+        color:white;
+      }
+
+      .title a{
+        color:white;
+        background: $primary;
+        padding:0 0.3rem;
+      }
+
+      .slide-back{
+        color:white;
+        background: $primary;
+        padding:0.3rem;
+      }
+
+      .slide-link{
+        color:white;
+        background: $primary;
+        padding:0.3rem;
+        font-size: 1rem;
+      }
+    }
+  }  
+}
+
+.inspiratie{
+}
 
 //card
 .card{
@@ -432,20 +589,30 @@ figcaption{
   align-items: center;
 }
 
+.media-content{
+  display: flex;
+  height: 96px;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .text-box{
-  padding: 1.5rem;
-  background: $accent;
-  margin-bottom: 1rem;
-  height:100%;
+  h2,h4{
+    color: $primary;
+  }
 
   h4{
     line-height: 1.5 !important;
   }
 
-  //browse-block
-  h2.title{
-    color: #333;
-  }
+}
+
+.content-value{
+  margin-bottom: 0.8rem;
+}
+
+.reverse .text-box h2{
+  margin-bottom: 0.2rem;
 }
 
 .color-section{
@@ -490,10 +657,6 @@ figcaption{
 }
 
 .browse-text{
-  padding: 2rem 2rem 1rem 2rem;
-  background: white;
-  box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.08);
-  height: 100%;
 
   input{
     border: none;
@@ -701,6 +864,8 @@ figcaption{
   }
   .search-facet-items{
     margin-bottom: 0.5rem;
+    max-height: 300px;
+    overflow-y: scroll;
   }
 
   .more-link, .less-link{
@@ -726,8 +891,6 @@ figcaption{
 }
 
 .resource-metadata{
-  padding: 1rem;
-
   h4 span{
       border-bottom: 2px solid $primary;
   }
@@ -816,8 +979,25 @@ figcaption{
   font-family: $family-primary;
   padding: 1rem;
 
+  #page-actions input{
+    background: rgba($primary,1);
+    border: none;
+    color: white;
+    padding: 0.3rem;
+    cursor: pointer;
+  }
+
   h4{      
-    color: #fff;
+    margin:1rem 0 0.2rem 0 !important;
+    font-size:1.2rem !important;
+  }
+
+  .reference-list{
+    max-height: 150px;
+    overflow-y: scroll;
+    padding:0.5rem 1rem;
+    background: rgba(white,0.4);
+    list-style: none;
   }
 
   .kaart-button{
@@ -832,6 +1012,11 @@ figcaption{
 }  
 #mapping-map{
   position: relative;
+}
+
+.leaflet-container a{
+  color: $primary !important;
+  font-family: $family-primary !important;
 }
 
 .link-button{
@@ -888,6 +1073,13 @@ figcaption{
     }
   }
 
+  .uri-value-link{
+    display: flex;
+    background: rgba($accent,0.1);
+    margin-bottom: 0.2rem;
+    padding: 1rem;
+  }
+
   .tabs a{
     border-bottom-color: rgba($accent,0.3);
     color: rgba($primary,0.8);
@@ -918,10 +1110,6 @@ figcaption{
 }
 
 .contribute{
-  .property{
-    margin-bottom: 2rem;
-  }
-
   .values{
     font-family: $family-light;
 
@@ -941,6 +1129,7 @@ figcaption{
 
   .contribute-medias{
     margin-top: 2rem;
+    margin-bottom: 2rem;
     padding:1rem;
     background: rgba($accent,0.1);
   }
@@ -955,23 +1144,111 @@ figcaption{
   }
 }
 
+[data-data-type="uri"] label {
+  padding: 6px 0 6px 6px;
+  z-index: 1;
+  font-weight: bold;
+  color: rgba(0,0,0,0.35);
+  width: 100% !important;
+  display: flex;
+}
+
+[data-data-type="uri"] .input-body input.value, [data-data-type="uri"] textarea.value-label {
+  margin: -6px 0 0 6px !important;
+  height: auto;
+  border: 0;
+  padding: 6px;
+  font-weight: normal;
+  width: 100%;
+  background: transparent;
+}
+
+strong{
+  color: inherit !important;
+}
+
+
+.tooltip {
+  background: rgba($accent, 0.2);  
+  margin: 1rem 0;
+  font-size:0.9rem;  
+  visibility:hidden;
+  position:absolute;
+  width:100%;
+  max-width: 400px;
+  background: $accent;
+
+  a{
+    text-decoration: underline;
+    color: white;
+  }
+
+  ul{
+    padding: 0.5rem 1.5rem;
+  }
+
+  .close{
+    position: absolute;
+    top:0;
+    right: 0;
+    cursor:pointer;
+    color: white;
+    padding: 0.8rem;
+    border-radius: 50%;
+    font-size: 0.9rem;
+  }
+}
+
+.tooltip-content {
+  visibility:hidden;
+  position: relative;
+}
+
+.tooltip.active{
+  visibility:visible;
+  
+}
+
+.tooltip-content.active {
+  visibility:visible;
+  padding: 1rem 2rem 1rem 1rem;
+  font-family: $family-light;
+  background: $primary;
+  color: white;
+  z-index: 100;
+  max-height: 400px;
+  overflow-y: scroll;
+  font-weight: 300;
+}
+
 figcaption{
   font-weight: bold;
 }
 
-.description{
-  padding-bottom: 2rem;  
+.content, .description{  
+    font-family: $family-light;
 }
-
 
 .metadata-line{
   border-top: 1px solid rgba($accent,0.1);
   padding:1rem 0;
-  overflow: auto;
+  clear: both;
+
+  .open{
+    background: rgba($primary,1);
+    color: white;
+    padding: 0rem 0.6rem;
+    border-radius: 50%;
+    margin-left: 0.2rem;
+    font-size: 0.9rem;
+    display: inline-block;
+  }
+  
 
   .titles{
     width:25%;
     float:left;
+    padding-right: 1rem;
 
     .label{
       font-size:1.1rem;
@@ -979,11 +1256,27 @@ figcaption{
     }
   }
   
-  .values{
+  .values-col{
     width: 75%;
-    float: left;
     padding-left: 2rem;
     font-family: $family-light;
+    display: inline-block;
+  }
+
+  
+
+  @media screen and (max-width: 500px){    
+    .titles{
+      width:100%;
+      float:none;
+  
+    }
+    
+    .values{
+      width: 100%;
+      float: none;
+      padding-left: 0;
+    }
   }
 }
 
@@ -1017,6 +1310,7 @@ figcaption{
 
 //footer
 footer{
+  padding-top:5rem !important;
   width: 100%;
   z-index: 0;
   background: #fff !important;
@@ -1024,6 +1318,7 @@ footer{
 
   img{
     height:55px;padding-right: 1rem;
+    margin-bottom: 1rem;
   }
 
   li {

@@ -30,10 +30,10 @@ $this->htmlElement('body')->appendAttribute('class', 'contribution resource show
     <h1 class="title is-2 is-family-secondary"><?php echo $contribution->displayTitle(); ?></h1>
     <div class="subtitle is-4 is-family-secondary">Aanvulling</div>
 
-    <ul class="contribution-status">
-        <li class="contribution-resource"><?= $resource ? $resource->linkPretty() : $escape($translate('No resource')) ?></li>
-        <li class="submitted"><?= $escape($contribution->isSubmitted() ? $translate('Is submitted') : $translate('Is not submitted')) ?></li>
-        <li class="reviewed"><?= $escape($contribution->isReviewed() ? $translate('Is reviewed') : $translate('Is not reviewed')) ?></li>
+    <ul class="contribution-status" style="margin-bottom:2rem;">
+        <li class="contribution-resource"><?= $resource ? $resource->linkPretty() : "De kapel heeft nog geen vaste link" ?></li>
+        <li class="submitted"><?= $escape($contribution->isSubmitted() ? "De kapel is al ingediend" : "De kapel is nog niet ingediend") ?></li>
+        <li class="reviewed"><?= $escape($contribution->isReviewed() ? "De kapel werd nagekeken" : "De kapel werd nog niet nagekeken") ?></li>
     </ul>
 
     <div class="messages">
@@ -42,18 +42,17 @@ $this->htmlElement('body')->appendAttribute('class', 'contribution resource show
 
     <?php $this->trigger('view.show.before'); ?>
 
-    <?= $contribution->displayValues() ?>
 
     <?php if (!$contribution->isSubmitted()): ?>
-    <ul class="actions" data-message-remove-contribution="<?= $escapeAttr($translate('Are you sure to remove this contribution?')) ?>">
+    <div class="actions" style="margin:2rem 0 0 0"  data-message-remove-contribution="<?= $escapeAttr($translate('Are you sure to remove this contribution?')) ?>">
         <?php if ($contribution->userIsAllowed('update')): ?>
-        <li><a class="o-icon-edit button edit-button edit-contribution" href="<?= $escapeAttr($contribution->siteUrl($siteSlug, false, 'edit', $space === 'guest')) ?>"><?= $escape($translate('Edit')) ?></a></li>
+        <a class="o-icon-edit button edit-button edit-contribution" href="<?= $escapeAttr($contribution->siteUrl($siteSlug, false, 'edit', $space === 'guest')) ?>"><?= $escape($translate('Edit')) ?></a>
         <?php endif; ?>
-        <li><a class="o-icon-submit button submit-button submit-contribution" href="<?= $escapeAttr($contribution->siteUrl($siteSlug, false, 'submit', $space === 'guest')) ?>"><?= $escape($translate('Submit')) ?></a></li>
+        <a class="button submit-button submit-contribution" href="<?= $escapeAttr($contribution->siteUrl($siteSlug, false, 'submit', $space === 'guest')) ?>"><?= $escape($translate('Indienen')) ?></a>
         <?php if ($contribution->userIsAllowed('delete')): ?>
-        <li><a class="o-icon-delete button delete-button remove-contribution" data-contribution-id="<?= $contribution->id() ?>" data-contribution-url="<?= $escapeAttr($contribution->siteUrl($siteSlug, false, 'delete', $space === 'guest')) ?>" href="#"><?= $escape($translate('Delete')) ?></a></li>
+        <a class="o-icon-delete button delete-button remove-contribution" data-contribution-id="<?= $contribution->id() ?>" data-contribution-url="<?= $escapeAttr($contribution->siteUrl($siteSlug, false, 'delete', $space === 'guest')) ?>" href="#"><?= $escape($translate('Delete')) ?></a>
         <?php endif; ?>
-    </ul>
+    </div>
     <?php endif; ?>
 
     <?php $this->trigger('view.show.after'); ?>

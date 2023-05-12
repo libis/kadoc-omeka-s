@@ -44,7 +44,7 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') 
 ?>
 
 
-<div class="columns is-multiline">
+<div class="columns is-multiline" style="align-items:strech;">
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):
         $resourceType = $resource->resourceName();
@@ -63,50 +63,78 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') 
         endif;
     ?>
 
-    <div class="column is-3  resource-thumbnail resource <?= $resourceType ?>">
+    <div class="column is-3 resource-thumbnail resource <?= $resourceType ?>" >
         <div class="">
-            <a class="resource-link" href="<?php echo $resource->url();?>"><img src="<?php echo $mediaUrl;?>"></a>
+            <a class="resource-link" href="https://kapelletjes.be/item/<?php echo $resource->id();?>"><img src="<?php echo $mediaUrl;?>"></a>
         </div>   
-        <div class="content resource-metadata-grid">
-            <h4 style="margin:0.3rem 0;" class="title is-5"><?= $resource->link($heading) ?></h4>        
+        <div class="resource-metadata-grid">
+            <h4 style="margin:0.3rem 0;" class="title is-4 font-family-secondary"> <a href="https://kapelletjes.be/item/<?php echo $resource->id();?>"><?php echo $heading;?></a></h4>        
+            <?php if($resource->value("locatie:gemeente") || $resource->value("locatie:deelgemeente")):?>
+                <h5 style="margin:0.3rem 0;" class="subtitle is-5">
+                <?php if($resource->value("locatie:gemeente")):
+                    echo $resource->value("locatie:gemeente");
+                endif;
+                if($resource->value("locatie:deelgemeente")):
+                    if($resource->value("locatie:deelgemeente")->asHtml() != $resource->value("locatie:gemeente")->asHtml()):
+                        echo ", ".$resource->value("locatie:deelgemeente");
+                    endif;
+                endif;?>       
+                </h5>
+            <?php endif;?>    
         </div>
     </div> 
-    <div class="content column is-8 resource-metadata">
-        <!--<h6 class="subtitle is-6"><?php echo $type;?></h6>-->
-        <h4 class="title"><?= $resource->link($heading) ?></h4>
-        <?php if($resource->value("schema:dateCreated")):?>
-        <div class="date is-small">
-            <?= $resource->value("schema:dateCreated");?>
-        </div>      
-        <?php endif;?>    
-        <div class="description">
-            <?php if ($resource->displayDescription()): ?>
-                <?php $body = $resource->displayDescription();?>   
-                <p>
-                    <?php $trunc = implode(" ", array_slice(explode(" ", $body), 0, 21)); ?>
-                    <?php if(strlen($body) != strlen($trunc)):?>
-                    <?php echo $trunc.' ...';?>
-                    <?php else:?>
-                    <?php echo $trunc;?>
-                    <?php endif;?>
-                </p>
-            <?php endif; ?>
-        </div>   
-        <?php if($resource->value("schema:creator")):?>
-            <div class="creator" style="font-size:0.9rem;margin-top:1rem;">
-                <a style="padding: 0.2rem 0;" href="/s/zorgerfgoed/collecties?facet[schema%3Acreator][]=<?php echo $resource->value("schema:creator");?>"><?php echo $resource->value("schema:creator");?></a>
+    <div class="column is-8 resource-metadata">
+        <div class="white-box">
+            <h4 style="margin:0.3rem 0;" class="title">
+            <a href="https://kapelletjes.be/item/<?php echo $resource->id();?>"><?php echo $heading;?></a>                      
+            </h4>
+        
+            <?php if($resource->value("locatie:gemeente") || $resource->value("locatie:deelgemeente")):?>
+                <h5 style="margin:0.3rem 0;font-size:1.1rem;" class="subtitle is-5">
+                <?php if($resource->value("locatie:gemeente")):
+                    echo $resource->value("locatie:gemeente");
+                endif;
+
+                if($resource->value("locatie:deelgemeente")):
+                    if($resource->value("locatie:deelgemeente")->asHtml() != $resource->value("locatie:gemeente")->asHtml()):
+                    echo ", ".$resource->value("locatie:deelgemeente");
+                    endif;
+                endif;?>                     
+                <?php if($resource->value("schema:dateCreated")):?>
+                    <?= ", ".$resource->value("schema:dateCreated");?>
+                <?php endif;?>  
+                </h5>
+            <?php endif;?>    
+                
+            <div class="description">
+                <?php if ($resource->displayDescription()): ?>
+                    <?php $body = $resource->displayDescription();?>   
+                    <p>
+                        <?php $trunc = implode(" ", array_slice(explode(" ", $body), 0, 21)); ?>
+                        <?php if(strlen($body) != strlen($trunc)):?>
+                        <?php echo $trunc.' ...';?>
+                        <?php else:?>
+                        <?php echo $trunc;?>
+                        <?php endif;?>
+                    </p>
+                <?php endif; ?>
+            </div>   
+            <?php if($resource->value("schema:creator")):?>
+                <div class="creator" style="font-size:0.9rem;margin-top:1rem;">
+                    <a style="padding: 0.2rem 0;" href="/s/zorgerfgoed/collecties?facet[schema%3Acreator][]=<?php echo $resource->value("schema:creator");?>"><?php echo $resource->value("schema:creator");?></a>
+                </div>
+            <?php endif;?>
+            <div style="padding-top:1rem;">
+                <span>
+                    <a href="https://kapelletjes.be/item/<?php echo $resource->id();?>">
+                    Alle gegevens
+                    <span class="icon is-small">
+                        <i class="fas fa-caret-right"></i>
+                    </span>
+                    </a>
+                </span>     
             </div>
-        <?php endif;?>
-        <div style="padding-top:1rem;">
-            <span>
-                <a href="<?php echo $resource->url();?>">
-                Alle gegevens
-                <span class="icon is-small">
-                    <i class="fas fa-caret-right"></i>
-                </span>
-                </a>
-            </span>     
-      </div>
+        </div>
     </div>
 
     <?php endforeach; ?>

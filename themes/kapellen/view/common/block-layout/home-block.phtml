@@ -1,0 +1,227 @@
+<?php
+$translate = $this->plugin('translate');
+$sitename = $block->page()->site()->title();
+?>
+<section class="section home-block">
+  <div class="container">   
+    <!--<h2 class="title is-2 is-family-secondary home-top">Kapel in de kijker</h2>  -->
+    <div class="columns is-8 is-variable">
+      <div class="column is-6">       
+        <div class="level home-level">
+          <div class="level-left">
+            <div class="level-item">
+              <h2 class="title is-4 is-family-secondary home-top">Kapelletjes in de kijker</h2>   
+            </div>
+          </div>          
+          <div class="level-right">
+            <div class="level-item">
+              <div class="browse-all has-text-right">
+                <a href="/s/kapellen/zoek-kapellen" class="">
+                  <span>Ontdek de kapelletjes van Vlaanderen</span>
+                  <span class="icon is-small">
+                    <i class="fas fa-angle-right"></i>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>              
+        </div>
+              
+        <?php if($this->resources):?>
+          <!--<div class="slider home-slider">
+            <?php
+            $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+            $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+
+            foreach ($this->resources as $resource):
+              $heading = $resource->value($headingTerm, ['default' => $translate('[Untitled]')]);
+            
+            ?>
+              <div class="slide">
+                <?php
+                  $media = $resource->media();      
+                ?>
+                <?php if($media):?>
+                  <div class="slide-container" style="background: url('<?php echo $media[0]->thumbnailUrl('large');?>') center center;">  
+                <?php else:?>   
+                  <div class="slide-container">
+                <?php endif;?>             
+                  <div class="slide-content">                
+                    <h3 class="title is-3 is-family-secondary">
+                        <a href="<?php echo $resource->url(); ?>"><?php echo $resource->displayTitle();?></a>
+                    </h3>  
+                    <h4 class="title is-5 is-family-secondary">
+                      <span class="slide-back"><?php if($resource->value("locatie:deelgemeente")):?>
+                        <?php echo $resource->value("locatie:deelgemeente");?>
+                      <?php endif;?>  
+                      <?php echo $resource->value("locatie:gemeente");?></span>
+                    </h4> 
+                    <p style="text-align:right;">
+                      <a class="slide-link" href="<?php echo $resource->url();?>">
+                      Alle gegevens
+                      <span class="icon is-small">
+                        <i class="fas fa-caret-right"></i>
+                      </span>
+                      </a>
+                    </p>                   
+                  </div>        
+              </div>
+            </div>
+          <?php endforeach; ?>
+                      -->
+          <div class="item" style="margin-bottom:1rem;">
+            <?php
+            $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+            $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+
+            foreach ($this->resources as $resource):
+                $heading = $resource->value($headingTerm, ['default' => $translate('[Untitled]')]);
+                $body = $resource->displayDescription();
+              
+                $type = $resource->resourceTemplate();
+                if($type):
+                  $type= $type->label();          
+                else:
+                  $type= "Object";
+                endif;
+                
+                $media = $resource->media();
+                if($media):
+                    $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('square'));
+                else:
+                  $mediaurl = "";
+                endif;
+
+                $url = $resource->url();
+                $date = '';
+              ?>
+              <article class="media" style="align-items: center;">
+                <figure class="media-left">
+                  <p class="image is-96x96">
+                    <img src="<?php echo  $mediaurl;?>">
+                  </p>
+                </figure>  
+                <div class="">                  
+                  <h4 class="is-5 title"><a class="" href="<?php echo $url;?>"><?php echo $resource->displayTitle();?></a></h4>
+                  <h4 class="subtitle is-6" style="margin-bottom:0.5rem;">
+                      <span class="slide-back">
+                      <?php if($resource->value("locatie:gemeente")):
+                          echo $resource->value("locatie:gemeente");
+                      endif;
+                      if($resource->value("locatie:deelgemeente")):
+                          if($resource->value("locatie:deelgemeente")->asHtml() != $resource->value("locatie:gemeente")->asHtml()):
+                              echo ", ".$resource->value("locatie:deelgemeente");
+                          endif;
+                      endif;?>       
+                      </span>
+                    </h4> 
+                  <p>
+                    <a href="<?php echo $resource->url();?>">
+                    Alle gegevens
+                    <span class="icon is-small">
+                      <i class="fas fa-caret-right"></i>
+                    </span>
+                    </a>
+                  </p>  
+                </article>
+            <?php endforeach; ?>
+          </div> 
+        <!--<div class="browse-all has-text-right" style="padding-top:1rem;">
+          <a href="/s/kapellen/zoek-kapellen" class="button is-primary">
+            <span>Ontdek de kapelletjes van Vlaanderen</span>
+            <span class="icon is-small">
+              <i class="fas fa-angle-right"></i>
+            </span>
+          </a>
+        </div>-->
+      <?php endif;?> 
+                      </div>                  
+
+      <div class="column is-6 right-home">   
+        <div class="inspiratie">
+        <div class="level home-level">
+          <div class="level-left">
+            <div class="level-item">
+              <h2 class="title is-4 is-family-secondary home-top">Inspiratie in de kijker</h2>         
+            </div>
+          </div>          
+          <div class="level-right">
+            <div class="level-item">
+              <div class="browse-all has-text-right">
+                <a href="/s/kapellen/inspiratiegids" class="">
+                  <span>Ga naar de inspiratiegids</span>
+                  <span class="icon is-small">
+                    <i class="fas fa-angle-right"></i>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>              
+        </div>        
+          
+        <?php if($this->resources2):?>
+          <div class="item">
+            <?php
+            $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+            $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+
+            foreach ($this->resources2 as $resource):
+                $heading = $resource->value($headingTerm, ['default' => $translate('[Untitled]')]);
+                $body = $resource->displayDescription();
+              
+                $type = $resource->resourceTemplate();
+                if($type):
+                  $type= $type->label();          
+                else:
+                  $type= "Object";
+                endif;
+                
+                $media = $resource->media();
+                if($media):
+                    $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('square'));
+                else:
+                  $mediaurl = "";
+                endif;
+
+                $url = $resource->url();
+                $date = '';
+              ?>
+              <article class="media" style="align-items: center;">
+                <figure class="media-left">
+                  <p class="image is-96x96">
+                    <img src="<?php echo  $mediaurl;?>">
+                  </p>
+                </figure>  
+                <div class="">
+                 
+                  <h4 class="is-5 title" style="margin-bottom: 0.5rem;"> <a class="" href="<?php echo $url;?>"><?php echo $resource->displayTitle();?></a></h4>
+                 
+                  <p>
+                    <a href="<?php echo $resource->url();?>">
+                    Alle gegevens
+                    <span class="icon is-small">
+                      <i class="fas fa-caret-right"></i>
+                    </span>
+                    </a>
+                  </p>
+                </article>
+            <?php endforeach; ?>
+          </div>       
+          
+        <?php endif;?>
+      </div>
+      </div>
+    </div>    
+  </div>
+</section>
+<script>
+  /*
+  $( document ).ready(function() {
+    $(".slider").slick({      
+      slidesToShow: 1,
+      autoplay: true,
+      adaptiveHeight: true,
+      autoplaySpeed: 6000
+    });  
+  });  */
+</script>  

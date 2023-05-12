@@ -85,7 +85,7 @@ $(document).ready(function() {
             },
         })
         .done(function(data) {
-            window.location.reload();
+            window.location.href("https://kapelletjes.be/zoek-kapellen");
          })
         .fail(function() {
             alert('An error occured.');
@@ -101,7 +101,7 @@ $(document).ready(function() {
         Object.keys(currentFields).forEach(function(term) {
             if (currentFields[term]['fillable'] === false) {
                 $('#edit-resource .property[data-term="' + term + '"]').each(function () {
-                    if ($(this).find('.values > .value').length) {
+                    if ($(this).find('.values > .value').length && term !="dcterms:title") {
                         $(this).find('.add-values').hide();
                     }
                 });

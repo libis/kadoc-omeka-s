@@ -5,7 +5,6 @@ $this->htmlElement('html')->setAttribute('lang', $this->lang());
 $this->headMeta()->setCharset('utf-8');
 $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
 $this->headTitle($siteTitle)->setSeparator(' · ');
-$this->headTitle()->append($this->setting('installation_title', 'Omeka S'));
 $this->headLink()->prependStylesheet($this->assetUrl('css/style.min.css'));
 $this->headLink()->prependStylesheet($this->assetUrl('css/selectize.css'));
 //$this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
@@ -35,15 +34,12 @@ if (strpos($url, 'page/home') !== false) {
        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
         <!-- Add the slick-theme.css if you want default styling -->
         <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
-       
         <?php echo $this->headMeta(); ?>
         <?php echo $this->headTitle(); ?>
         <?php echo $this->headLink(); ?>
         <?php echo $this->headStyle(); ?>
         <?php echo $this->headScript(); ?>
-        <META HTTP-EQUIV="Access-Control-Allow-Origin" CONTENT="http://https://lib.is">
         <script src="https://kit.fontawesome.com/582fb8c29f.js" crossorigin="anonymous"></script>
-        
         <script src="https://unpkg.com/colcade@0/colcade.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,12 +54,17 @@ if (strpos($url, 'page/home') !== false) {
         <div class="container">
           <div class="navbar-brand">
             <?php if(!$home):?>
-            <a class="navbar-item" href="<?php echo $site->url(); ?>">
+            <a class="navbar-item not-on-mobile" href="<?php echo $site->url(); ?>">
             <?php if ($this->themeSetting('logo')): ?>
                   <img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" alt="<?php echo $escape($siteTitle); ?>" />
               <?php endif; ?>
             </a>
             <?php endif;?>
+            <a class="navbar-item on-mobile" href="<?php echo $site->url(); ?>">
+            <?php if ($this->themeSetting('logo')): ?>
+                  <img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" alt="<?php echo $escape($siteTitle); ?>" />
+              <?php endif; ?>
+            </a>
             <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -96,11 +97,8 @@ if (strpos($url, 'page/home') !== false) {
      </div>
     </header>
 
+    <div class="main-area"><?php echo $this->content; ?></div>    
     
-        
-          <div class="main-area"><?php echo $this->content; ?></div>    
-      
-
     <footer class="footer">
       <div class="container">
         <nav class="level">
@@ -118,13 +116,9 @@ if (strpos($url, 'page/home') !== false) {
             </div>
 
             <!-- Right side -->
-            <div class="level-right">
-              <p class="level-item">
-                </p><ul>
-                  <li><a href="/page/disclaimer">Disclaimer</a></li>
-                </ul><p></p>
-
-            </div>
+            <!--<div class="level-right">              
+                <a href="/page/project">Project</a>              
+            </div>-->
           </nav>
           <p style="font-size:0.9rem;">© KU Leuven, built by <a href="//libis.be">LIBIS</a></p>
       </div>

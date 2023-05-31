@@ -17,6 +17,9 @@ $itemMedia = [];
 
 if(isset($resource)){
     $item = $resource;
+    $pdf = "/themes/kapellen/asset/docs/Handleiding_Kaarttoepassing_ContributorEdit.pdf";
+}else{
+    $pdf = "/themes/kapellen/asset/docs/Handleiding_Kaarttoepassing_ContributorAdd.pdf";
 }
 
 if (isset($item)) {
@@ -29,7 +32,7 @@ if (isset($item)) {
 ?>
 <fieldset id="mapping-section">
     <h4 class="label" style="font-weight:bold;margin-top:1rem;font-size:1.1rem;">Op de kaart</h4>                                       
-    
+    <a href="<?php echo $pdf;?>">Bekijk de handleiding</a><br><br>
     <div id="mapping-map" style="height:500px;"
         data-mapping="<?php echo $this->escapeHtml(json_encode($mapping)); ?>"
         data-markers="<?php echo $this->escapeHtml(json_encode($markers)); ?>"

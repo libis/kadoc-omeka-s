@@ -212,7 +212,7 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
                     <div class="values">
                         <?php
                         foreach ($field['contributions'] as $indexContribution => $fieldContribution):
-                        
+                            
                             /** @var \Omeka\Api\Representation\ValueRepresentation $value */
                             $value = $fieldContribution['original']['value'];
                             if (!$value && !$field['fillable']) continue;

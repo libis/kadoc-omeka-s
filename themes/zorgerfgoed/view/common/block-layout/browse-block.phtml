@@ -61,14 +61,27 @@ $sitename = $block->page()->site()->title();
               $mediaurl= "";
             endif;
           else:
-            $media = $resource->media();
-            if($media):
+           
+            $media = $resource->thumbnail();
+            
+            if($media):           
+              if($media->getControllerName() == "asset"):
+                $mediaurl = $media->assetUrl('medium');
+              else:                  
+                if(sizeof($this->resources) <= 2):
+                  $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('large'));
+                else:
+                  $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('medium'));
+                endif;
+              endif;  
+            elseif($media = $resource->media()):
               if(sizeof($this->resources) <= 2):
                 $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('large'));
               else:
                 $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('medium'));
               endif;
             else:
+
               $mediaurl = "";
             endif;
           endif;

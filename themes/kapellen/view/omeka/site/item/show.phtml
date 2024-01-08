@@ -140,8 +140,15 @@ endif;
               <?php foreach($links as $link):?>                
                 <?php echo $link->asHtml();?>
               <?php endforeach;?>
+            <?php endif;?> 
+            <?php $links = $item->value('project:projectUrl', array('all' => true));?>
+            <?php if($links):?>              
+              <?php foreach($links as $link):?>                
+                <?php echo $link->asHtml();?>
+              <?php endforeach;?>
             <?php endif;?>       
            </div>
+          
          </div>
         </div>
       </div>
@@ -152,6 +159,7 @@ endif;
     <div class="container" style="margin-bottom:1.5rem;">      
       <?php
         $itemMedia = $resource->media();
+        $itemMedia = array_reverse($itemMedia);
         $sortedMedia = $this->SortMedia($itemMedia);
         $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
         $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
@@ -175,12 +183,13 @@ endif;
 
       <div class="columns">
         <div class="column is-8">
-                 
+           <!--      
           <?php if($item->value('schema:description')):?>
             <div class="content description">
               <?php echo $item->value('schema:description');?>
             </div>  
           <?php endif;?>  
+          -->
 
           <div class="tabs is-centered">
             <ul>
@@ -188,6 +197,7 @@ endif;
               <li class="tab"><a href="#Ontstaan-en-tradities">Ontstaan en tradities</a></li>
               <li class="tab"><a href="#Exterieur">Exterieur</a></li>
               <li class="tab"><a href="#Interieur">Interieur</a></li>
+              <li class="tab"><a href="#Beheer-en-toestand">Beheer en toestand</a></li>
               <li class="tab"><a href="#Bronnen-en-links">Bronnen en links</a></li>
             </ul>
           </div>
@@ -209,6 +219,19 @@ endif;
                 <?= $next->link($translate('Next item'), null, ['class' => 'next-item']) ?>
                 <?php endif; ?>
             </div>
+          <?php endif; ?>
+
+          <?php
+          $page = $this->params()->fromQuery('page', 1);
+          $property = $this->params()->fromQuery('property');
+          $subjectValues = $item->displaySubjectValues($page, 25, $property);
+          ?>
+          
+          <?php if ($subjectValues): ?>
+          <div id="item-linked" style="margin-top:2rem;">
+              <h3 class="title is-4 is-family-secondary"><?php echo $translate('Lees meer over deze kapel'); ?></h3>
+              <?php echo $subjectValues; ?>
+          </div>
           <?php endif; ?>
         </div>
         <div class="column">

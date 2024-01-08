@@ -17,7 +17,8 @@ RUN apt-get -qq update && apt-get -qq -y --no-install-recommends install \
     libmagickwand-dev \
     wget \
     ghostscript \
-    ffmpeg
+    ffmpeg \
+    dos2unix
 
 # Mail
 RUN apt-get update && \

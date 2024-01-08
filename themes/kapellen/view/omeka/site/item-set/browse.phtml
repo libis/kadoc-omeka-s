@@ -28,10 +28,10 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
     ?>  
   </div>
   <div class="container">
-    <div class="columns">
+    <!-- <div class="columns">
       <div class="column is-9">
         <div class="browse-text">
-        <form class="has-icons-right" action="<?php echo $this->escapeHtml($this->url(null, ['action' => 'browse'], true)); ?>" id="search-form">
+       <form class="has-icons-right" action="<?php echo $this->escapeHtml($this->url(null, ['action' => 'browse'], true)); ?>" id="search-form">
           <div class="columns" style="margin-bottom:0">
             <div class="column is-7">
               <?php
@@ -58,7 +58,7 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
           </form>
         </div>
       </div>
-    </div>
+    </div>-->
 
 
     <?php $this->trigger('view.browse.before'); ?>
@@ -72,10 +72,12 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
         $media = $itemSet->thumbnail();
         $mediaurl = '';
         if($media):
-            $mediaurl = str_replace('http:','',$media->assetUrl('medium'));
+          $mediaurl = str_replace('http:','',$media->assetUrl('medium'));
+        elseif($media = $itemSet->primaryMedia()):
+          $mediaurl = str_replace('http:','',$media->thumbnailUrl('medium'));
         endif;
     ?>
-        <div class="column is-4">
+        <div class="column is-3">
           <div class="card equal-height">
               <a class="card-link-wrapper" href="<?php echo $itemSet->url();?>">
                 <div class="card-bg card-bg-img-2"
@@ -106,7 +108,7 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
         </div>
     <?php endforeach; ?>
     </div>
-    <?php $this->trigger('view.browse.after'); ?>
+    <?php //$this->trigger('view.browse.after'); ?>
     <?php echo $this->pagination(); ?>
   </div>
 </section>

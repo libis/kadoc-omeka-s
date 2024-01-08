@@ -679,6 +679,8 @@ class ContributionController extends AbstractActionController
             return $this->returnError('Missing term or key.'); // @translate
         }
 
+         
+
         $key = (int) $key;
 
         $resourceData = $contribution->proposalToResourceData($term, $key);
@@ -688,6 +690,12 @@ class ContributionController extends AbstractActionController
                 $this->translate('Contribution is not valid.') // @translate
             ));
         }
+
+        //libis hack to prevent multiple uploads of same file
+        if($term != 'file'):
+            unset($resourceData["o:media"]);
+        endif;   
+        //end hack
 
         $errorStore = new ErrorStore();
         $resource = $this->validateOrCreateOrUpdate($contribution, $resourceData, $errorStore, true);

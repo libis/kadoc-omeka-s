@@ -354,9 +354,9 @@ class ContributionController extends AbstractActionController
                                 $this->messenger()->addSuccess('Contribution successfully saved!'); // @translate
                                 $this->messenger()->addWarning('Review it before its submission.'); // @translate
                             }
-                            die($contribution->resource());
+                            //die($contribution->resource());
                             return $contribution->resource()
-                                ? $this->redirect()->toUrl($contribution->resource()->siteUrl())
+                                ? $this->redirect()->toUrl("https://kapelletjes.be/page/bedankt")
                                 : $this->redirectContribution($contribution);
                         }
                     }
@@ -605,6 +605,8 @@ class ContributionController extends AbstractActionController
 
         $hasError = false;
         if ($this->getRequest()->isPost()) {
+            
+        
             $post = $params->fromPost();
             // The template cannot be changed once set.
             $post['template'] = $resourceTemplate->id();
@@ -637,6 +639,10 @@ class ContributionController extends AbstractActionController
                             if ($response) {
                                 $this->messenger()->addSuccess('Contribution successfully submitted!'); // @translate
                                 // $this->prepareContributionEmail($response->getContent(), 'submit');
+                                $contribution = $response->getContent();
+                                $this
+                                    ->notifyContribution($contribution, 'submit')
+                                    ->confirmContribution($contribution, 'submit');
                             }
                         } elseif ($contribution->isSubmitted() && !$allowUpdateUntilValidation) {
                             $this->messenger()->addWarning('This contribution is already submitted and cannot be updated.'); // @translate
@@ -658,6 +664,10 @@ class ContributionController extends AbstractActionController
                                     $this->messenger()->addSuccess('Contribution successfully updated!'); // @translate
                                 }
                                 // $this->prepareContributionEmail($response->getContent(), 'update');
+                                $contribution = $response->getContent();
+                                $this
+                                    ->notifyContribution($contribution, 'submit')
+                                    ->confirmContribution($contribution, 'submit');
                             }
                         }
                         if ($response) {
@@ -670,7 +680,7 @@ class ContributionController extends AbstractActionController
                             /** @var \Contribute\Api\Representation\ContributionRepresentation $contribution $content */
                             $contribution = $response->getContent();
                             return $contribution->resource()
-                                ? $this->redirect()->toUrl($contribution->resource()->siteUrl())
+                                ? $this->redirect()->toUrl("https://kapelletjes.be/page/bedankt")
                                 : $this->redirectContribution($contribution);
                         }
                     }
@@ -768,6 +778,7 @@ class ContributionController extends AbstractActionController
 
     public function submitAction()
     {
+        
         $resourceType = $this->params('resource');
         $resourceId = $this->params('id');
         $space = $this->params('space', 'default');
@@ -981,13 +992,15 @@ class ContributionController extends AbstractActionController
     {
         $settings = $this->settings();
         $confirms = $settings->get('contribute_author_confirmations', []);
+       
         if (empty($confirms) || !in_array($action, $confirms)) {
             return $this;
         }
 
+       
         $emails = $this->authorEmails($contribution);
         if (empty($emails)) {
-            $this->messenger()->err('The author of this contribution has no valid email. Check it or check the config.'); // @translate
+            $this->messenger()->addError('The author of this contribution has no valid email. Check it or check the config.'); // @translate
             return $this;
         }
 
@@ -1092,6 +1105,8 @@ class ContributionController extends AbstractActionController
 
     protected function authorEmails(?ContributionRepresentation $contribution = null): array
     {
+       
+
         $emails = [];
         $propertyEmails = $this->settings()->get('contribute_author_emails', ['owner'])  ?: ['owner'];
 

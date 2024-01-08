@@ -69,6 +69,9 @@ $notalt = array('Collectie ID','Referenties object','Beeld','Beeld copyright','t
 
                 <?php if($propertyData['alternate_label'] == 'Trefwoorden'):?>
                   <a target="_blank" href="https://slimerfgoed.be/s/zorgerfgoed/collecties?facet%5Bschema%3Agenre%5D%5B%5D=collectie&facet%5Bschema%3Akeywords%5D%5B%5D=<?php echo $value->asHtml(); ?>"><?php echo $value->asHtml(); ?></a>
+                
+                <?php elseif($propertyData['alternate_label'] == 'Bouwjaar'):?>
+                  <?php echo rtrim($value->asHtml(),"-"); ?>
                 <?php else:?>
                   <?php echo $value->asHtml(); ?>
                 <?php endif;?>

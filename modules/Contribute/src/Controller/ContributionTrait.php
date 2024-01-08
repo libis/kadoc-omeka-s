@@ -84,22 +84,25 @@ trait ContributionTrait
             $apiOptions = [];
         }
 
-        try {
+        try {            
+            //add to kapellen
+           
+
             if ($contributionResource) {
                 $apiOptions['isPartial'] = true;
-
+                //var_dump($resourceData);
                 //libis - add media in seperate call to prevent deletion of existing media
                 if(!empty($resourceData["o:media"])):
-                    //var_dump($resourceData["o:media"]);
+                   
                     $medias = $resourceData["o:media"];
                     foreach($medias as $media):
                         $media["o:item"]["o:id"] = $contributionResource->id();
                         $response2 = $api->create("media", $media, [], $apiOptions);
                     endforeach;                   
                    
-                    unset($resourceData["o:media"]);
-                endif;    
-                
+                    //unset($resourceData["o:media"]);
+                endif;
+                unset($resourceData["o:media"]);
 
                 $response = $api
                     ->update($resourceName, $contributionResource->id(), $resourceData, [], $apiOptions);
@@ -110,6 +113,7 @@ trait ContributionTrait
                 $owner = $contribution->owner() ?: null;
                 $resourceData['o:owner'] = $owner ? ['o:id' => $owner->id()] : null;
                 $resourceData['o:is_public'] = false;
+                $resourceData['o:site'] = ['o:id' => 12];
                 $response = $api
                     ->create($resourceName, $resourceData, [], $apiOptions);
             }

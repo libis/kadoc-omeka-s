@@ -26,8 +26,8 @@ class LightGalleryOutput extends AbstractHelper
             $source = ($media->originalUrl()) ? $media->originalUrl() : $media->source(); 
             $mediaCaptionOptions = [
                 'none' => '',
-                'title' => 'data-sub-html="' . $media->displayTitle() . '"',
-                'description' => 'data-sub-html="'. $media->value("dcterms:date") .' '.$media->value("dcterms:description"). '"'
+                'title' => 'data-sub-html="' . $escape($media->displayTitle()) . '"',
+                'description' => 'data-sub-html="'. $escape($media->value("dcterms:date")) .' '.$escape($media->value("dcterms:description")). '"'
             ];
             $mediaCaptionAttribute = ($mediaCaption) ? $mediaCaptionOptions[$mediaCaption] : '';
             $mediaType = $media->mediatype();

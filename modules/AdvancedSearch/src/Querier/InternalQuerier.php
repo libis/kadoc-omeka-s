@@ -483,12 +483,15 @@ SQL;
         }
 
         if ($this->engine->settingAdapter('default_search_partial_word', false)) {
-            $this->args['property'][] = [
-                'joiner' => 'and',
-                'property' => '',
-                'type' => 'in',
-                'text' => $q,
-            ];
+            $qs = explode(" ",$q);
+            foreach($qs as $qe):
+                $this->args['property'][] = [
+                    'joiner' => 'and',
+                    'property' => '',
+                    'type' => 'in',
+                    'text' => $qe,
+                ];
+            endforeach;
             return;
         }
 

@@ -1,0 +1,27 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+?>
+
+<?php foreach ($subjectValues as $term => $values): ?>
+    <?php foreach ($values as $value): ?>
+        <?php
+        $template = $value->resource()->resourceTemplate();
+        $templateProperty = $template ? $template->resourceTemplateProperty($value->property()->id()) : null;
+        $altLabel = $templateProperty ? $templateProperty->alternateLabel() : null;
+        ?>
+        <div class="linked-resource">
+        <?php echo $value->resource()->linkPretty('square', null, null, null); ?></td>
+        </div> 
+    <?php endforeach; ?>
+<?php endforeach; ?>
+
+<script>
+$('#filter-property').on('change', function(e) {
+    var thisSelect = $(this);
+    var property = thisSelect.find(':selected').val();
+    var url = thisSelect.data('url');
+    var fragment = thisSelect.data('fragment');
+    window.location = url + '?' + $.param({property: property}) + '#' + fragment;
+});
+</script>

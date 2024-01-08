@@ -44,6 +44,11 @@ if (strpos($url, 'page/home') !== false) {
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.cdnfonts.com/css/gill-sans-mt-condensed?styles=15946,15950,15948,15949,15952,15945" rel="stylesheet">
+    
+		    <!-- Google tag (gtag.js) -->
+        <script async src=https://www.googletagmanager.com/gtag/js?id=G-2XD0THDD5P></script>
+        <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-2XD0THDD5P'); </script>
+     
       </head>
 
     <?php echo $this->htmlElement('body'); ?>
@@ -82,14 +87,7 @@ if (strpos($url, 'page/home') !== false) {
                       'maxDepth' => $this->themeSetting('nav_depth') - 1
                   ]);
                 ?>
-              </div>
-              <div class="navbar-item">
-                  <button class="button is-primary showSearch">
-                    <span class="icon is-small">
-                      <i class="fas fa-search"></i>
-                    </span>
-                  </button>
-              </div>
+              </div>              
             </div>
           </div>
         </div>
@@ -124,14 +122,7 @@ if (strpos($url, 'page/home') !== false) {
       </div>
     </footer>
 
-    <div class="search-menu modal">
-      <div class="modal-background"></div>
-        <div class="modal-content">
-          <?php echo $this->partial('common/search-form'); ?>
-        </div>
-        <button class="search-menu-close modal-close is-large"></button>
-     </div>
-
+   
      <div class="burger-menu modal">
        <div class="modal-background"></div>
          <div class="modal-content">

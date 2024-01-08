@@ -37,6 +37,7 @@ var Search = (function() {
             resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')
                 + ' ' + viewType;
         }
+        
         localStorage.setItem('search_view_type', viewType);
     };
 
@@ -255,8 +256,8 @@ $(document).ready(function() {
     }
 
     var view_type = localStorage.getItem('search_view_type');
-    if (!view_type) {
-        view_type = 'list';
+    if (view_type != "list") {
+        view_type = 'grid';
     }
     $('.search-view-type-' + view_type).click();
 

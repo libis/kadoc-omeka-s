@@ -21,6 +21,8 @@ endif;
         <li><a href="<?php echo "/s/zorgerfgoed/item/browse?resource_template_id=27";?>">Nieuws</a></li>
         <?php elseif($type == 'Actor (organisatie)'):?>
         <li><a href="<?php echo "/page/project";?>">Partner</a></li>
+        <?php elseif($type == "Tool"):?>              
+            <li><a href="/s/zorgerfgoed/objecten?facet[resource_template_id][]=<?php echo $type;?>">Draaiboek</a></li>  
         <?php else:?>              
             <li><a href="/s/zorgerfgoed/objecten?facet[resource_template_id][]=<?php echo $type;?>"><?php echo $type;?></a></li>  
         <?php endif;?>
@@ -32,6 +34,13 @@ endif;
 <section class="section">
   <div class="container">
     <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle(); ?>
+    <?php if($type == "Tool" && $types = $resource->value("dcterms:type", ["all" => true])):?>
+          <div class="tags are-normal" style="margin-bottom:0;margin-top:0.5rem;">
+          <? foreach($types as $dctype):?>
+              <a href="<?php echo "/s/zorgerfgoed/draaiboek-zoeken?facet[type][]=".$dctype;?>" class="tag is-white is-medium"><?= $dctype ?></a></a>
+          <?php endforeach;?>    
+          </div>
+    <?php endif;?>  
     <?php 
     if($item->value('schema:dateCreated')):?>
       <?php echo ", ".$item->value('schema:dateCreated').' - ';                 
@@ -51,12 +60,11 @@ endif;
   </div>
 </section>
 
-
-<?php if($type == 'Nieuwsbericht'):?>
-  <section class="section">
-    <div class="container">
+<section class="section">
+<?php if($type == 'Nieuwsbericht'):?>  
+    <div class="container" style="margin-bottom:1.5rem;">
       <div class="columns">
-        <div class="column">
+        <div class="column is-4">
           <?php
             $itemMedia = $resource->media();
             $sortedMedia = $this->SortMedia($itemMedia);
@@ -66,49 +74,33 @@ endif;
             <?php if (isset($lightMedia)): ?>
                 <?php echo $this->LightGalleryOutput($lightMedia); ?>
             <?php endif; ?>
-            <?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
-              <div class="column is-4"> 
-                <div id="other-media" class="property">
-                    <h4><?php echo $this->translate('Other Media'); ?></h4>
-                    <div class="values">
-                        <?php foreach($otherMedia as $media): ?>
-                        <div class="value">
-                            <?php echo $media->linkPretty(); ?>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-              </div>  
-          <?php endif; ?>
+           
         </div>
-        <div class="column is-7">
-           <div class="text-box content">
-           <?php $date =  $item->value('schema:datePublished');?>
-           <?php if($date):?>
-            <?php $date = new DateTime($date->asHtml());?>
-            <div style="margin-bottom:0.6rem;color:#666;">
-              <?php echo $date->format('d-m-Y');?>
-            </div>            
-            <?php endif;?> 
-            <?php echo $item->value('schema:description');?>
-            <?php $links = $item->value('schema:citation', array('all' => true));?>
-            <?php if($links):?>
-              <?php foreach($links as $link):?>
-                <div style="margin-top:0.6rem;">
-                  <?php echo $link->asHtml();?>
-                </div>
-              <?php endforeach;?>
-            <?php endif;?>       
-           </div>
-         </div>
+        <div class="column is-8">
+            <div class="text-box content">
+              <?php $date =  $item->value('schema:datePublished');?>
+              <?php if($date):?>
+                <?php $date = new DateTime($date->asHtml());?>
+                <div style="margin-bottom:0.6rem;color:#666;">
+                  <?php echo $date->format('d-m-Y');?>
+                </div>            
+              <?php endif;?> 
+              <?php echo $item->value('schema:description');?>
+              <?php $links = $item->value('schema:citation', array('all' => true));?>
+              <?php if($links):?>
+                <?php foreach($links as $link):?>
+                  <div style="margin-top:0.6rem;">
+                    <?php echo $link->asHtml();?>
+                  </div>
+                <?php endforeach;?>
+              <?php endif;?>       
+            </div>
         </div>
       </div>
     </div>
-  </section>
-<?php else:?>
-  <section class="section">
+<?php elseif($type == "Tool"):?>
     <div class="container" style="margin-bottom:1.5rem;">
-      <div class="columns">
+    <div class="zorg-lightbox">
       <?php
         $itemMedia = $resource->media();
         $sortedMedia = $this->SortMedia($itemMedia);
@@ -116,12 +108,89 @@ endif;
         $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
         ?>
 
-        <div class="column is-4"> 
         <?php if (isset($lightMedia)): ?>
             <?php echo $this->LightGalleryOutput($lightMedia); ?>
         <?php endif; ?>
         <?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
-         
+        
+          <div id="other-media" class="property">
+              <h4><?php echo $this->translate('Other Media'); ?></h4>
+              <div class="values">
+                  <?php foreach($otherMedia as $media): ?>
+                  <div class="value">
+                      <?php echo $media->linkPretty(); ?>
+                  </div>
+                  <?php endforeach; ?>
+              </div>
+          </div>
+       
+        <?php endif; ?>  
+        </div>    
+        <?php $refs =  $item->value('dcterms:references', array('all' => true)); ?>
+        <?php $descs =  $item->value('dcterms:description', array('all' => true)); ?>
+        <?php if($refs || $descs):?>
+         <div class="text-box" >           
+           <?php if($descs):?>
+               <?php foreach($descs as $desc):?>
+                 <div style="margin-bottom:0.3rem;">
+                   <?php if ($res = $desc->valueResource()) {?>
+                     <div class="icon-text">
+                        <span class="icon">
+                          <i class="fas fa-chevron-right"></i>
+                        </span>
+                        <span><?php echo $res->link($res->displayTitle());?></span>
+                     </div>
+                   <?php }elseif($desc->type() == 'uri'){ ?>
+                     <div class="icon-text">
+                        <span class="icon">
+                          <i class="fas fa-chevron-right"></i>
+                        </span>
+                        <span><?php echo $desc->asHtml();?></span>
+                     </div>
+                   <?php }else{ ?>
+                        <?php echo $desc;?>
+                   <?php } ?>
+                 </div>
+              <?php endforeach;?>
+           <?php endif;?>
+           
+           <?php if($refs):?>
+             <hr />
+             <?php foreach($refs as $ref):?>
+               <?php $ref_e = explode("$$",$ref->__toString());?>
+               <?php //var_dump($ref_e);?>
+               <?php if($ref_e[0] != ", "):?>
+                 <?php if(substr( $ref_e[0],0, 2 ) === ", "):?>
+                  <?php $ref_e[0] = substr( $ref_e[0],2 );?>
+                 <?php endif;?>
+                 <div style="margin-bottom:0.3rem;">
+                   <?php if($ref_e[1]):?>
+                     <a target="_blank" href="<?php echo $ref_e[1]; ?>"><?php echo $ref_e[0]; ?></a>
+                   <?php else:?>
+                     <?php echo $ref_e[0]; ?>
+                   <?php endif;?>
+                 </div>
+               <?php endif;?>
+             <?php endforeach;?>
+           <?php endif;?>        
+      </div>
+    <?php endif;?>                
+   
+    </div>   
+<?php else:?>
+    <div class="container" style="margin-bottom:1.5rem;">
+      <div class="columns">
+        <?php
+          $itemMedia = $resource->media();
+          $sortedMedia = $this->SortMedia($itemMedia);
+          $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
+          $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
+        ?>
+
+        <div class="column is-4"> 
+          <?php if (isset($lightMedia)): ?>
+              <?php echo $this->LightGalleryOutput($lightMedia); ?>
+          <?php elseif(isset($otherMedia) && (count($otherMedia) > 0)): ?>       
             <div id="other-media" class="property">
                 <h4><?php echo $this->translate('Other Media'); ?></h4>
                 <div class="values">
@@ -132,13 +201,11 @@ endif;
                     <?php endforeach; ?>
                 </div>
             </div>
-        <?php endif; ?>
-        
+          <?php endif; ?>        
         </div>  
        
-       <div class="column">
-         <div class="text-box" style="height:100%;margin-bottom:0;">
-              
+        <div class="column">
+          <div class="text-box" style="height:100%;margin-bottom:0;">              
             <?php if($item->value('schema:abstract')):?>
               <div style="font-size:1rem;margin-bottom:1rem;">
                 <?php echo $item->value('schema:abstract');?>  
@@ -164,20 +231,17 @@ endif;
                  <?php endforeach; ?>
                </div>
              </div>
-           <?php endif; ?>
-          
-         </div>
-       </div>
+           <?php endif; ?>           
+          </div>
+        </div>
      </div>
    </div>
+
    <?php $refs =  $item->value('dcterms:references', array('all' => true)); ?>
    <?php $descs =  $item->value('dcterms:description', array('all' => true)); ?>
    <?php if($refs || $descs):?>
    <div class="container">
-     <div class="columns">
-       <div class="column is-12">
-         <div class="text-box" >
-           
+         <div class="text-box" >        
            <?php if($descs):?>
                <?php foreach($descs as $desc):?>
                  <div style="margin-bottom:0.3rem;">
@@ -221,17 +285,86 @@ endif;
                <?php endif;?>
              <?php endforeach;?>
            <?php endif;?>
-          </div>
-        </div>
-        
-      </div>
-    <?php endif;?>                
-    <?php //$this->trigger('view.show.after'); ?>
-      <?php
-        $plugins = $this->getHelperPluginManager();
-        $hasNext = $plugins->has('previousResource');
-      ?>
-      <?php if ($hasNext): ?>
+                   </div>
+    </div>
+    <?php endif;?>        
+  
+<?php endif;?>
+<?php 
+    //PDF
+    $itemMedia = $resource->media();
+    $pdfs=[];
+    $sortedMedia = $this->SortMedia($itemMedia);
+    $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
+    $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
+       
+    foreach($itemMedia as $media){
+      if($media->mediaType() == "application/pdf"){
+        $pdfs[] = $media;
+      }
+    };
+
+    if($pdfs || $otherMedia){?>
+      <div class="container">
+        <div class="text-box">
+          <h2>Documenten</h2>  
+          <?php foreach($itemMedia as $media){?>  
+            <?php if($media->mediaType() == "application/pdf"){?>
+              <article class="media" style="max-width:800px;">
+                <figure class="media-left">
+                  <p class="image is-64x64">
+                    <img src='<?php echo $media->thumbnailurl('square')?>'>
+                  </p>
+                </figure>
+                <div class="media-content">
+                  <div class="content">
+                    <?php if($media->value("dcterms:title")):?>
+                      <strong><?php echo $media->value("dcterms:title");?></strong><br>
+                    <?php endif;?>  
+                    <?php if($media->value("dcterms:description")):?>
+                      <?php echo $media->value("dcterms:description");?>
+                    <?php endif;?>  
+                    <hr style="margin:0.5rem;">
+                    <a class='button is-small is-primary' href='<?php echo $media->originalUrl();?>'><span class='icon-text'><span class='icon'><i class='fas fa-file-pdf'></i></span><span>Download PDF</span></span></a>
+                  </div>                  
+                </div>
+              </article>
+            <?php }?>
+          <?php } ?>  
+
+          <?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
+              <?php foreach($otherMedia as $media): ?>
+                <article class="media" style="max-width:800px;">
+                <figure class="media-left">
+                  <p class="image is-64x64">
+                    <img src='<?php echo $media->thumbnailurl('square')?>'>
+                  </p>
+                </figure>
+                <div class="media-content">
+                  <div class="content">
+                    <?php if($media->value("dcterms:title")):?>
+                      <strong><?php echo $media->value("dcterms:title");?></strong><br>
+                    <?php endif;?>  
+                    <?php if($media->value("dcterms:description")):?>
+                      <?php echo $media->value("dcterms:description");?>
+                    <?php endif;?>  
+                    <hr style="margin:0.5rem;">
+                    <a class='button is-small is-primary' href='<?php echo $media->originalUrl();?>'><span>Download</span></a>
+                  </div>                  
+                </div>
+              </article>
+              <?php endforeach; ?>
+          <?php endif; ?>
+        </div> 
+      </div> 
+    <?php }?>  
+                        
+    
+    <?php
+      $plugins = $this->getHelperPluginManager();
+      $hasNext = $plugins->has('previousResource');
+    ?>
+    <?php if ($hasNext): ?>
       <div class="previous-next-items">
           <?php if ($previous = $this->previousResource($resource)): ?>
           <?= $previous->link($translate('Previous item'), null, ['class' => 'previous-item']) ?>
@@ -240,11 +373,11 @@ endif;
           <?= $next->link($translate('Next item'), null, ['class' => 'next-item']) ?>
           <?php endif; ?>
       </div>
-      <?php endif; ?>
-    </div>   
-</section>
-<?php endif;?>
-
+    <?php endif; ?>      
+      
+     
+  </div>   
+</section>           
 <?php
 $page = $this->params()->fromQuery('page', 1);
 $property = $this->params()->fromQuery('property');

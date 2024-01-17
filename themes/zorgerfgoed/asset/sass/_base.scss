@@ -432,9 +432,45 @@ h2.title{
     line-height: 1.5 !important;
   }
 
+  blockquote{
+    border: 1px solid $primary;
+    padding:1.5rem;
+    margin:1.5rem 0;
+  }
+
   //browse-block
   h2.title{
     color: #333;
+  }
+
+  h2{
+    font-family: "Barlow Semi Condensed",sans-serif !important;
+    color: $primary !important;
+    font-size: 1.3rem !important;
+    margin-bottom:1rem;
+  }
+
+  ol,ul{
+    padding-left:2rem;
+    margin-bottom:0.5rem;
+
+    li{
+      margin-bottom: 0.4rem;;
+    }
+
+    ul{
+      padding-top:0.5rem;
+    }
+  }
+
+  ul{
+    li{
+      list-style: circle;
+    }
+
+    ul{
+      padding-top:0.5rem;
+    }
   }
 }
 
@@ -530,6 +566,12 @@ h2.title{
       font-style: normal;
       padding:0;
     }
+  }
+}
+
+.search-results{
+  .pagination{
+    margin:0;
   }
 }
 

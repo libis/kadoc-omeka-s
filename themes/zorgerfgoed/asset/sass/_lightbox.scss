@@ -98,9 +98,19 @@
     height: 30rem;
     text-align: left;
     float: right;
+    float:none;
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
+    font-size: 0;
+}
+
+.media-list li{
+    font-size: 0;
+}
+
+.zorg-lightbox .media-list {
+    float:none;
 }
 
 .media-list .media.resource {
@@ -110,7 +120,7 @@
 
 .lg-backdrop{
     background-color: transparent;
-    background: rgba(#202d5b,0.8) !important;
+    background: rgba(#202d5b,1) !important;
 }
 
 .lg-outer .lg-img-wrap::before, .lg-outer .lg-item::before {
@@ -118,6 +128,10 @@
     display: inline-block;
     height: auto !important;
     vertical-align: middle;
+}
+
+.lg-outer .lg-img-wrap {
+    padding-bottom: 2rem;
 }
 
 .lg-outer .lg-thumb-outer {

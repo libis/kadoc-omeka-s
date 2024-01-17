@@ -71,6 +71,13 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') 
         </div>   
         <div class="content resource-metadata-grid">
             <h4 style="margin:0.3rem 0;" class="title is-5"><?= $resource->link($heading) ?></h4>        
+            <?php if($type == "Tool" && $types = $resource->value("dcterms:type", ["all" => true])):?>
+            <div class="tags are-normal">
+            <? foreach($types as $dctype):?>
+                <span class="tag is-primary"><?= $dctype ?></span>
+            <?php endforeach;?>    
+            </div>
+        <?php endif;?>
         </div>
     </div> 
     <div class="content column is-8 resource-metadata">
@@ -80,7 +87,14 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') 
         <div class="date is-small">
             <?= $resource->value("schema:dateCreated");?>
         </div>      
-        <?php endif;?>    
+        <?php endif;?>  
+        <?php if($type == "Tool" && $types = $resource->value("dcterms:type", ["all" => true])):?>
+            <div class="tags are-normal" style="margin-bottom:0;">
+            <? foreach($types as $dctype):?>
+                <span class="tag is-primary"><?= $dctype ?></span>
+            <?php endforeach;?>    
+            </div>
+        <?php endif;?>  
         <div class="description">
             <?php if ($resource->displayDescription()): ?>
                 <?php $body = $resource->displayDescription();?>   
@@ -99,6 +113,9 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') 
                 <a style="padding: 0.2rem 0;" href="/s/zorgerfgoed/collecties?facet[schema%3Acreator][]=<?php echo $resource->value("schema:creator");?>"><?php echo $resource->value("schema:creator");?></a>
             </div>
         <?php endif;?>
+
+        
+       
     </div>
 
     <?php endforeach; ?>

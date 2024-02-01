@@ -158,16 +158,37 @@ $editRight = $resource->userIsAllowed('update');
                         }
                         echo $this->partialLoop('common/admin/contribute-list-part', $varsForLoop);
                         ?>
+                        
                     </div>
                 <?php endif; ?>
 
                
-                <?php if (isset($proposal["mapping"]) && count($proposal["mapping"])):
+                <?php if (isset($proposal["mapping"]['markers']) && count($proposal["mapping"])):
                     // No upper div to simplify admin theme.
                     ?>
                     <div class="contribution-medias">
                         <div class="property">
                             <h4>Mapping</h4>
+                            <?php                                
+                                // Add mapping data.
+                                $map_set = false;
+                                $mapping = $this->api()->search('mappings', ['item_id' => $this->resource->id()])->getContent();
+                                
+                                $features = $this->api()->search('mapping_markers', ['item_id' => $resource->id()])->getContent();
+                                // echo json_encode($features[0]->getJsonLd());
+                                if(isset($proposal['mapping']['markers'][0])){
+                                if(is_array($proposal['mapping']['markers'][0]['proposed']['@value'])){
+                                    if($features){                                    
+                                        if(
+                                            $proposal['mapping']['markers'][0]['proposed']['@value'][array_key_first($proposal['mapping']['markers'][0]['proposed']['@value'])]["o-module-mapping:lat"] == $features[0]->lat() &&
+                                            $proposal['mapping']['markers'][0]['proposed']['@value'][array_key_first($proposal['mapping']['markers'][0]['proposed']['@value'])]["o-module-mapping:lng"] == $features[0]->lng()
+                                        ){                                       
+                                            $map_set = true;
+                                        }      
+                                    }
+                                }  
+                                }                             
+                            ?>
                             <div class="values">
                                 <div>
                                     <div>
@@ -175,32 +196,40 @@ $editRight = $resource->userIsAllowed('update');
                                        <?php
                                         if (isset($proposal['mapping']['bounds'][0]['proposed']['@value'])):
                                             echo "<h6>Bounds map</h6>";
+                                            if($mapping && $features){
+                                                echo '<span data-name="mapping" class="original-value">'.$mapping[0]->bounds().'</span><br>';
+                                            }
                                             echo $proposal['mapping']['bounds'][0]['proposed']['@value']["o-module-mapping:bounds"];
                                             endif;
                                         if (isset($proposal['mapping']['markers'][0]['proposed']['@value'])):
                                             echo "<h6>Marker Latitude / longitude</h6>";
+                                            if($mapping && $features){
+                                                echo '<span data-name="mapping" class="original-value">'.$features[0]->lat().' / '.$features[0]->lng().'</span><br>';
+                                            }
                                             foreach($proposal['mapping']['markers'][0]['proposed']['@value'] as $marker):
                                                 echo $marker["o-module-mapping:lat"];
                                                 echo " / ".$marker["o-module-mapping:lng"];                                        
                                             endforeach;    
                                         endif;    
-                                        ?>
-                                        
+                                        ?>                                        
                                         </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <?php if ($contribution->isPatch()): // Only patchs should be validated individually. ?>
-                            <span class="single actions">
-                        
-                                <a href="#"
-                                    class="validate-value o-icon-validate-value"
-                                    data-validate-value-url="<?= $escapeAttr($contribution->adminUrl('validate-value')) ?>?term=mapping&key=0"
-                                    data-status="validate-value"
-                                    aria-label="<?= $txt = $escapeAttr(sprintf($translate('Validate this value (%s)'), $translate($process))) ?>"
-                                    title="<?= $txt ?>"></a>
-                        
+                            
+                            <span class="single actions">           
+                                <?php if(!$map_set):?>                                             
+                                        <a href="#"
+                                            class="validate-value o-icon-validate-value"
+                                            data-validate-value-url="<?= $escapeAttr($contribution->adminUrl('validate-value')) ?>?term=mapping&key=0"
+                                            data-status="validate-value"
+                                            aria-label="<?= $txt = $escapeAttr(sprintf($translate('Validate this value (%s)'), $translate($process))) ?>"
+                                            title="<?= $txt ?>"></a>                                
+                                <?php else:?>
+                                    <span class="no-action o-icon-validated-value" aria-label="<?= $escapeAttr($translate('Validated')) ?>"></span>
+                                <?php endif; ?>
                             </span>
                         <?php endif; ?>
                         <?php

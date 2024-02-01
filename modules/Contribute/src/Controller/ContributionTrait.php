@@ -92,14 +92,19 @@ trait ContributionTrait
                 $apiOptions['isPartial'] = true;
                 //var_dump($resourceData);
                 //libis - add media in seperate call to prevent deletion of existing media
-                if(!empty($resourceData["o:media"])):
-                   
+                $exisiting_names = array();
+                $medias = $contributionResource->media();
+                foreach($medias as $media){
+                    $exisiting_names[] = $media->source();
+                }
+                if(!empty($resourceData["o:media"])):                   
                     $medias = $resourceData["o:media"];
                     foreach($medias as $media):
-                        $media["o:item"]["o:id"] = $contributionResource->id();
-                        $response2 = $api->create("media", $media, [], $apiOptions);
+                        if(!in_array($media["o:source"],$exisiting_names)):
+                            $media["o:item"]["o:id"] = $contributionResource->id();
+                            $response2 = $api->create("media", $media, [], $apiOptions);
+                        endif;                         
                     endforeach;                   
-                   
                     //unset($resourceData["o:media"]);
                 endif;
                 unset($resourceData["o:media"]);

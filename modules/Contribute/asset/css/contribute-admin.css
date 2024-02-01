@@ -185,6 +185,16 @@
         content: "";
     }
 
+    .contribution-medias{
+        position: relative;
+    }
+
+    .contribution-medias .actions.file{
+        position: absolute;
+        top:0;
+        right:6px;
+    }
+
     .contribution-medias-label {
         border-bottom: solid 1px;
     }

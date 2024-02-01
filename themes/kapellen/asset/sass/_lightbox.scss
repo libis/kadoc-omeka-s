@@ -95,7 +95,7 @@
 
 .media-list {
     display: flex;
-    height: 25rem;
+    height: 30rem;
     text-align: left;
     float: right;
     flex-wrap: wrap;
@@ -118,7 +118,7 @@
 .media-list .media.resource {
     margin: auto auto;
     width:100%;
-    
+    display: none;
 }
 
 .lg-backdrop{

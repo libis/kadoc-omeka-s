@@ -335,8 +335,6 @@ class ContributionRepresentation extends AbstractEntityRepresentation
         $contributive = $this->contributiveData();
         $proposal = $this->proposal();
 
-        
-
         // Normalize sub-proposal.
         $isSubTemplate = is_int($indexProposalMedia);
         if ($isSubTemplate) {
@@ -364,8 +362,6 @@ class ContributionRepresentation extends AbstractEntityRepresentation
         $proposal['template'] = $resourceTemplate;
         $proposal['media'] = [];
 
-        //var_dump($proposal['mapping']);
-
         $mapping = $proposal['mapping'] ?? [];
         $proposal['mapping'] = [];
 
@@ -375,17 +371,42 @@ class ContributionRepresentation extends AbstractEntityRepresentation
             if ($term === 'template' || $term === 'media') {
                 continue;
             }
-
+            
             // File is specific: for media only, one value only, not updatable,
             // not a property and not in resource template.
-            if ($term === 'file') {
-                $prop = &$proposal[$term][0];
-                $prop['value'] = null;
-                $prop['value_updated'] = $prop['proposed']['@value'];
-                $prop['validated'] = false;
-                $prop['process'] = 'append';
+            if ($term === 'file') {               
+                
+                //find existing file_names and check with new names (LIBIS hack)               
+                $medias = array();
+                $exisiting_names = array();
+                if($this->resource()):
+                    $medias = $this->resource()->media();
+                    foreach($medias as $media){
+                        $exisiting_names[] = $media->source();
+                    }
+                endif;
+                
+                $propterms = $proposal[$term];
+               
+                $i = $indexProposalMedia;
+                $i = 0;
+               // while($i < sizeof($proposal[$term])):
+                    //foreach($propterms as $key=>$value):
+                    //$prop = &$proposal["file"][$key];
+                    $proposal[$term][$i]['value'] = null;
+                    $proposal[$term][$i]['value_updated'] = $proposal[$term][0]['proposed']['@value'];
+                    if(in_array($proposal[$term][0]['proposed']["@value"],$exisiting_names)):
+                        $proposal[$term][$i]['validated'] =true;
+                    else:
+                        $proposal[$term][$i]['validated'] =false;
+                    endif;    
+                    $proposal[$term][$i]['process'] = 'append';
+                    $i++;                  
+               // endwhile;
+                
                 continue;
             }
+            
 
             $isEditable = $contributive->isTermEditable($term);
             $isFillable = $contributive->isTermFillable($term);
@@ -675,13 +696,14 @@ class ContributionRepresentation extends AbstractEntityRepresentation
         if (!$isSubTemplate) {
             foreach ($medias ? array_keys($medias) : [] as $indexProposalMedia) {
                 $indexProposalMedia = (int) $indexProposalMedia;
+                
                 // TODO Currently, only new media are managed as sub-resource: contribution for new resource, not contribution for existing item with media at the same time.
                 $proposal['media'][$indexProposalMedia] = $this->proposalNormalizeForValidation($indexProposalMedia);
+                
             }
         }
 
         $proposal["mapping"] = $mapping;
- 
         return $proposal;
     }
 
@@ -710,6 +732,7 @@ class ContributionRepresentation extends AbstractEntityRepresentation
             return null;
         }
 
+        
         // Right to update the resource is already checked.
         // There is always a resource template.
         if ($isSubTemplate) {
@@ -724,6 +747,8 @@ class ContributionRepresentation extends AbstractEntityRepresentation
 
         $resourceTemplate = $contributive->template();
         $proposal = $this->proposalNormalizeForValidation($indexProposalMedia);
+
+        
         $hasProposedTermAndKey = $proposedTerm && !is_null($proposedKey);
 
         $services = $this->getServiceLocator();
@@ -745,12 +770,22 @@ class ContributionRepresentation extends AbstractEntityRepresentation
         }
 
         // File is specific: for media only, one value only, not updatable,
-        // not a property and not in resource template.
-        if (isset($proposal['file'][0]['proposed']['@value']) && $proposal['file'][0]['proposed']['@value'] !== '') {
+        // not a property and not in resource template.      
+        $data['o:ingester'] = 'contribution';  
+        //another hack libib
+        if(!is_null($indexProposalMedia) && is_null($proposedKey)):
+            $proposedKey = 0;
+        endif;
+        //end hack
+
+        if (isset($proposal['file'][$proposedKey]['proposed']['@value']) && $proposal['file'][$proposedKey]['proposed']['@value'] !== '') {
+          
             $data['o:ingester'] = 'contribution';
-            $data['o:source'] = $proposal['file'][0]['proposed']['@value'];
-            $data['store'] = $proposal['file'][0]['proposed']['store'] ?? null;
+            $data['o:source'] = $proposal['file'][$proposedKey]['proposed']['@value'];
+           
+            $data['store'] = $proposal['file'][$proposedKey]['proposed']['store'] ?? null;
         }
+          
 
         if (isset($proposal['mapping']['bounds'][0]['proposed']['@value']) && isset($proposal['mapping']['markers'][0]['proposed']['@value'])):
             $data['o-module-mapping:mapping'] = $proposal['mapping']['bounds'][0]['proposed']['@value'];
@@ -949,14 +984,14 @@ class ContributionRepresentation extends AbstractEntityRepresentation
 
         // Recursive call to this method for each media.
         if (!$isSubTemplate) {
+            
             foreach ($proposalMedias ? array_keys($proposalMedias) : [] as $indexProposalMedia) {
                 $indexProposalMedia = (int) $indexProposalMedia;
                 // TODO Currently, only new media are managed as sub-resource: contribution for new resource, not contribution for existing item with media at the same time.
-                if(!$term):
-                    $term = "";
-                endif;
-                $data['o:media'][$indexProposalMedia] = $this->proposalToResourceData($term, $proposedKey, true, $indexProposalMedia);
+                //$term = "file";
                 
+                $data['o:media'][$indexProposalMedia] = $this->proposalToResourceData($term, $proposedKey, true, $indexProposalMedia);
+               
                 unset($data['o:media'][$indexProposalMedia]['o:media']);
                 unset($data['o:media'][$indexProposalMedia]['file']);
             }

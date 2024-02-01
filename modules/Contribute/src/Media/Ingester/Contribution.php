@@ -39,6 +39,7 @@ class Contribution implements IngesterInterface
     public function ingest(Media $media, Request $request, ErrorStore $errorStore): void
     {
         $data = $request->getContent();
+        
         if (!isset($data['store'])) {
             $errorStore->addError('error', 'The store for file is not set.'); // @translate
             return;

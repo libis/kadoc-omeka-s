@@ -24,10 +24,20 @@ class LightGalleryOutput extends AbstractHelper
         foreach ($files as $file) {
             $media = $file['media'];
             $source = ($media->originalUrl()) ? $media->originalUrl() : $media->source(); 
+            $caption="";
+            if($escape($media->value("dcterms:date"))){
+                $caption = $escape($media->value("dcterms:date"));
+            }
+            if($escape($media->value("dcterms:description"))){
+                $caption .= "<br>".$escape($media->value("dcterms:description"));
+            }
+            if($escape($media->value("dcterms:creator"))){
+                $caption .= "<br><strong>Fotograaf / eigenaar</strong>: ".$escape($media->value("dcterms:creator"));
+            }
             $mediaCaptionOptions = [
                 'none' => '',
                 'title' => 'data-sub-html="' . $escape($media->displayTitle()) . '"',
-                'description' => 'data-sub-html="'. $escape($media->value("dcterms:date")) .' '.$escape($media->value("dcterms:description")). '"'
+                'description' => 'data-sub-html="'. $caption. '"'
             ];
             $mediaCaptionAttribute = ($mediaCaption) ? $mediaCaptionOptions[$mediaCaption] : '';
             $mediaType = $media->mediatype();

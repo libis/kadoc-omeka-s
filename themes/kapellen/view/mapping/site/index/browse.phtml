@@ -54,7 +54,7 @@ $query['mapping_basemap_provider'] = $query['mapping_basemap_provider'] ?? '';
                         echo "<h4 class='title is-5'>Gemeente</h4>";
                         echo "<ul class='reference-list'>";
                         foreach($gemeente["o:references"] as $gemeente):
-                            $gemeente_query = "property[0][joiner]=or&property[0][property]=4738&property[0][type]=in&property[0][text]=".$gemeente["val"];
+                            $gemeente_query = "property[0][joiner]=or&property[0][property]=4738&property[0][type]=eq&property[0][text]=".$gemeente["val"];
                             echo "<li><a href='".$this->escapeHtml($this->url(null, ['action' => 'browse'], true))."?".$gemeente_query."'>".$gemeente["val"]." (".$gemeente["total"].")</a></li>";
                         endforeach; 
                         echo "</ul>";   
@@ -73,7 +73,7 @@ $query['mapping_basemap_provider'] = $query['mapping_basemap_provider'] ?? '';
                             echo "<h4 class='title is-5'>Deelgemeente</h4>";
                             echo "<ul class='reference-list'>";
                             foreach($deelgemeente["o:references"] as $deelgemeente):
-                                $deelgemeente_query = "property[0][joiner]=or&property[0][property]=4732&property[0][type]=in&property[0][text]=".$deelgemeente["val"];
+                                $deelgemeente_query = "property[0][joiner]=or&property[0][property]=4732&property[0][type]=eq&property[0][text]=".$deelgemeente["val"];
                                 echo "<li><a href='".$this->escapeHtml($this->url(null, ['action' => 'browse'], true))."?".$deelgemeente_query."'>".$deelgemeente["val"]." (".$deelgemeente["total"].")</a></li>";
                             endforeach; 
                             echo "</ul>";  

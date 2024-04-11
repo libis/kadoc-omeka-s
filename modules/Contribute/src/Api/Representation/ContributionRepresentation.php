@@ -788,8 +788,17 @@ class ContributionRepresentation extends AbstractEntityRepresentation
           
 
         if (isset($proposal['mapping']['bounds'][0]['proposed']['@value']) && isset($proposal['mapping']['markers'][0]['proposed']['@value'])):
-            $data['o-module-mapping:mapping'] = $proposal['mapping']['bounds'][0]['proposed']['@value'];
-            $data['o-module-mapping:marker'] = $proposal['mapping']['markers'][0]['proposed']['@value'];
+            $bounds_a = $proposal['mapping']['bounds'][0]['proposed']['@value'];           
+            if(isset( $bounds_a[array_key_first($bounds_a)]["o:id"])):
+                $bounds_a[array_key_first($bounds_a)]["o:id"]=null;
+            endif;
+            $data['o-module-mapping:mapping'] = $bounds_a;
+            
+            $markers_a = $proposal['mapping']['markers'][0]['proposed']['@value'];
+            if(isset( $bounds_a[array_key_first($markers_a)]["o:id"])):
+                $markers_a[array_key_first($markers_a)]["o:id"]=null;
+            endif;    
+            $data['o-module-mapping:marker'] =  $markers_a;
         endif;    
 
         // Clean data for the special keys.

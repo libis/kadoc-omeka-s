@@ -75,7 +75,7 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') 
                     echo $resource->value("locatie:gemeente");
                 endif;
                 if($resource->value("locatie:deelgemeente")):
-                    if($resource->value("locatie:deelgemeente")->asHtml() != $resource->value("locatie:gemeente")->asHtml()):
+                    if($resource->value("locatie:deelgemeente") != $resource->value("locatie:gemeente")):
                         echo ", ".$resource->value("locatie:deelgemeente");
                     endif;
                 endif;?>       
@@ -96,7 +96,7 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') 
                 endif;
 
                 if($resource->value("locatie:deelgemeente")):
-                    if($resource->value("locatie:deelgemeente")->asHtml() != $resource->value("locatie:gemeente")->asHtml()):
+                    if($resource->value("locatie:deelgemeente") != $resource->value("locatie:gemeente")):
                     echo ", ".$resource->value("locatie:deelgemeente");
                     endif;
                 endif;?>                     

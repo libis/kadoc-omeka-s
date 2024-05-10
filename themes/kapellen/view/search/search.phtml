@@ -116,7 +116,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
                 $query_url = "";                
                 if($query->getActiveFacet("locatie:gemeente")):
                     $gemeente = $query->getActiveFacet("locatie:gemeente");
-                    $query_url = "?property[0][joiner]=or&property[0][property]=4738&property[0][type]=in&property[0][text]=".$gemeente[0];
+                    $query_url = "?property[0][joiner]=or&property[0][property]=4738&property[0][type]=eq&property[0][text]=".$gemeente[0];
                 endif;  
             ?>
             <a class="button is-primary" style="margin-top:1rem;" href="/map-browse<?php echo $query_url;?>">

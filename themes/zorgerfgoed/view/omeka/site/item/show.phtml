@@ -111,7 +111,7 @@ endif;
         <?php if (isset($lightMedia)): ?>
             <?php echo $this->LightGalleryOutput($lightMedia); ?>
         <?php endif; ?>
-        <?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
+        <!--<?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
         
           <div id="other-media" class="property">
               <h4><?php echo $this->translate('Other Media'); ?></h4>
@@ -124,7 +124,7 @@ endif;
               </div>
           </div>
        
-        <?php endif; ?>  
+        <?php endif; ?>  -->
         </div>    
         <?php $refs =  $item->value('dcterms:references', array('all' => true)); ?>
         <?php $descs =  $item->value('dcterms:description', array('all' => true)); ?>

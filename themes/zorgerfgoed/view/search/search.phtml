@@ -79,21 +79,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
 </section>-->
 <section class="page section" id="search-page" style="background:#fff;">
     <div class="container">
-        <?php if($searchPage->name() == "Draaiboek"):?>
-            <h1 class="title is-2 is-family-secondary">Draaiboek</h1>
-            <div class="columns">
-                <div class="column is-5">
-                <p>
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sed ornare ex, vitae hendrerit odio. Mauris interdum ullamcorper est. Suspendisse auctor magna arcu, at tempus ipsum interdum sit amet. Aliquam tristique pulvinar velit in maximus. Sed maximus nunc et risus mattis porttitor. Nam laoreet lorem augue, non ornare neque pellentesque vel. Donec non ipsum sit amet ex placerat pretium. Curabitur feugiat dictum elit. Phasellus gravida massa sit amet augue fringilla, quis viverra odio bibendum. Morbi neque nisi, finibus a sagittis sed, bibendum vitae nisl. Etiam eleifend erat enim, vel pharetra odio tincidunt id.
-</p>
-                </div>
-                <div class="column is-5">
-                <p>
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sed ornare ex, vitae hendrerit odio. Mauris interdum ullamcorper est. Suspendisse auctor magna arcu, at tempus ipsum interdum sit amet. Aliquam tristique pulvinar velit in maximus. Sed maximus nunc et risus mattis porttitor. Nam laoreet lorem augue, non ornare neque pellentesque vel. Donec non ipsum sit amet ex placerat pretium. Curabitur feugiat dictum elit. Phasellus gravida massa sit amet augue fringilla, quis viverra odio bibendum. Morbi neque nisi, finibus a sagittis sed, bibendum vitae nisl. Etiam eleifend erat enim, vel pharetra odio tincidunt id.
-</p>
-                </div>
-            </div>
-        <?php endif;?>    
+       
         <?php if (isset($response)):
         $documentCount = $response->getTotalResults();
         ?>

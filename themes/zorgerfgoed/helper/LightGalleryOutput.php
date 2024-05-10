@@ -24,6 +24,7 @@ class LightGalleryOutput extends AbstractHelper
         foreach ($files as $file) {
             $media = $file['media'];
             $source = ($media->originalUrl()) ? $media->originalUrl() : $media->source(); 
+            $source = str_replace("http:","https:",$source);
             $mediaCaptionOptions = [
                 'none' => '',
                 'title' => 'data-sub-html="' . $media->displayTitle() . '"',
@@ -65,7 +66,7 @@ class LightGalleryOutput extends AbstractHelper
                 $html .=  '<li data-src="' . $source . '" ' . $mediaCaptionAttribute . 'data-thumb="' . $escape($media->thumbnailUrl('medium')) . '" data-download-url="' . $source . '" class="media resource">';
             }
             //$html .= $media->render();
-            $html .= $media->thumbnailUrl('medium');
+            $html .= str_replace("http:","https:",$media->thumbnailUrl('medium'));
             $html .= '</li>';
         }
         $html .= '</ul>';

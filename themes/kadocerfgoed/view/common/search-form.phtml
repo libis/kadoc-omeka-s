@@ -1,0 +1,23 @@
+<?php
+$translate = $this->plugin('translate');
+$searchValue = $this->escapeHtml($this->params()->fromQuery('fulltext_search', ''));
+?>
+  <form class="has-icons-right" action="<?php echo $this->escapeHtml($this->url('site/resource', ['controller' => 'index','action' => 'search'], true)); ?>" id="search-form" style="max-width: 100%;">
+    <div class="field has-addons" style="padding: 3.5rem;background-color: #edced3;">
+      <div class="control">
+      <label class="label">Doorzoek de tentoonstellingen, collecties en verhalen</label> 
+        <input class="input is-medium" type="search" name="fulltext_search" value="<?php echo $searchValue; ?>"
+            placeholder="<?php echo $translate('Search'); ?>"
+            aria-label="<?php echo $translate('Search'); ?>">
+      </div>
+      <div class="control"> 
+      <label class="label"></label> 
+        <a class="button is-primary is-medium" style="top: 24px;background-color: #f0a43d;">
+          <span class="icon is-large">
+            <i class="fas fa-search"></i>
+          </span>
+        </a>
+      </div>
+    </div>
+  </form>
+

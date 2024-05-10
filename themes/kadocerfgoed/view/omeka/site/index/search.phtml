@@ -1,0 +1,33 @@
+<section class="section breadcrumb-section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><?php echo sprintf($this->translate('Search results'), $query); ?></li>
+      </ul>
+    </nav>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <h1 class="title is-2 is-family-secondary"><?php echo sprintf($this->translate('Search results for “%s”'), $query); ?></h1>
+    <div class="content">
+      <?php if($pages || $items):?>
+        <ul>
+          <?php if ($pages): ?>
+            <?php foreach ($pages as $page): ?>
+            <li><?php echo $page->link($page->title()); ?></li>
+            <?php endforeach; ?>
+          <?php endif; ?>
+          <?php if ($items): ?>
+            <?php foreach ($items as $item): ?>
+            <li><?php echo $item->link($item->displayTitle()); ?></li>
+            <?php endforeach; ?>
+          <?php endif?>
+        </ul>
+    <?php else: ?>
+    <p><?php echo $this->translate('No items found'); ?></p>
+    <?php endif; ?>      
+    </div>
+  </div>
+</section>

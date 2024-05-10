@@ -1,0 +1,89 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets
+ * @var string $thumbnailType
+ * @var string $showTitleOption
+ * @var string $heading
+ * 
+ * @var \Laminas\Navigation\Navigation $subNav
+ */
+use Laminas\Navigation\Navigation;
+
+$plugins = $this->getHelperPluginManager();
+$thumbnail = $plugins->get('thumbnail');
+
+$defaultThumbnail = $this->assetUrl('thumbnails/default.png', 'Omeka', true);
+$defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
+
+$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$lang = $filterLocale ? $this->lang() : null;
+
+$nav = $block->page()->site()->publicNav();
+$container = $nav->getContainer();
+$activePage = $nav->findActive($container);
+$pages = $activePage['page']->getPages();
+$newPages = [];
+foreach ($pages as $page) {
+    $newPages[] = $page->toArray();
+}
+$subNav = new Navigation($newPages);
+?>
+
+<div class="block item-set-showcase section">
+    <?php if (!empty($heading)): ?>
+    <h1 class="title is-1"><?= $heading ?></h1>
+    <?php endif; ?>
+
+    <?php
+    foreach ($itemSets as $itemSet):
+        $render = null;
+        $title = null;
+        $link = null;
+
+        $itemSetThumbnail = $thumbnail($itemSet, $thumbnailType) ?: $defaultThumbnail;
+        $render = $itemSet->linkRaw($itemSetThumbnail);
+
+        if ($showTitleOption !== 'no_title'):
+            $title = $itemSet->displayTitle(null, $lang);
+            $link = $itemSet->link($title);
+        endif;
+
+        $items = $itemSet->value('dcterms:relation', ['all' => true]);
+    ?>
+    <div class="item-set resource columns">
+        <div class="column is-8">
+    <?= $itemSet->displayDescription(null, $lang) ?>
+    </div>
+<aside class="menu column is-4 box" style="padding: 1.25rem 2rem;">
+    <ul class="menu-list">
+        <?php foreach ($items as $item):?>
+            <?php if($item->valueResource()->value('dcterms:relation')):?>
+            <li>
+                <details>
+                    <summary><?php echo '<a href="'. $item->valueResource()->url().'" style="display: inline;">'.$item->valueResource()->displayTitle().'</a>';?></summary>
+                    <ul>
+                        <?php 
+                        $itemss = $item->valueResource()->value('dcterms:relation', ['all' => true]);
+                        ?>
+                        <?php foreach($itemss as $item):?>
+                        <li><?php echo '<a href="'. $item->valueResource()->url().'">'.$item->valueResource()->displayTitle().'</a>';?></li>
+                        <?php endforeach;?>
+                    </ul>
+                </details>
+            </li>
+            <?php else: ?>
+                <li>
+        <?php echo '<a href="'. $item->valueResource()->url().'">'.$item->valueResource()->displayTitle().'</a>';?>
+        </li>
+            <?php endif;?>
+
+        <? endforeach;?>
+        <?= $this->navigation($subNav)->menu()->renderMenu(null, ['maxDepth' => 1]);?>
+
+    </ul>
+</aside>
+
+<?php endforeach; ?>
+</div>

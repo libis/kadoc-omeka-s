@@ -1,0 +1,433 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+$this->htmlElement('body')->appendAttribute('class', 'item resource show');
+$embedMedia = $this->siteSetting('item_media_embed', false);
+$itemMedia = $item->media();
+$download = array();
+
+$template = $item->resourceTemplate();
+if($template):
+  $type = $template->label();
+  $type = str_replace("Slim erfgoed - ","",$type);
+else:
+  $type = "";
+endif;
+
+$links = array(
+  'Tool' => array('/zoek-inspiratie?q=&facet[resource_template_id][0]=Slim erfgoed - Tool', 'inspiratie'),
+  'Organisatie' => array('/zoek-schoolerfgoed?q=&facet[resource_template_id][0]=Slim erfgoed - Organisatie', 'schoolerfgoed'),
+  'Project' => array('/zoek-inspiratie?q=&facet[resource_template_id][0]=Slim erfgoed - Project', 'inspiratie'),
+  'Leermiddel' => array('/zoek-inspiratie?q=&facet[resource_template_id][0]=Slim erfgoed - Leermiddel', 'inspiratie'),
+  'Activiteit' => array('/zoek-inspiratie?q=&facet[resource_template_id][0]=Slim erfgoed - Activiteit', 'inspiratie'),
+  'Schoolerfgoed' => array('/zoek-schoolerfgoed?q=&facet[resource_template_id][0]=Slim erfgoed - Schoolerfgoed', 'schoolerfgoed'),
+  'School' => array('/zoek-schoolerfgoed?q=&facet[resource_template_id][0]=Slim erfgoed - School', 'schoolerfgoed')
+);
+?>
+<section class="section breadcrumb-section title-section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="/">Home</a></li>
+
+        <li><a href="<?php echo "/s/start".$links[$type][0];?>"><?php echo $type;?></a></li>
+        <li><?php echo $item->displayTitle(); ?></li>
+      </ul>
+    </nav>
+  </div>
+</section>
+<section class="section title-section">
+  <div class="container">
+    <?php if($type == 'Schoolerfgoed'):?>
+      <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle().', '.$item->value('dcterms:date'); ?></h1>
+    <?php elseif($type == 'Project'):?>
+      <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle().', '.$item->value('project:schooljaar'); ?></h1>
+    <?php else:?>
+      <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle(); ?></h1>
+      <?php if($type == 'Activiteit'):?>
+          <h2 class="subtitle is-4"><?php echo $item->value('activiteit:typeActiviteit'); ?></h2>
+      <?php endif;?>
+    <?php endif;?>
+    <?if($item->value('dcterms:description') || $item->value('activiteit:samenvatting') || $item->value('project:samenvatting')):?>
+    <div class="columns">
+      <div class="column is-9">
+      <div class="content">
+        <?php echo $item->value('dcterms:description'); ?>
+        <?php if($type == 'Activiteit'):?>
+            <?php echo $item->value('activiteit:samenvatting')->asHtml(); ?>
+        <?php endif;?>
+        <?php if($type == 'Project'):?>
+            <?php echo $item->value('project:samenvatting')->asHtml(); ?>
+        <?php endif;?>
+      </div>
+    </div>
+    <?php endif;?>
+  </div>
+</section>
+<?php if($type != 'Project'):?>
+  <section class="section image-section-2">
+<?php else:?>
+  <section class="section image-section">
+<?php endif;?>
+  <div class="container">
+    <div class="columns is-multiline">
+        <?php if($type == 'Organisatie' || $type=="School" || $type == "Activiteit" || $type == "Tool" || $type == 'Leermiddel'):?>
+          <div class="column is-4">
+        <?php elseif($type == 'Project'):?>
+          <div class="column is-4">
+        <?php else:?>
+          <div class="column is-4">
+        <?php endif;?>
+        <?php if (!$embedMedia && $itemMedia): ?>
+          <div class="slide-container">
+
+             <div class="slider-for">
+               <?php $count = 0;?>
+               <?php foreach($itemMedia as $media):?>                 
+                   <?php $count++;?>
+                   <?php if($media->mediaType() != 'application/pdf'):?> 
+                   <div class="has-text-centered">
+                     <?php $url = str_replace('http:', '', $media->thumbnailUrl('large'));?>                     
+                     <?php echo $media->render();?> 
+                   </div>
+                   <?php endif;?>
+                 <?php if($media->mediaType() == 'application/pdf'):?>
+                   <?php if($media->value('dcterms:title')):?>
+                     <?php $download[$media->filename()]['url'] = $media->originalUrl();?>
+                     <?php $download[$media->filename()]['label'] = $media->value('dcterms:title');?>
+                   <?php else:?>                    
+                     <?php $download[$media->filename()]['url'] = $media->originalUrl();?>
+                     <?php $download[$media->filename()]['label'] = 'Download';?>
+                   <?php endif;?>
+                 <?php endif;?>
+               <?php endforeach;?>
+             </div>
+             <?php if($count > 1):?>
+               <div class="slider-nav" role="toolbar">
+                 <?php foreach($itemMedia as $media):?>
+                   <?php if($media->mediaType() != 'application/pdf'):?>
+                     <?php $url = str_replace('http:', '', $media->thumbnailUrl('square'));?>
+                     <img src="<?php echo $url;?>">
+                  <?php endif;?>
+                 <?php endforeach;?>
+               </div>
+             <?php endif;?>
+         </div>
+        </div>
+        <?php endif; ?>
+
+        <div class="column"> 
+          <div class="content show-metadata <?php echo $type;?>">
+            <?php $this->trigger('view.show.before'); ?>
+            <?php if ($embedMedia && $itemMedia): 
+              $itemMedia = $resource->media();
+            $sortedMedia = $this->SortMedia($itemMedia);
+            $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
+            $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
+            ?>
+            <?php if (isset($lightMedia)): ?>
+                <?php echo $this->LightGalleryOutput($lightMedia); ?>
+            <?php endif; ?>
+                <!-- <div class="media-embeds">
+                <?php foreach ($itemMedia as $media):
+                    echo $media->render();
+                endforeach;
+                ?>
+                </div> -->
+            <?php endif; ?>
+            <?php if($download):?>
+              <div class="">
+                <h3 class="is-title is-3">Download</h3>
+                <?php foreach($download as $link):?>
+                  <a href="<?php echo $link['url'];?>" class="button is-text">
+                    <span class="icon"><i class="fa fa-file-pdf-o"></i></span>
+                    <span><?php //echo $name;?><?php echo $link['label'];?></span>
+                  </a><br />
+                <?php endforeach;?>
+              </div>
+              <hr />
+            <?php endif;?>
+            <?if($type == 'School' || $type == 'Organisatie'):?>
+              <div class="content">
+                <?if($item->value('locatie:locatiestraatnaam')):?>
+                <?php echo $item->value('locatie:locatiestraatnaam');?> <?php echo $item->value('locatie:locatiehuisnummer');?><br />
+                <?php echo $item->value('locatie:locatiepostcode');?> <?php echo $item->value('locatie:locatiegemeente');?><br />
+                <br />
+                <?php endif;?>
+                <?php $contacts = array();?>
+                <?if($item->value('school:contact')):?>
+                  <?php $contacts = $item->value('school:contact', ['all' => true]);?>
+                <?php endif;?>
+                <?if($item->value('organisatie:contact')):?>
+                  <?php $contacts = $item->value('organisatie:contact', ['all' => true]);?>
+                <?php endif;?>
+                <?php foreach($contacts as $contact):?>
+                  <?php echo $contact->asHtml().'<br />';?>
+                <?php endforeach;?>
+                <hr />
+              </div>
+            <?php endif;?>
+            <?php echo $item->displayValues(); ?>
+            <?php $itemSets = $item->itemSets(); ?>
+            <?php if($item->value('dcterms:source')):?>
+              <?php $infos = $item->value('dcterms:source',["all" => true]);?>
+              <hr />
+              <?php if($type == 'Schoolerfgoed'):?>
+                <?php foreach($infos as $info):?>
+                  <a target="_blank" href="<?php echo $info->uri();?>" class="button">
+                    <?php if(sizeof($infos)>1 && $info != ''):?>
+                      <span><?php echo $info;?></span>
+                    <?php else:?>
+                      <span>Meer info</span>
+                    <?php endif;?>
+                  </a>&nbsp;
+                <?php endforeach;?>
+              <?php else:?>
+
+              <?php endif;?>
+
+            <?php endif;?>
+
+          </div>
+          <div class="content">
+            <?php if($type == 'Project'):?>
+                <?php if($item->value('project:projectUrl') && $item->value('project:logoUrl')):?>
+                  <br /><a target="_blank" href="<?php echo $item->value('project:projectUrl')->uri();?>"><img style="height:70px;" src="<?php echo $item->value('project:logoUrl');?>"</a>
+                <?php endif;?>
+                <!--<?php if($item->value('project:projectUrl') && !$item->value('project:logoUrl')):?>
+                  <br /><a target="_blank" class="button" href="<?php echo $item->value('project:projectUrl')->uri();?>">Meer info</a>
+                <?php endif;?>-->
+            <?php endif;?>
+          </div>
+  </div>
+  </section>
+
+  <?php if($type == 'Organisatie'):?>
+    <?php if($item->value('organisatie:cultuurkuur')):?>
+      <section class="section project-section">
+        <div class="container">
+          <a target="_blank" class="" href="<?php echo $item->value('organisatie:cultuurkuur');?>">
+            <img style="height:32px;" src="https://www.cultuurkuur.be/themes/custom/cultuurkuur_theme/logo.svg" alt="Home">
+          </a>
+        </div>
+      </section>
+    <?php endif;?>
+  <?php endif;?>
+
+  <?php if($type == 'School'):?>
+    <section class="section project-section">
+      <div class="container">
+        <?php if($item->value('school:bewaardErfgoed')):?>
+          <h4 class="title is-5 is-family-secondary">Bewaard erfgoed</h4>
+          <div class="content values erfgoed">
+            <?php $values = $item->value('school:bewaardErfgoed',array('all'=>true)); ?>
+            <?php foreach ($values as $value): ?>
+                <?php
+                $valueType = $value->type();
+                $class = ['value'];
+                if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
+                    $class[] = 'resource';
+                    $class[] = $escape($value->valueResource()->resourceName());
+                } elseif ('uri' == $valueType) {
+                    $class[] = 'uri';
+                }
+                if (!$value->isPublic()) {
+                    $class[] = 'private';
+                }
+                ?>
+                <div class="erfgoed <?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
+                    <?php if ($language = $value->lang()): ?>
+                    <span class="language"><?php echo $language; ?></span>
+                    <?php endif; ?>
+                    <?php echo $value->asHtml(); ?>
+                </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif;?>
+
+        <?php if($item->value('school:erfgoedwerking')):?>
+          <h4 class="title is-5 is-family-secondary">Erfgoedwerking</h4>
+          <div class="content values erfgoed">
+            <?php $values = $item->value('school:erfgoedwerking',array('all'=>true)); ?>
+            <?php foreach ($values as $value): ?>
+                <?php
+                $valueType = $value->type();
+                $class = ['value'];
+                if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
+                    $class[] = 'resource';
+                    $class[] = $escape($value->valueResource()->resourceName());
+                } elseif ('uri' == $valueType) {
+                    $class[] = 'uri';
+                }
+                if (!$value->isPublic()) {
+                    $class[] = 'private';
+                }
+                ?>
+                <div class="erfgoed <?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
+                    <?php if ($language = $value->lang()): ?>
+                    <span class="language"><?php echo $language; ?></span>
+                    <?php endif; ?>
+                    <?php echo $value->asHtml(); ?>
+                </div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif;?>
+      </div>
+    </section>
+  <?php endif;?>
+
+  <?php if($type == 'Activiteit' || $type == 'Tool' || $type == 'Leermiddel'):?>
+    <section class="section project-section">
+      <div class="container">
+        <?php if($item->value('activiteit:meerInfo')):?>
+          <?php $links = $item->value('activiteit:meerInfo',array('all' => true));?>
+          <?php foreach($links as $link):?>
+            <a target="_blank" href="<?php echo $link->uri();?>" class="button">
+              <span><?php echo $link;?></span>
+            </a>
+          <?php endforeach;?>
+        <?php endif;?>
+        <?php if($item->value('activiteit:cultuurkuur')):?>
+          <a target="_blank" href="<?php echo $item->value('activiteit:cultuurkuur');?>" class="button">
+            <span>Ontdek meer in Cultuurkuur</span>
+          </a>
+        <?php endif;?>
+      </div>
+    </section>
+  <?php endif;?>
+
+  <?php if($type == 'Project' && $item->value('project:faseEen')):?>
+    <section class="section project-section">
+      <div class="container">
+        <div class="content project-text">
+
+            <h4 class="title is-4 is-family-secondary">Fasering</h4>
+
+            <h4 class="title is-5 is-family-secondary">Fase 1</h4>
+            <div class="content">
+              <?php echo $item->value('project:faseEen')->asHtml(); ?>
+            </div>
+          <?php if($item->value('project:faseTwee')):?>
+            <h4 class="title is-5 is-family-secondary">Fase 2</h4>
+            <div class="content">
+              <?php echo $item->value('project:faseTwee')->asHtml(); ?>
+            </div>
+          <?php endif;?>
+          <?php if($item->value('project:faseDrie')):?>
+            <h4 class="title is-5 is-family-secondary">Fase 3</h4>
+            <div class="content">
+              <?php echo $item->value('project:faseDrie')->asHtml(); ?>
+            </div>
+          <?php endif;?>
+          <?php if($item->value('project:bewaardErfgoed')):?>
+            <a class="button" href="<?php echo $item->value('project:bewaardErfgoed');?>">Bewaard erfgoed</a>
+            <?php if($item->value('project:gerelateerdErfgoed')):?>
+              <h4 class="title is-4 is-family-secondary">Bewaard erfgoed</h4>
+              <div class="content values erfgoed">
+                <?php $values = $item->value('project:gerelateerdErfgoed',array('all'=>true)); ?>
+                <?php foreach ($values as $value): ?>
+                    <?php
+                    $valueType = $value->type();
+                    $class = ['value'];
+                    if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
+                        $class[] = 'resource';
+                        $class[] = $escape($value->valueResource()->resourceName());
+                    } elseif ('uri' == $valueType) {
+                        $class[] = 'uri';
+                    }
+                    if (!$value->isPublic()) {
+                        $class[] = 'private';
+                    }
+                    ?>
+                    <div class="erfgoed <?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
+                        <?php if ($language = $value->lang()): ?>
+                        <span class="language"><?php echo $language; ?></span>
+                        <?php endif; ?>
+                        <?php echo $value->asHtml(); ?>
+                    </div>
+                <?php endforeach; ?>
+              </div>
+            <?php endif;?>
+
+          <?php endif;?>
+
+        </div>
+      </div>
+    </section>
+  <?php endif;?>
+  <section style="background:white;height:4rem;">
+    <div class="container">
+      <div class="is-pulled-right" style="height:4rem;">
+        <?php //$this->trigger('view.show.after'); ?>
+                  <!-- Sharingbutton Facebook -->
+          <a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=<?php echo "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";?>" target="_blank" rel="noopener" aria-label="">
+            <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Sharingbutton Twitter -->
+          <a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=<?php echo $item->displayTitle(); ?>&amp;url=<?php echo "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";?>" target="_blank" rel="noopener" aria-label="">
+            <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/></svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Sharingbutton Pinterest -->
+          <a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=<?php echo "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";?>&amp;media=<?php echo "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";?>&amp;description=<?php echo $item->displayTitle(); ?>" target="_blank" rel="noopener" aria-label="">
+            <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.14.5C5.86.5 2.7 5 2.7 8.75c0 2.27.86 4.3 2.7 5.05.3.12.57 0 .66-.33l.27-1.06c.1-.32.06-.44-.2-.73-.52-.62-.86-1.44-.86-2.6 0-3.33 2.5-6.32 6.5-6.32 3.55 0 5.5 2.17 5.5 5.07 0 3.8-1.7 7.02-4.2 7.02-1.37 0-2.4-1.14-2.07-2.54.4-1.68 1.16-3.48 1.16-4.7 0-1.07-.58-1.98-1.78-1.98-1.4 0-2.55 1.47-2.55 3.42 0 1.25.43 2.1.43 2.1l-1.7 7.2c-.5 2.13-.08 4.75-.04 5 .02.17.22.2.3.1.14-.18 1.82-2.26 2.4-4.33.16-.58.93-3.63.93-3.63.45.88 1.8 1.65 3.22 1.65 4.25 0 7.13-3.87 7.13-9.05C20.5 4.15 17.18.5 12.14.5z"/></svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Sharingbutton WhatsApp -->
+          <a class="resp-sharing-button__link" href="whatsapp://send?text=<?php echo $item->displayTitle(); ?>%20<?php echo "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";?>" target="_blank" rel="noopener" aria-label="">
+            <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.1 3.9C17.9 1.7 15 .5 12 .5 5.8.5.7 5.6.7 11.9c0 2 .5 3.9 1.5 5.6L.6 23.4l6-1.6c1.6.9 3.5 1.3 5.4 1.3 6.3 0 11.4-5.1 11.4-11.4-.1-2.8-1.2-5.7-3.3-7.8zM12 21.4c-1.7 0-3.3-.5-4.8-1.3l-.4-.2-3.5 1 1-3.4L4 17c-1-1.5-1.4-3.2-1.4-5.1 0-5.2 4.2-9.4 9.4-9.4 2.5 0 4.9 1 6.7 2.8 1.8 1.8 2.8 4.2 2.8 6.7-.1 5.2-4.3 9.4-9.5 9.4zm5.1-7.1c-.3-.1-1.7-.9-1.9-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1s-1.2-.5-2.3-1.4c-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6s.3-.3.4-.5c.2-.1.3-.3.4-.5.1-.2 0-.4 0-.5C10 9 9.3 7.6 9 7c-.1-.4-.4-.3-.5-.3h-.6s-.4.1-.7.3c-.3.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.3-.3-.4-.6-.5z"/></svg>
+              </div>
+            </div>
+          </a>
+
+
+      </div>
+    </div>
+  </section>
+<?php
+$page = $this->params()->fromQuery('page', 1);
+$property = $this->params()->fromQuery('property');
+$subjectValues = $item->displaySubjectValues($page, 25, $property);
+?>
+<!--
+<?php if ($subjectValues): ?>
+<div id="item-linked">
+    <h3><?php echo $translate('Linked resources'); ?></h3>
+    <?php echo $subjectValues; ?>
+</div>
+<?php endif; ?>-->
+
+<div class="content" style="padding:2rem 0;">
+  <div class="container">
+    <?php $this->trigger('view.show.after'); ?>
+  </div>
+</div>
+<script>
+  $(document).ready(function(){
+    $('.slider-for').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: false,
+      fade: true,
+      centerMode: true,
+      asNavFor: '.slider-nav'
+    });
+    $('.slider-nav').slick({
+      slidesToShow: 10,
+      slidesToScroll: 1,
+      asNavFor: '.slider-for',
+      focusOnSelect: true
+    });
+  });
+</script>

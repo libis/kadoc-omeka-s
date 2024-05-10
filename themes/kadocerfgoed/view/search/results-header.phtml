@@ -1,0 +1,32 @@
+<?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var \Search\Query $query
+ * @var \Search\Response $response
+ * @var array $sortOptions
+ */
+
+$translate = $this->plugin('translate');
+?>
+
+<div class="level">
+  <div class="level-left">
+        <?= $this->pagination() ?>
+  </div>
+  <div class="level-right">
+    <div class="level-item">
+    <?= $this->searchSortSelector($query, $searchPage->subSetting('sort', 'fields')) ?>
+    
+    </div>
+    <!--<div class="level-item">
+        <a class="button search-view-type search-view-type-list" href="#">
+          <span class="icon is-small">
+            <i class="fas fa-list"></i>
+          </span></a>
+
+        <a class="button search-view-type search-view-type-grid" href="#"><span class="icon is-small">
+          <i class="fas fa-th"></i>
+        </span></a>
+    </div>-->
+  </div>
+</div>

@@ -1,0 +1,71 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets
+ * @var string $thumbnailType
+ * @var string $showTitleOption
+ * @var string $heading
+ */
+
+$plugins = $this->getHelperPluginManager();
+$thumbnail = $plugins->get('thumbnail');
+
+$defaultThumbnail = $this->assetUrl('thumbnails/default.png', 'Omeka', true);
+$defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
+
+$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$lang = $filterLocale ? $this->lang() : null;
+?>
+<style>
+.carousel {
+  overflow: hidden;
+}
+</style>
+<section class="section">
+    <div class="container">
+        <?php foreach ($itemSets as $itemSet):
+            $itemSetTitle = $itemSet->displayTitle();
+            $itemSetId = $itemSet->id();
+            $items = $this->api()->search("items", ["item_set_id" => $itemSetId])->getContent();
+            $i=0;
+        ?>
+        <h2><?php echo $itemSetTitle;?></h2>
+        <div class="columns">
+
+            <div class="column is-6">
+                
+
+                <div class="carousel" id="carousel-demo">
+
+            <?php foreach($items as $item):
+                $url = $item->url();
+                $media = $item->media();
+                $thumbnail = $media[0]->thumbnailUrl('large'); 
+                $i++;  
+            ?>
+            <figure class="image is-square">
+                <img src="<?php echo $thumbnail;?>" class="item-<?php echo $i;?>">
+
+
+                <!-- <div class="card item-<?php echo $i;?>">
+                    <a href="<?php echo $url;?>">
+                        <div class="card-image" style="border:5px solid #d4e7f3;">
+                            <figure class="image is-square">
+                                <img src="<?php echo $thumbnail;?>">
+                            </figure>
+                        </div>
+                    </a>
+                    <div class="card-content">
+                        <h5 class="title is-5"><?php echo $item->displayTitle();?></h5>
+                    </div>
+                </div> -->
+                </figure>
+                <?php endforeach;?>
+            </div>
+            </div>
+ 
+        </div>
+        <?php endforeach;?>
+    </div>
+</section>

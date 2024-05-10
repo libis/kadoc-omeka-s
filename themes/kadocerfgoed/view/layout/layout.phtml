@@ -1,0 +1,266 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$siteTitle = $site->title();
+$this->htmlElement('html')->setAttribute('lang', $this->lang());
+$this->htmlElement('body')->setAttribute('class', 'has-navbar-fixed-top');
+$this->headMeta()->setCharset('utf-8');
+$this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
+$this->headTitle($siteTitle)->setSeparator(' · ');
+$this->headTitle()->append($this->setting('installation_title', 'Omeka S'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/style.min.css'));
+//$this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
+//$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700italic,700');
+$this->headScript()->prependFile($this->assetUrl('js/default.js'));
+$this->headScript()->prependFile($this->assetUrl('js/slick.js'));
+$this->headScript()->prependFile($this->assetUrl('js/clamp.min.js'));
+$this->headScript()->prependFile($this->assetUrl('js/global.js', 'Omeka'));
+$this->headScript()->prependFile($this->assetUrl('vendor/jquery/jquery.min.js', 'Omeka'));
+$this->trigger('view.layout');
+$userBar = $this->userBar();
+$primColor = '#edced3'; //#edced3
+
+$url = $this->serverUrl(true);
+if (strpos($url, 'page/home') !== false) {
+    $home = false;
+}else{
+  $home = false;
+}
+?>
+<?php echo $this->doctype(); ?>
+<?php echo $this->htmlElement('html'); ?>
+    <head>
+        <?php echo $this->headMeta(); ?>
+        <?php echo $this->headTitle(); ?>
+        <?php echo $this->headLink(); ?>
+        <?php echo $this->headStyle(); ?>
+        <?php echo $this->headScript(); ?>
+        <script src="https://kit.fontawesome.com/582fb8c29f.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/css/bulma-carousel.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&family=Raleway:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
+        <script src="https://unpkg.com/colcade@0/colcade.js"></script>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-208068755-1"></script>
+		<script>
+		  window.dataLayer = window.dataLayer || [];
+		  function gtag(){dataLayer.push(arguments);}
+		  gtag('js', new Date());
+
+		  gtag('config', 'UA-208068755-1');
+		</script>
+    <style>
+      @media (max-width: 1024px) {
+        .navigation {
+          display: none;
+        }
+      };
+      .has-icons-right > .has-addons {
+        display:flex;
+        padding: 3.5rem;
+        background-color: azure;
+      };
+      .modal-content > #search-form {
+        max-width: 100%;
+      }
+      .modal-content {
+        margin: 4.5rem auto;
+        width: 100%;
+        max-height: calc(100vh - 40px);
+        position: absolute;
+      }
+      .modal {
+        justify-content: flex-start;
+        z-index: 0;
+      }
+      .modal-background {
+        background-color: rgba(00, 00, 00, 0.4) !important;
+      }
+      .zigzag {
+        display: inline-block;
+        position: relative;
+      }
+
+      .zigzag:after {
+        content: '';
+        height: 10px;
+        width: 100%;
+        position: absolute;
+        background: url("https://cldup.com/MiGVGBh-0U.png");
+        background-size: 18px;
+        top: 35px;
+        bottom: 0px;
+        left: 0;
+      }
+      .arrow-left {
+        width: 0; 
+        height: 0; 
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent; 
+        
+        border-left:10px solid #f5e300; 
+        float: left;
+        margin-top: 10px;
+        margin-right: 5px;
+      }
+      #showNav {
+        background-color: rgba(242,219,58,0.6);
+      }
+      .wrapper, .footer {
+        font-family: Montserrat Light;
+        color: #2d2d30;
+      }
+      .wrapper a {
+        font-family: Montserrat SemiBold;
+        color: #007082;
+      }
+      .navbar .navigation li>a, .wrapper .button, .footer .button {
+        font-family: Montserrat SemiBold;
+        color: #2d2d30;
+      }
+      body .wrapper div>.title {
+        font-family: Montserrat Bold !important;
+        color:#2d2d30;
+      }
+    </style>
+    </head>
+
+    <?php echo $this->htmlElement('body'); ?>
+    <?php echo $userBar; ?>
+    <?php if(!$home):?>
+    <header>
+        <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation" style="background-color:<?php echo $primColor;?>;">
+          <div class="container">
+          <div class="navbar-brand">
+            <a class="navbar-item" href="<?php echo $site->url(); ?>">
+              <?php if ($this->themeSetting('logo')): ?>
+                  <img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" alt="<?php echo $escape($siteTitle); ?>" style="height: 3.5rem;"/>
+              <?php else: ?>
+                  <?php echo $escape($siteTitle); ?>
+              <?php endif; ?>
+            </a>
+          </div>
+          <div class="navbar-menu">
+            <div class="navbar-start">
+                <?php
+                  echo $site->publicNav()->menu()->renderMenu(null, [
+                      'maxDepth' => $this->themeSetting('nav_depth', 0)
+                  ]);
+                ?>
+            </div> 
+            <div class="navbar-end">
+              <div class="navbar-item">
+                 <button class="button is-primary is-hidden" id="showNav">
+                    <span class="icon is-small">
+                      <i class="fas fa-bars"></i>
+                    </span>
+                  </button>
+                 <button class="button is-primary" id="showSearch" style="background-color: #f0a43d;">
+                    <span class="icon is-small">
+                      <i class="fas fa-search"></i>
+                    </span>
+                  </button>
+                  <button class="button is-primary search-menu-close modal-close is-hidden" style="top:20px;background-color: #f0a43d"></button>
+                </div>
+             </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <?php endif;?>
+    <div class="over-footer">
+      <div class="wrapper">
+        <?php echo $this->content;?>
+      </div>
+    </div>
+
+    <footer class="footer" style="background-color:white;">
+        <div class="container">
+          <nav class="level">
+            <!-- Left side -->
+            <div class="level-left">
+              <div class="level-item">
+                <a target="_blank" href="https://kadoc.kuleuven.be"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/kadoc.PNG" /></a>
+              </div>
+              <div class="level-item">
+                <a target="_blank" style="color:black;" href="https://libis.be"><button class="button colour-button" style="box-shadow: #f0a43d -5px -5px, inset white -5px -5px;background-color: #f0a43d;border-color:black;border-width:3px;">Disclaimer</button></a>
+              </div>
+              <div class="level-item">
+                <a target="_blank" style="color:black;" href="https://libis.be"><button class="button colour-button" style="box-shadow: #f0a43d -5px -5px, inset white -5px -5px;background-color: #f0a43d;border-color:black;border-width:3px;">Contact</button></a>
+              </div>
+            </div>
+
+            <!-- Right side -->
+            <div class="level-right">
+              <div class="level-item">
+                <a target="_blank" href="https://libis.be"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/libissmall.png" /></a>
+              </div>
+            </div>
+          </nav>
+        </div>
+      <?php if ($footerContent = $this->themeSetting('footer')): ?>
+      <?php //echo $footerContent; ?>
+      <?php endif; ?>
+    </footer>
+
+    <div class="search-menu modal">
+      <div class="modal-background"></div>
+        <div class="modal-content">
+          <?php echo $this->partial('common/search-form'); ?>
+        </div>
+        
+     </div>
+
+     <div class="burger-menu modal">
+       <div class="modal-background"></div>
+         <div class="modal-content">
+           <!-- Any other Bulma elements you want -->
+           <?php echo $this->partial('common/search-form'); ?>
+           <?php
+             echo $site->publicNav()->menu()->renderMenu(null, [
+                 'maxDepth' => $this->themeSetting('nav_depth') - 1
+             ]);
+           ?>
+         </div>
+         <button class="burger-menu-close modal-close is-large"></button>
+      </div>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/js/bulma-carousel.min.js"></script>
+  <script>
+  $(document).ready(function() {
+    bulmaCarousel.attach('#carousel-demo', {
+			slidesToScroll: 1,
+			slidesToShow: 1
+		});
+    $(".navigation li > a").addClass("has-text-weight-bold");
+    // Check for click events on the navbar burger icon
+    $("#showNav").click(function() {
+        $(".burger-menu").toggleClass("is-active");
+    });
+
+    $("#showSearch").click(function() {
+      $(".search-menu").addClass("is-active");
+      $("#showSearch").addClass("is-hidden");
+      $(".search-menu-close").removeClass("is-hidden");
+    });
+
+    $(".search-menu-close").click(function() {
+       $(".search-menu").removeClass("is-active");
+       $("#showSearch").removeClass("is-hidden");
+       $(".search-menu-close").addClass("is-hidden");
+    });
+    $(".burger-menu-close").click(function() {
+       $(".burger-menu").removeClass("is-active");
+    });
+    $(window).resize(function() {
+      if ($(window).width() <= 1024) {
+        $(".navigation").addClass("is-hidden");
+        $("#showNav").removeClass("is-hidden");
+      }
+      if ($(window).width() > 1024) {
+        $(".navigation").removeClass("is-hidden");
+        $("#showNav").addClass("is-hidden");
+      }
+    });
+  });
+  </script>
+</html>

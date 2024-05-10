@@ -1,0 +1,60 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+
+$this->htmlElement('body')->appendAttribute('class', 'item-set resource browse');
+?>
+<section class="section breadcrumb-section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="<?php echo $site->url();?>">Home</a></li>
+        <li>Thema's</li>
+      </ul>
+    </nav>
+  </div>
+</section>
+<section class="section featured-section">
+  <div class="container">
+    <h2 class="title is-2" style="margin-bottom:2rem;">Thema's</h2>
+
+    <?php echo $this->searchFilters(); ?>
+
+
+    <?php $this->trigger('view.browse.before'); ?>
+    <div class="columns is-multiline">
+      <?php
+      $headingTerm = $this->siteSetting('browse_heading_property_term');
+      $bodyTerm = $this->siteSetting('browse_body_property_term');
+      foreach ($itemSets as $itemSet):
+          $heading = $headingTerm ? $itemSet->value($headingTerm, ['default' => $translate('[Untitled]')]) : $itemSet->displayTitle();
+          $body = $bodyTerm ? $itemSet->value($bodyTerm) : $itemSet->displayDescription();
+          $media = $itemSet->thumbnail();
+          $mediaurl = '';
+          if($media):
+              $mediaurl = str_replace('http:','',$media->assetUrl('large'));
+          endif;
+          $pageSlug = $itemSet -> displayTitle();
+          $pageSlug = strtolower($pageSlug);
+      ?>
+          <div class="column is-4 item-set resource">
+            <div class="" style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;height:250px;background-color:#eee;background-size: cover;">
+
+            </div>
+              <div class="featured-content" style="background:#fff;">
+
+                    <a class="card-link-wrapper" href="<?php echo $site->url().'/item-set\/'.$itemSet->id();?>">
+
+                      <h3 class="title is-3 is-family-secondary" style="margin-bottom:0rem;">
+                          <span ><a style="border-bottom:2px solid #3b9c7c;" href="<?php echo $site->url().'/item-set/'.$itemSet->id();?>"><?php echo $heading; ?></a></span></h3>
+                    </a>
+                    <div class="link is-family-secondary"><a href="<?php echo $site->url(). '/page/' .$pageSlug;?>">Lees meer</a></div>
+              </div>
+
+          </div>
+      <?php endforeach; ?>
+    </div>
+    <?php $this->trigger('view.browse.after'); ?>
+    <?php echo $this->pagination(); ?>
+  </div>
+</section>

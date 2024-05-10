@@ -1,0 +1,63 @@
+<?php $reverse = ''; ?>
+  <?php foreach ($attachments as $attachment): ?>
+    <section class="section showcase text-image-block highlight-section <?php echo $reverse;?>-section">
+    <div class="container">
+      <div class="columns is-gapless hightlight-columns <?php echo $reverse;?>">
+        <?php
+        $item = $attachment->item();
+        $template = $item->resourceTemplate();
+        if($template):
+          $template = $template->label();
+        else:
+          $template = "Object";
+        endif;
+        $showTitleOption = $this->showTitleOption; ?>
+        <?php if ($showTitleOption == 'item_title'): ?>
+          <?php $title = $item->link($item->displayTitle()); ?>
+        <?php elseif ($showTitleOption == 'file_name'): ?>
+          <?php $title = $media->displayTitle(); ?>
+        <?php endif; ?>
+        <?php $bodyTerm = $this->siteSetting('browse_body_property_term');?>
+        <?php $body = $bodyTerm ? $item->value($bodyTerm) : $item->displayDescription(); ?>
+
+        <?php
+        $media = $attachment->media() ?: $item->primaryMedia();
+        if($media):
+          $url = $media->thumbnailUrl('large');
+          $url = str_replace('http:', '', $url);
+          if($block->dataValue('itemurl')):
+            $itemUrl = $media->item()->url();
+            $itemUrl = str_replace('http:', '', $itemUrl);
+          endif;?>
+        <?php endif;?>
+        <div class="column column-img hightlight">
+          <div class="img-box" style="background-image: url('<?php echo $url;?>')"></div>
+        </div>
+        <div class="column column-text hightlight">
+          <a href="<?php echo $item->url();?>">
+            <div class="text">
+              <h2 class="title is-2 is-family-secondary is-centered"><span><?php echo $template;?> in de kijker</span></h2>
+              <h3 class="title is-4 is-family-secondary"><?php echo $title;?></h3>
+              <?php if ($body): ?>
+                <div class="content">
+                  <p>
+                    <?php $trunc = implode(" ", array_slice(explode(" ", $body), 0, 21)); ?>
+                    <?php if(strlen($body) != strlen($trunc)):?>
+                      <?php echo $trunc.' ...';?>
+                    <?php else:?>
+                      <?php echo $trunc;?>
+                    <?php endif;?>
+                  </p>
+                </div>
+              <?php endif; ?>
+              <div class="has-text-right">
+                <a class="read-more" href="<?php echo $item->url();?>">Meer lezen</a>
+              </div>
+            </div>
+          </a>
+        </div>
+    </div>
+  </div>
+</section>
+  <?php $reverse = ($reverse == '')? 'reverse' : '';?>
+  <?php endforeach; ?>

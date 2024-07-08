@@ -1,0 +1,233 @@
+<?php
+$translate = $this->plugin('translate');
+?>
+<style>
+.zigzag {
+  display: inline-block;
+  position: relative;
+}
+
+.zigzag:after {
+  content: '';
+  height: 18px;
+  width: 100%;
+  position: absolute;
+  background: url("https://cldup.com/MiGVGBh-0U.png");
+  background-size: 30px;
+  top: 35px;
+  bottom: 0px;
+  left: 0;
+}
+
+.card-content {
+  background-color: rgba(0,0,0,0.36);
+  padding: 1.5rem;
+  bottom: 0;
+  position:absolute;
+  width: 100%;
+  height: 40%;
+  transition: transform 250ms;
+  transition-property: height;
+}
+
+input[type="radio"] {
+accent-color:#00b7e7;
+}
+input[type="checkbox"] {
+  accent-color: #f0a43d;
+}
+</style>
+<section class="section page-browse-section">
+  <div class="container">
+  <?php if ($this->heading): ?>
+      <div class="arrow-left"></div>
+      <h2 class="title is-3 is-family-secondary"><?php echo $block->dataValue('heading');?></h2>
+    <?php endif; ?>
+
+    <?php if($block->dataValue('filters')):
+    $filters = explode(",", $block->dataValue('filters'));
+    natcasesort($filters);
+    $years = array();
+    ?>
+    <div class="control" style="padding:1em 0;font-size:1.5rem;">
+    <button type="button" class="btn-check button is-medium is-pulled-right" id="btn-check-outlined" onclick="ResetFilter()" autocomplete="off" style="background-color: #f0a43d;color:aliceblue;">Show all</button>
+    <?php foreach ($filters as $filter):?>
+      <?php if(is_numeric($filter)){
+        $years[] = $filter;
+      } else { ?>   
+  <input type="radio" class="btn-check tag-button" id="<?php echo $filter;?>" name="tag" value="<?php echo $filter;?>" onclick="FilterTags()" autocomplete="off">
+  <label class="radio" for="<?php echo $filter;?>"><?php echo $filter;?></label>
+  <?php };?>
+  <?php endforeach;
+  if($years):
+  natsort($years);?>
+  <?php foreach ($years as $year):?>
+  <input type="radio" class="btn-check tag-button" id="<?php echo $year;?>" name="tag" value="<?php echo $year;?>" onclick="FilterTags()" autocomplete="off">
+  <label class="radio" for="<?php echo $year;?>"><?php echo $year;?></label>
+  <?php endforeach; endif;?>
+  </div>
+  <?php endif;?>
+
+  <?php if($block->dataValue('text')):?>
+      <div class="columns">
+        <div class="column is-8">
+          <div class="content">
+              <?php echo $block->dataValue('text');?>
+          </div>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <div class="control">
+      <label class="checkbox">
+        <input type="checkbox" checked name="type" value="tentoonstelling" onclick="FilterTags()"/>
+        Tentoonstelling
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" checked name="type" value="collectie" onclick="FilterTags()"/>
+        Collectie
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" checked name="type" value="verhaal" onclick="FilterTags()"/>
+        Verhaal
+      </label>
+    </div>
+
+    <div class="columns is-multiline">
+      <?php
+      $i=0;
+      foreach ($pages as $page):
+        $heading = $page->page()->title();
+        $body = $page->dataValue('summary');
+        $tagsArray = $page->dataValue('tags');
+        $tags = implode(", ", $tagsArray);
+        $i++;
+      ?>
+      <div class="column is-4 browse-item<?php if($tags):?><?php foreach($tagsArray as $tag):?><?php echo ' ' . $tag; ?><?php endforeach; ?><?php endif;?><?php echo ' '.$page->dataValue('type');?>">
+        <?php
+          $asset = $page->dataValue('cover');
+
+          if (!$asset) {
+              $mediaurl = "";
+          }else{
+            try {
+                $media = $this->api()->read('assets', ['id' => $asset])->getContent();
+                $mediaurl = $media->assetUrl('large');
+            } catch (NotFoundException $e) {
+                $mediaurl = "";
+            }
+          }
+
+          $url = $page->page()->url();
+        ?>
+        <a href="<?php echo $url;?>">
+          <div class="card equal-height card-hover-<?php echo $i;?>" onpointerenter="showCardContent(<?php echo $i;?>)";>              
+            <div class="bg-block" style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#aaa;background-size: cover; min-height:250px;">
+            <div class="overlay"></div>
+
+            <div class="card-content" id="card-<?php echo $i;?>">
+              <div class="content">
+              <div class="card-top">
+              <h3 class="title is-4 is-family-secondary has-text-white" id="title-<?php echo $i;?>">
+                  <?php echo $heading;?>
+              </h3>
+            </div>
+            <div class="is-hidden has-text-white" id="body-<?php echo $i;?>">
+                <?php if ($body): ?>
+                  <?php
+                    if(strlen($body) > 200):
+                      $body = substr($body, 0, 200);
+                      $body = substr($body, 0, strrpos($body, ' ')).' ...';
+                    endif;
+                  ?>
+                    <?php echo $body; ?>
+                    <hr>
+                <?php endif; ?>
+                <?php if($page->dataValue('credits')):?>
+                  <div>Door <?php echo $page->dataValue('credits'); ?></div>
+                <?php endif;?> 
+                <?php if($page->dataValue('type')):?>
+                  <div><?php echo ucfirst($page->dataValue('type'));?></div>
+                <?php endif;?>
+                </div> 
+              </div>
+            </div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php if($block->dataValue('link')):?>
+      <div class="has-text-right">
+        <a class="button is-outlined is-white" href="<?php echo $block->dataValue('link');?>">
+          <?php if($block->dataValue('linktext')):?>
+            <span><?php echo $block->dataValue('linktext');?></span>
+          <?php else:?>
+            <span>Lees meer</span>
+          <?php endif;?>  
+          <span class="icon is-small">
+            <i class="fas fa-angle-right"></i>
+          </span>
+        </a>
+      </div>  
+    <?php endif;?>                
+  </div>
+</section>
+<script>
+function showCardContent(x){
+  let id = '#card-' + x;
+  let hover = '.card-hover-' + x;
+  let idtitle = '#title-' + x;
+  let idbody = '#body-' + x;
+  $(hover).hover(function(){
+    $( id ).css("height","100%");
+    $( idtitle ).addClass("is-hidden");
+    $( idbody ).removeClass( "is-hidden" );
+  }, function() {
+    $( idtitle ).removeClass( "is-hidden" );
+    $( id ).css("height","40%");
+    $( idbody ).addClass( "is-hidden" );
+  })
+}
+
+function FilterTags() {
+  //get all tags
+  let checkedtags =document.querySelectorAll('input[name="tag"]:checked');
+  let tags = [];
+  checkedtags.forEach((checkedtag) => {
+    tags.push(checkedtag.value);
+  });
+  //get all types
+  let checkedtypes =document.querySelectorAll('input[name="type"]:checked');
+  let types = [];
+  checkedtypes.forEach((checkedtype) => {
+    types.push(checkedtype.value);
+  });
+
+  $(".browse-item").addClass("is-hidden");
+
+  tags.forEach((tag) => {
+    types.forEach((type) => {
+      if($("." + tag).hasClass(type)){
+        $("." + tag).removeClass("is-hidden");
+      }  
+    });
+  });
+
+  if(tags.length == 0) {
+    types.forEach((type) => {
+      $("." + type).removeClass("is-hidden");
+    });
+  }
+  if(types.length == 0) {
+    $(".browse-item").addClass("is-hidden");
+  }
+}
+
+function ResetFilter(){
+  $(".browse-item").removeClass("is-hidden");
+  $(".tag-button").prop('checked', false);
+  $("input[name='type']").prop('checked', true);
+}
+</script>

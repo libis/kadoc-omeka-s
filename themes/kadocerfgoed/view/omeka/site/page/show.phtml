@@ -7,6 +7,9 @@ $showPagePagination = $this->siteSetting('show_page_pagination', true);
 $nav = $site->publicNav();
 $container = $nav->getContainer();
 $activePage = $nav->findActive($container);
+$type = $this->pagesMetadata('type') ?: null;
+$next = $this->pagesMetadata('next',$page) ?: null;
+$previous = $this->pagesMetadata('previous',$page) ?: null;
 ?>
 
 <?php if($page->title() != 'Home'):?>
@@ -26,9 +29,19 @@ $activePage = $nav->findActive($container);
 </section>
 <?php endif;?>
 
+<div class="has-text-centered">
+  <?php if($previous && ($this->pageMetadata('type',$previous) == 'tentoonstelling' || $this->pageMetadata('type',$previous) == 'tentoonstelling')):?>
+    <a class="button is-outlined" href="<?php echo $previous->url();?>">Vorige</a>
+  <?php endif;?>
+  <?php if($next  && ($this->pageMetadata('type',$next) == 'tentoonstelling'|| $this->pageMetadata('type',$next) == 'tentoonstelling')):?>
+    <a class="button is-outlined" href="<?php echo $next->url();?>">Volgende</a>
+  <?php endif;?>
+</div>
+
 <?php //$this->trigger('view.show.before'); ?>
 <?php echo $this->content; ?>
 <?php //$this->trigger('view.show.after'); ?>
 <?php if ($showPagePagination): ?>
 <?php echo $this->sitePagePagination(); ?>
 <?php endif; ?>
+ 

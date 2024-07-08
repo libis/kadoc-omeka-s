@@ -1,0 +1,59 @@
+<div class="section image-only-section">
+    <div class="container">
+      <div class="columns">
+        <?php $i=0;?>
+        <?php foreach($attachments as $attachment):
+            $media = $attachment->media();
+            if($media):
+              $url = $media->thumbnailUrl('large');
+              $url = str_replace('http:', '', $url);
+            ?>
+            <div class="column">
+              <img src="<?= $url;?>" class="item-<?php echo $i;?> is-clickable" onclick="moreInfo(<?php echo $i;?>);" />
+              <figcaption><?php echo $attachments[0]->caption();?></figcaption>
+            </div>
+            <?php endif;?>
+            <?php $i++;?>
+        <?php endforeach;?>
+      </div>
+    </div>
+</div>
+
+<?php $a=0;?>
+<?php foreach($attachments as $item):
+$media = $item->media();?>
+<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;" onclick="closeModal();">
+    <div class="modal-background"></div>
+    <div class="modal-content">    
+        <div class="container" style="background-color: aliceblue;width: fit-content;">
+        <img src="<?php echo $media->originalUrl(); ?>">
+        <div class="column">
+        <?php echo $item->item()->displayValues();?>
+        <div class="has-text-right">
+        <a href="<?php echo $media->originalUrl(); ?>" class="button is-warning" download="<?php echo $item->item()->displayTitle();?>">Download</a>
+        </div>
+        </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+<?php $a++;?>
+<?php endforeach;?>
+
+<script>
+    function moreInfo(x) {
+        let id = '#modal-' + x;
+        $( id ).addClass("is-active");
+    }
+    function closeModal(){
+        let modal = '.modal';
+        $( modal ).removeClass("is-active");
+    }
+    //somehow try and get rid of carrousel arrows
+    $(document).ready(function() {
+        let prev = "slider-container > .slider-navigation-previous";
+        let next = ".slider-navigation-next";
+        $( prev ).addClass("is-hidden");
+        $( next ).addClass("is-hidden");
+    });
+</script>

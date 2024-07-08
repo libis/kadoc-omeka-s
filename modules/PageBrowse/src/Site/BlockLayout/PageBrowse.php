@@ -25,7 +25,7 @@ class PageBrowse extends AbstractBlockLayout
             'heading' => '',
             'text' => '',
             'link' => '',
-            'link-text' => 'Browse all', // @translate
+            'linktext' => 'Browse all', // @translate
         ];
 
         $data = $block ? $block->data() + $defaults : $defaults;
@@ -45,6 +45,14 @@ class PageBrowse extends AbstractBlockLayout
             'options' => [
                 'label' => 'Description', // @translate
                 'info' => 'Description that appears above the items'
+            ],
+        ]);
+        $form->add([
+            'name' => 'o:block[__blockIndex__][o:data][filters]',
+            'type' => Element\Text::class,
+            'options' => [
+                'label' => 'Filter tags', // @translate
+                'info' => 'The filters that appear on top of the page. Please use commas to seperate them.'
             ],
         ]);
         $form->add([
@@ -86,10 +94,11 @@ class PageBrowse extends AbstractBlockLayout
         $form->setData([
             'o:block[__blockIndex__][o:data][type1]' => $data['type1'],
             'o:block[__blockIndex__][o:data][text]' => $data['text'],
+            'o:block[__blockIndex__][o:data][filters]' => $data['filters'],
             'o:block[__blockIndex__][o:data][heading]' => $data['heading'],
             'o:block[__blockIndex__][o:data][tag]' => $data['tag'],
             'o:block[__blockIndex__][o:data][link]' => $data['link'],
-            'o:block[__blockIndex__][o:data][link]' => $data['linktext'],
+            'o:block[__blockIndex__][o:data][linktext]' => $data['linktext'],
         ]);
 
         return $view->formCollection($form);

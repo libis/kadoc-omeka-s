@@ -24,7 +24,7 @@ $translate = $this->plugin('translate');
   bottom: 0;
   position:absolute;
   width: 100%;
-  height: 50%;
+  height: 40%;
   transition: transform 250ms;
   transition-property: height;
 }
@@ -32,6 +32,7 @@ $translate = $this->plugin('translate');
 <section class="section page-browse-section">
   <div class="container">
     <?php if ($this->heading): ?>
+      <div class="arrow-left"></div>
       <h2 class="title is-3 is-family-secondary"><?php echo $block->dataValue('heading');?></h2>
     <?php endif; ?>
 
@@ -45,15 +46,41 @@ $translate = $this->plugin('translate');
       </div>
     <?php endif; ?>
 
+    <?php if($block->dataValue('filters')):
+    $filters = explode(",", $block->dataValue('filters'));
+    natcasesort($filters);
+    $years = array();
+    ?>
+    <div class="control" style="padding:1em 0;font-size:1.5rem;">
+    <button type="button" class="btn-check button is-medium is-pulled-right" style="background-color:#f0a43d;color:aliceblue;" id="btn-check-outlined" name="tag" onclick="ResetFilter()" autocomplete="off">Show all</button>
+    <?php foreach ($filters as $filter):?>
+      <?php if(is_numeric($filter)){
+        $years[] = $filter;
+      } else { ?>   
+  <input type="radio" class="btn-check tag-button" id="<?php echo $filter;?>" name="tag" value="<?php echo $filter;?>" onclick="FilterTags()" autocomplete="off">
+  <label class="radio" for="<?php echo $filter;?>"><?php echo $filter;?></label>
+  <?php };?>
+  <?php endforeach;
+  if($years):
+  natsort($years);?>
+  <?php foreach ($years as $year):?>
+  <input type="radio" class="btn-check tag-button" id="<?php echo $year;?>" name="tag" value="<?php echo $year;?>" onclick="FilterTags()" autocomplete="off">
+  <label class="radio" for="<?php echo $year;?>"><?php echo $year;?></label>
+  <?php endforeach; endif;?>
+  </div>
+  <?php endif;?>
+
     <div class="columns is-multiline">
       <?php
       $i=0;
       foreach ($pages as $page):
         $heading = $page->page()->title();
         $body = $page->dataValue('summary');
+        $tagsArray = $page->dataValue('tags');
+        $tags = implode(", ", $tagsArray);
         $i++;
       ?>
-      <div class="column is-4">
+      <div class="column is-4 browse-item<?php if($tags):?><?php foreach($tagsArray as $tag):?><?php echo ' ' . $tag; ?><?php endforeach; ?><?php endif;?>">
         <?php
           $asset = $page->dataValue('cover');
 
@@ -78,7 +105,7 @@ $translate = $this->plugin('translate');
             <div class="card-content" id="card-<?php echo $i;?>">
               <div class="content">
               <div class="card-top">
-              <h3 class="title is-3 is-family-secondary has-text-white" id="title-<?php echo $i;?>">
+              <h3 class="title is-4 is-family-secondary has-text-white" id="title-<?php echo $i;?>">
                   <?php echo $heading;?>
               </h3>
             </div>
@@ -133,8 +160,29 @@ function showCardContent(x){
     $( idbody ).removeClass( "is-hidden" );
   }, function() {
     $( idtitle ).removeClass( "is-hidden" );
-    $( id ).css("height","50%");
+    $( id ).css("height","40%");
     $( idbody ).addClass( "is-hidden" );
   })
+}
+
+function FilterTags() {
+  let checkedtags =document.querySelectorAll('input[name="tag"]:checked');
+  let tags = [];
+  checkedtags.forEach((checkedtag) => {
+    tags.push(checkedtag.value);
+  });
+  console.log(tags);
+  $(".browse-item").addClass("is-hidden");
+  tags.forEach((tag) => {
+    $("." + tag).removeClass("is-hidden");
+  });
+  if(tags.length == 0) {
+    $(".browse-item").removeClass("is-hidden");
+  }
+}
+
+function ResetFilter(){
+  $(".browse-item").removeClass("is-hidden");
+  $(".tag-button").prop('checked', false);
 }
 </script>

@@ -2,6 +2,7 @@
 $escape = $this->plugin('escapeHtml');
 $siteTitle = $site->title();
 $this->htmlElement('html')->setAttribute('lang', $this->lang());
+$this->htmlElement('html')->setAttribute('id', 'html');
 $this->htmlElement('body')->setAttribute('class', 'has-navbar-fixed-top');
 $this->headMeta()->setCharset('utf-8');
 $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
@@ -121,6 +122,20 @@ if (strpos($url, 'page/home') !== false) {
         font-family: Montserrat Bold !important;
         color:#2d2d30;
       }
+      #logosite:hover{
+        background-color: inherit !important;
+      }
+      .colour-button:hover {
+        box-shadow: unset !important;
+        transform:translateX(-5px);
+        transition: all 1s ease;
+    }
+    .colour-button {
+        transition: all 1s ease;
+    }
+    .value-piece::after{
+      content:"" !important;
+    }
     </style>
     </head>
 
@@ -131,7 +146,7 @@ if (strpos($url, 'page/home') !== false) {
         <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation" style="background-color:<?php echo $primColor;?>;">
           <div class="container">
           <div class="navbar-brand">
-            <a class="navbar-item" href="<?php echo $site->url(); ?>">
+            <a class="navbar-item" href="<?php echo $site->url(); ?>" id="logosite">
               <?php if ($this->themeSetting('logo')): ?>
                   <img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" alt="<?php echo $escape($siteTitle); ?>" style="height: 3.5rem;"/>
               <?php else: ?>
@@ -173,7 +188,7 @@ if (strpos($url, 'page/home') !== false) {
       </div>
     </div>
 
-    <footer class="footer" style="background-color:white;">
+    <footer class="footer" style="background-color:white;position:absolute;z-index:-1;">
         <div class="container">
           <nav class="level">
             <!-- Left side -->

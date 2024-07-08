@@ -7,80 +7,22 @@ $itemMedia = $item->media();
 $download = array();
 
 $template = $item->resourceTemplate();
-if($template):
-  $type = $template->label();
-  $type = str_replace("Slim erfgoed - ","",$type);
-else:
-  $type = "";
-endif;
-
-$links = array(
-  'Tool' => array('/zoek-inspiratie?q=&facet[resource_template_id][0]=Slim erfgoed - Tool', 'inspiratie'),
-  'Organisatie' => array('/zoek-schoolerfgoed?q=&facet[resource_template_id][0]=Slim erfgoed - Organisatie', 'schoolerfgoed'),
-  'Project' => array('/zoek-inspiratie?q=&facet[resource_template_id][0]=Slim erfgoed - Project', 'inspiratie'),
-  'Leermiddel' => array('/zoek-inspiratie?q=&facet[resource_template_id][0]=Slim erfgoed - Leermiddel', 'inspiratie'),
-  'Activiteit' => array('/zoek-inspiratie?q=&facet[resource_template_id][0]=Slim erfgoed - Activiteit', 'inspiratie'),
-  'Schoolerfgoed' => array('/zoek-schoolerfgoed?q=&facet[resource_template_id][0]=Slim erfgoed - Schoolerfgoed', 'schoolerfgoed'),
-  'School' => array('/zoek-schoolerfgoed?q=&facet[resource_template_id][0]=Slim erfgoed - School', 'schoolerfgoed')
-);
 ?>
-<section class="section breadcrumb-section title-section">
+<section class="section breadcrumb-section">
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><a href="/">Home</a></li>
-
-        <li><a href="<?php echo "/s/start".$links[$type][0];?>"><?php echo $type;?></a></li>
+        <li><a href="<?php echo $site->url();?>">Home</a></li>
         <li><?php echo $item->displayTitle(); ?></li>
       </ul>
     </nav>
   </div>
 </section>
-<section class="section title-section">
+<section class="section">
   <div class="container">
-    <?php if($type == 'Schoolerfgoed'):?>
-      <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle().', '.$item->value('dcterms:date'); ?></h1>
-    <?php elseif($type == 'Project'):?>
-      <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle().', '.$item->value('project:schooljaar'); ?></h1>
-    <?php else:?>
-      <h1 class="title is-2 is-family-secondary"><?php echo $item->displayTitle(); ?></h1>
-      <?php if($type == 'Activiteit'):?>
-          <h2 class="subtitle is-4"><?php echo $item->value('activiteit:typeActiviteit'); ?></h2>
-      <?php endif;?>
-    <?php endif;?>
-    <?if($item->value('dcterms:description') || $item->value('activiteit:samenvatting') || $item->value('project:samenvatting')):?>
     <div class="columns">
-      <div class="column is-9">
-      <div class="content">
-        <?php echo $item->value('dcterms:description'); ?>
-        <?php if($type == 'Activiteit'):?>
-            <?php echo $item->value('activiteit:samenvatting')->asHtml(); ?>
-        <?php endif;?>
-        <?php if($type == 'Project'):?>
-            <?php echo $item->value('project:samenvatting')->asHtml(); ?>
-        <?php endif;?>
-      </div>
-    </div>
-    <?php endif;?>
-  </div>
-</section>
-<?php if($type != 'Project'):?>
-  <section class="section image-section-2">
-<?php else:?>
-  <section class="section image-section">
-<?php endif;?>
-  <div class="container">
-    <div class="columns is-multiline">
-        <?php if($type == 'Organisatie' || $type=="School" || $type == "Activiteit" || $type == "Tool" || $type == 'Leermiddel'):?>
-          <div class="column is-4">
-        <?php elseif($type == 'Project'):?>
-          <div class="column is-4">
-        <?php else:?>
-          <div class="column is-4">
-        <?php endif;?>
         <?php if (!$embedMedia && $itemMedia): ?>
           <div class="slide-container">
-
              <div class="slider-for">
                <?php $count = 0;?>
                <?php foreach($itemMedia as $media):?>                 
@@ -113,11 +55,10 @@ $links = array(
                </div>
              <?php endif;?>
          </div>
-        </div>
         <?php endif; ?>
 
         <div class="column"> 
-          <div class="content show-metadata <?php echo $type;?>">
+          <div class="content show-metadata">
             <?php $this->trigger('view.show.before'); ?>
             <?php if ($embedMedia && $itemMedia): 
               $itemMedia = $resource->media();
@@ -147,217 +88,22 @@ $links = array(
               </div>
               <hr />
             <?php endif;?>
-            <?if($type == 'School' || $type == 'Organisatie'):?>
-              <div class="content">
-                <?if($item->value('locatie:locatiestraatnaam')):?>
-                <?php echo $item->value('locatie:locatiestraatnaam');?> <?php echo $item->value('locatie:locatiehuisnummer');?><br />
-                <?php echo $item->value('locatie:locatiepostcode');?> <?php echo $item->value('locatie:locatiegemeente');?><br />
-                <br />
-                <?php endif;?>
-                <?php $contacts = array();?>
-                <?if($item->value('school:contact')):?>
-                  <?php $contacts = $item->value('school:contact', ['all' => true]);?>
-                <?php endif;?>
-                <?if($item->value('organisatie:contact')):?>
-                  <?php $contacts = $item->value('organisatie:contact', ['all' => true]);?>
-                <?php endif;?>
-                <?php foreach($contacts as $contact):?>
-                  <?php echo $contact->asHtml().'<br />';?>
-                <?php endforeach;?>
-                <hr />
-              </div>
-            <?php endif;?>
+
             <?php echo $item->displayValues(); ?>
             <?php $itemSets = $item->itemSets(); ?>
             <?php if($item->value('dcterms:source')):?>
               <?php $infos = $item->value('dcterms:source',["all" => true]);?>
               <hr />
-              <?php if($type == 'Schoolerfgoed'):?>
-                <?php foreach($infos as $info):?>
-                  <a target="_blank" href="<?php echo $info->uri();?>" class="button">
-                    <?php if(sizeof($infos)>1 && $info != ''):?>
-                      <span><?php echo $info;?></span>
-                    <?php else:?>
-                      <span>Meer info</span>
-                    <?php endif;?>
-                  </a>&nbsp;
-                <?php endforeach;?>
-              <?php else:?>
-
-              <?php endif;?>
 
             <?php endif;?>
 
-          </div>
-          <div class="content">
-            <?php if($type == 'Project'):?>
-                <?php if($item->value('project:projectUrl') && $item->value('project:logoUrl')):?>
-                  <br /><a target="_blank" href="<?php echo $item->value('project:projectUrl')->uri();?>"><img style="height:70px;" src="<?php echo $item->value('project:logoUrl');?>"</a>
-                <?php endif;?>
-                <!--<?php if($item->value('project:projectUrl') && !$item->value('project:logoUrl')):?>
-                  <br /><a target="_blank" class="button" href="<?php echo $item->value('project:projectUrl')->uri();?>">Meer info</a>
-                <?php endif;?>-->
-            <?php endif;?>
           </div>
   </div>
   </section>
-
-  <?php if($type == 'Organisatie'):?>
-    <?php if($item->value('organisatie:cultuurkuur')):?>
-      <section class="section project-section">
-        <div class="container">
-          <a target="_blank" class="" href="<?php echo $item->value('organisatie:cultuurkuur');?>">
-            <img style="height:32px;" src="https://www.cultuurkuur.be/themes/custom/cultuurkuur_theme/logo.svg" alt="Home">
-          </a>
-        </div>
-      </section>
-    <?php endif;?>
-  <?php endif;?>
-
-  <?php if($type == 'School'):?>
-    <section class="section project-section">
-      <div class="container">
-        <?php if($item->value('school:bewaardErfgoed')):?>
-          <h4 class="title is-5 is-family-secondary">Bewaard erfgoed</h4>
-          <div class="content values erfgoed">
-            <?php $values = $item->value('school:bewaardErfgoed',array('all'=>true)); ?>
-            <?php foreach ($values as $value): ?>
-                <?php
-                $valueType = $value->type();
-                $class = ['value'];
-                if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
-                    $class[] = 'resource';
-                    $class[] = $escape($value->valueResource()->resourceName());
-                } elseif ('uri' == $valueType) {
-                    $class[] = 'uri';
-                }
-                if (!$value->isPublic()) {
-                    $class[] = 'private';
-                }
-                ?>
-                <div class="erfgoed <?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
-                    <?php if ($language = $value->lang()): ?>
-                    <span class="language"><?php echo $language; ?></span>
-                    <?php endif; ?>
-                    <?php echo $value->asHtml(); ?>
-                </div>
-            <?php endforeach; ?>
-          </div>
-        <?php endif;?>
-
-        <?php if($item->value('school:erfgoedwerking')):?>
-          <h4 class="title is-5 is-family-secondary">Erfgoedwerking</h4>
-          <div class="content values erfgoed">
-            <?php $values = $item->value('school:erfgoedwerking',array('all'=>true)); ?>
-            <?php foreach ($values as $value): ?>
-                <?php
-                $valueType = $value->type();
-                $class = ['value'];
-                if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
-                    $class[] = 'resource';
-                    $class[] = $escape($value->valueResource()->resourceName());
-                } elseif ('uri' == $valueType) {
-                    $class[] = 'uri';
-                }
-                if (!$value->isPublic()) {
-                    $class[] = 'private';
-                }
-                ?>
-                <div class="erfgoed <?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
-                    <?php if ($language = $value->lang()): ?>
-                    <span class="language"><?php echo $language; ?></span>
-                    <?php endif; ?>
-                    <?php echo $value->asHtml(); ?>
-                </div>
-            <?php endforeach; ?>
-          </div>
-        <?php endif;?>
-      </div>
-    </section>
-  <?php endif;?>
-
-  <?php if($type == 'Activiteit' || $type == 'Tool' || $type == 'Leermiddel'):?>
-    <section class="section project-section">
-      <div class="container">
-        <?php if($item->value('activiteit:meerInfo')):?>
-          <?php $links = $item->value('activiteit:meerInfo',array('all' => true));?>
-          <?php foreach($links as $link):?>
-            <a target="_blank" href="<?php echo $link->uri();?>" class="button">
-              <span><?php echo $link;?></span>
-            </a>
-          <?php endforeach;?>
-        <?php endif;?>
-        <?php if($item->value('activiteit:cultuurkuur')):?>
-          <a target="_blank" href="<?php echo $item->value('activiteit:cultuurkuur');?>" class="button">
-            <span>Ontdek meer in Cultuurkuur</span>
-          </a>
-        <?php endif;?>
-      </div>
-    </section>
-  <?php endif;?>
-
-  <?php if($type == 'Project' && $item->value('project:faseEen')):?>
-    <section class="section project-section">
-      <div class="container">
-        <div class="content project-text">
-
-            <h4 class="title is-4 is-family-secondary">Fasering</h4>
-
-            <h4 class="title is-5 is-family-secondary">Fase 1</h4>
-            <div class="content">
-              <?php echo $item->value('project:faseEen')->asHtml(); ?>
-            </div>
-          <?php if($item->value('project:faseTwee')):?>
-            <h4 class="title is-5 is-family-secondary">Fase 2</h4>
-            <div class="content">
-              <?php echo $item->value('project:faseTwee')->asHtml(); ?>
-            </div>
-          <?php endif;?>
-          <?php if($item->value('project:faseDrie')):?>
-            <h4 class="title is-5 is-family-secondary">Fase 3</h4>
-            <div class="content">
-              <?php echo $item->value('project:faseDrie')->asHtml(); ?>
-            </div>
-          <?php endif;?>
-          <?php if($item->value('project:bewaardErfgoed')):?>
-            <a class="button" href="<?php echo $item->value('project:bewaardErfgoed');?>">Bewaard erfgoed</a>
-            <?php if($item->value('project:gerelateerdErfgoed')):?>
-              <h4 class="title is-4 is-family-secondary">Bewaard erfgoed</h4>
-              <div class="content values erfgoed">
-                <?php $values = $item->value('project:gerelateerdErfgoed',array('all'=>true)); ?>
-                <?php foreach ($values as $value): ?>
-                    <?php
-                    $valueType = $value->type();
-                    $class = ['value'];
-                    if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
-                        $class[] = 'resource';
-                        $class[] = $escape($value->valueResource()->resourceName());
-                    } elseif ('uri' == $valueType) {
-                        $class[] = 'uri';
-                    }
-                    if (!$value->isPublic()) {
-                        $class[] = 'private';
-                    }
-                    ?>
-                    <div class="erfgoed <?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
-                        <?php if ($language = $value->lang()): ?>
-                        <span class="language"><?php echo $language; ?></span>
-                        <?php endif; ?>
-                        <?php echo $value->asHtml(); ?>
-                    </div>
-                <?php endforeach; ?>
-              </div>
-            <?php endif;?>
-
-          <?php endif;?>
-
-        </div>
-      </div>
-    </section>
-  <?php endif;?>
   <section style="background:white;height:4rem;">
     <div class="container">
       <div class="is-pulled-right" style="height:4rem;">
+        <a href="<?php echo $itemMedia[0]->originalUrl();?>" style="height:40px;margin:0.5em;" class="button is-warning" download="<?php echo $item->displayTitle();?>">Download</a>
         <?php //$this->trigger('view.show.after'); ?>
                   <!-- Sharingbutton Facebook -->
           <a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=<?php echo "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";?>" target="_blank" rel="noopener" aria-label="">

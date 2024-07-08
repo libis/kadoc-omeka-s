@@ -94,11 +94,14 @@ $translate = $this->plugin('translate');
                     endif;
                   ?>
                     <?php echo $body; ?>
+                    <hr>
                 <?php endif; ?>
                 <?php if($page->dataValue('credits')):?>
-                  <hr>
-                  Door <?php echo $page->dataValue('credits'); ?>
+                  <div>Door <?php echo $page->dataValue('credits'); ?></div>
                 <?php endif;?> 
+                <?php if($page->dataValue('type')):?>
+                  <div><?php echo ucfirst($page->dataValue('type'));?></div>
+                <?php endif;?>
                 </div> 
               </div>
             </div>

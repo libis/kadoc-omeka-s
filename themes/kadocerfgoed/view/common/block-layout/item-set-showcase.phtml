@@ -58,7 +58,7 @@ $subNav = new Navigation($newPages);
     </div>
 <aside class="menu column is-4 box" style="padding: 1.25rem 2rem;">
     <ul class="menu-list">
-        <?php foreach ($items as $item):?>
+        <!-- <?php foreach ($items as $item):?>
             <?php if($item->valueResource()->value('dcterms:relation')):?>
             <li>
                 <details>
@@ -79,7 +79,8 @@ $subNav = new Navigation($newPages);
         </li>
             <?php endif;?>
 
-        <? endforeach;?>
+        <? endforeach;?> -->
+    
         <?= $this->navigation($subNav)->menu()->renderMenu(null, ['maxDepth' => 1]);?>
 
     </ul>

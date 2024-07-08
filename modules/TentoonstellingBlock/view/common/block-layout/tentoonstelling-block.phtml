@@ -1,0 +1,108 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets
+ * @var string $thumbnailType
+ * @var string $showTitleOption
+ * 
+ * @var \Laminas\Navigation\Navigation $subNav
+ */
+use Laminas\Navigation\Navigation;
+
+$plugins = $this->getHelperPluginManager();
+$thumbnail = $plugins->get('thumbnail');
+
+$defaultThumbnail = $this->assetUrl('thumbnails/default.png', 'Omeka', true);
+$defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
+
+$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$lang = $filterLocale ? $this->lang() : null;
+
+$nav = $block->page()->site()->publicNav();
+$container = $nav->getContainer();
+$activePage = $nav->findActive($container);
+$pages = $activePage['page']->getPages();
+$newPages = [];
+foreach ($pages as $page) {
+    $newPages[] = $page->toArray();
+}
+$subNav = new Navigation($newPages);
+  $escape = $this->plugin('escapeHtml');
+  $url = '';
+  $siteTitle = $block->page()->site()->title();
+  if($attachments):
+    $media = $attachments[0]->media();
+
+    $url = '';
+    if($media):
+      $url = $media->thumbnailUrl('large');
+      $url = str_replace('http:', '', $url);
+    endif;
+  endif;
+
+?>
+<header>
+<?php if($url):?>
+<section class="hero is-bold" style="background:url(<?php echo $url;?>) no-repeat center center;background-size: cover;">
+<?php else:?>
+<section class="hero is-bold">
+<?php endif;?>
+  <div class="hero-overlay">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns">
+          <div class="column hero-left is-info is-12">
+            <div class="hero-text is-size-5">
+              <?php if($block->dataValue('sec_title')):?>
+                 <h2 class="subtitle is-size-6"><?php echo $block->dataValue('sec_title');?></h2>
+              <?php endif;?>
+              <h1 class="title is-family-secondary is-1"><span><?php echo $block->dataValue('title');?></span></h1>
+              <div class="link">
+                <a class="button is-primary is-inverted is-outlined is-large" href="#">
+                  <span><?php echo $block->dataValue('author');?></span>
+                  <span class="icon is-small">
+                    <i class="fas fa-angle-right"></i>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="column hero-right" >
+            <div class="hero-overlay"></div>
+          </div>
+        </div>
+
+      </div>
+     </div>
+   </div>
+ </section>
+ </header>
+ <div class="block item-set-showcase section">
+<button title="tooltip" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="level button is-warning" onclick="copyLink()"><i class="fa fa-share-alt"></i> Delen</button>
+    <div class="item-set resource columns">
+        <div class="column is-8">
+        <div class="level"><?php echo $block->dataValue('text');?></div>
+            <a href="<?php echo $newPages[0]['label'];?>" class="button" style="background-color:#00b7e7;color:aliceblue;">Start Tentoonstelling</a>
+        </div>
+<aside class="menu column is-4 box" style="padding: 1.25rem 2rem;">
+    <ul class="menu-list">
+    
+        <?= $this->navigation($subNav)->menu()->renderMenu(null, ['maxDepth' => 1]);?>
+
+    </ul>
+</aside>
+</div>
+<script>
+  function copyLink() {
+    console.log("Clicked!");
+  // Get the text field
+  var copyText = document.getElementById("delen");
+
+   // Copy the text inside the text field
+  navigator.clipboard.writeText(copyText.value);
+
+  // Tooltip the copied text
+  copyText.title = "Copied link: " + copyText.value;
+} 
+</script>

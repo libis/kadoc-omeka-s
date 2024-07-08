@@ -26,11 +26,12 @@ $lang = $filterLocale ? $this->lang() : null;
     <div class="container">
         <?php foreach ($itemSets as $itemSet):
             $itemSetTitle = $itemSet->displayTitle();
+            $itemSetDescription = $itemSet->displayDescription();
             $itemSetId = $itemSet->id();
             $items = $this->api()->search("items", ["item_set_id" => $itemSetId])->getContent();
             $i=0;
         ?>
-        <h2><?php echo $itemSetTitle;?></h2>
+        <!-- <h2><?php echo $itemSetTitle;?></h2> -->
         <div class="columns">
 
             <div class="column is-6">
@@ -38,14 +39,14 @@ $lang = $filterLocale ? $this->lang() : null;
 
                 <div class="carousel" id="carousel-demo">
 
-            <?php foreach($items as $item):
-                $url = $item->url();
-                $media = $item->media();
-                $thumbnail = $media[0]->thumbnailUrl('large'); 
-                $i++;  
-            ?>
-            <figure class="image is-square">
-                <img src="<?php echo $thumbnail;?>" class="item-<?php echo $i;?>">
+                <?php foreach($items as $item):
+                    $url = $item->url();
+                    $media = $item->media();
+                    $thumbnail = $media[0]->thumbnailUrl('large'); 
+                ?>
+                <figure class="image is-square" style="cursor:pointer;">
+                    <img src="<?php echo $thumbnail;?>" class="item-<?php echo $i;?>" onclick="moreInfo(<?php echo $i;?>);">
+                    
 
 
                 <!-- <div class="card item-<?php echo $i;?>">
@@ -61,11 +62,59 @@ $lang = $filterLocale ? $this->lang() : null;
                     </div>
                 </div> -->
                 </figure>
+                <?php $i++;?>
                 <?php endforeach;?>
             </div>
+            </div>
+            <div class="column is-6">
+                <h1 class="title is-1"><?php echo $itemSet->displayTitle();?></h1>
+                    <p><?php echo $itemSetDescription; ?></p>
             </div>
  
         </div>
         <?php endforeach;?>
     </div>
 </section>
+
+<?php $a=0;?>
+<?php foreach($items as $item):
+$media = $item->media();?>
+<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;" onclick="closeModal();">
+    <div class="modal-background"></div>
+    <div class="modal-content">    
+        <div class="container" style="background-color: aliceblue;width: fit-content;">
+        <img src="<?php echo $media[0]->originalUrl(); ?>">
+        <div class="column">
+        <?php echo $item->displayValues();?>
+        <div class="has-text-right">
+        <a href="<?php echo $media[0]->originalUrl(); ?>" class="button is-warning" download="<?php echo $item->displayTitle();?>">Download</a>
+        </div>
+        </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+<?php $a++;?>
+<?php endforeach;?>
+
+<script>
+    function moreInfo(x) {
+        let id = '#modal-' + x;
+        let html = '#html'
+        $( id ).addClass("is-active");
+        $( html ).css("overflow-y","hidden");
+    }
+    function closeModal(){
+        let modal = '.modal';
+        let html = '#html'
+        $( modal ).removeClass("is-active");
+        $( html ).css("overflow-y","unset");
+    }
+    //somehow try and get rid of carrousel arrows
+    $(document).ready(function() {
+        let prev = "slider-container > .slider-navigation-previous";
+        let next = ".slider-navigation-next";
+        $( prev ).addClass("is-hidden");
+        $( next ).addClass("is-hidden");
+    });
+</script>

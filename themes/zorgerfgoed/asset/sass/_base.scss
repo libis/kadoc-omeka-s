@@ -129,6 +129,21 @@ figcaption{
   }
 }
 
+.new-site-modal .modal-card{
+  padding: 2rem;
+  background: white;
+  position: relative;
+
+  .modal-close{
+    position: absolute;
+    color: $primary;
+
+    &::before, &::after{
+      background-color: rgba($primary,1);
+    }
+  }
+}
+
 //breadcrumb
 .breadcrumb-section{
   padding-top: 2rem;

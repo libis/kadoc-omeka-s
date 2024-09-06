@@ -55,11 +55,7 @@ class OutputController extends AbstractActionController
         $resourceType = $params->fromRoute('__CONTROLLER__');
         // Support common modules.
         if (empty($resourceTypesToNames[$resourceType])) {
-            if (in_array($resourceType, [
-                'AdvancedSearch\Controller\IndexController',
-                'AdvancedSearch\Controller\SearchController',
-                'Search\Controller\IndexController',
-            ])) {
+            if (in_array($resourceType, ['AdvancedSearch\Controller\IndexController', 'Search\Controller\IndexController'])) {
                 // TODO It may be an item set.
                 $resourceType = 'resource';
             } else {
@@ -146,7 +142,6 @@ class OutputController extends AbstractActionController
         $options['format_resource'] = $settings->get('bulkexport_format_resource', 'url_title');
         $options['format_resource_property'] = $settings->get('bulkexport_format_resource_property', 'dcterms:identifier');
         $options['format_uri'] = $settings->get('bulkexport_format_uri', 'uri_label');
-        $options['language'] = $settings->get('bulkexport_language', '');
         $options['template'] = $settings->get('bulkexport_template');
         $options['is_admin_request'] = !$isSiteRequest;
         $options['resource_type'] = $resourceName;

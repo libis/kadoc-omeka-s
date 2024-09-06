@@ -1,0 +1,34 @@
+.row-left {
+    padding-right: 15px;
+
+}
+
+.selected {
+    background-color: lightgrey;
+}
+
+.toggle-vis {
+    display: none;
+}
+
+.chozn-select select{
+    display: block;
+}
+
+#team-resources td ul {
+    float:right;
+}
+
+.icon-form {
+    color: rgb(169, 25, 25);
+    opacity: .5;
+}
+
+.icon-form:hover {
+    opacity: 1;
+}
+
+tr.current-team {
+    background: lightgrey;
+    font-weight: bold;
+}

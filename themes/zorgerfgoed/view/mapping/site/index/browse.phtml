@@ -35,7 +35,7 @@ $query['mapping_basemap_provider'] = $query['mapping_basemap_provider'] ?? '';
 >
     <?php 
         //$media = $marker->item()->primaryMedia();
-        $mediaUrl = $marker->item()->thumbnailDisplayUrl('medium');
+        $mediaUrl = $marker->item()->thumbnailDisplayUrl('thumbnail');
         if(!$mediaUrl):
             $mediaUrl= "";
         endif;     

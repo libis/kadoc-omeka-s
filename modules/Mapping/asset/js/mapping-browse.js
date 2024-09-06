@@ -25,6 +25,7 @@ if(window.location.href.indexOf("kapel") > -1) {
         'Terrain': L.tileLayer.provider('Esri.WorldShadedRelief')
     };
 }else{
+    map.scrollWheelZoom.disable();
     baseMaps = {        
         'Default': defaultProvider,
         'Streets': L.tileLayer.provider('OpenStreetMap.Mapnik'),

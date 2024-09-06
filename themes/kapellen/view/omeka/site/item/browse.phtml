@@ -49,11 +49,7 @@ $sortHeadings = [
       <ul>
         <li><a href="/">Home</a></li>
         <?php if ($itemSetShow):?>
-          <?php if($type == "Expositie" || $type == "Erfgoed"):?>
-            <li><a href="/s/zorgerfgoed/collecties">Erfgoedcollecties</a></li>
-          <?php else:?>
-            <li><a href="/page/proeftuinen">Proeftuinen</a></li>
-          <?php endif;?>  
+         
           <li><?php echo $itemSet->displayTitle(); ?></li>
         <?php elseif ($news):?>
           <li><?php echo sprintf($this->translate('Nieuws')); ?></li>

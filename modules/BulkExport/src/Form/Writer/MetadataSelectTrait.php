@@ -2,7 +2,7 @@
 
 namespace BulkExport\Form\Writer;
 
-use Omeka\Form\Element as OmekaElement;
+use Omeka\Form\Element\PropertySelect;
 
 trait MetadataSelectTrait
 {
@@ -11,7 +11,7 @@ trait MetadataSelectTrait
         $this
             ->add([
                 'name' => $name,
-                'type' => OmekaElement\PropertySelect::class,
+                'type' => PropertySelect::class,
                 'options' => [
                     'element_group' => 'export',
                     'label' => 'Metadata', // @translate
@@ -28,7 +28,7 @@ trait MetadataSelectTrait
             ])
             ->add([
                 'name' => $name . '_exclude',
-                'type' => OmekaElement\PropertySelect::class,
+                'type' => PropertySelect::class,
                 'options' => [
                     'element_group' => 'export',
                     'label' => 'Metadata to exclude', // @translate
@@ -123,10 +123,23 @@ trait MetadataSelectTrait
                     'o:resource[dcterms:title]' => 'Label (first title)', // @translate
                 ],
             ],
+            'o:mappingMarker' => [
+                'label' => 'MappingMarker', // @translate
+                'options' => [    
+                    'o-item[o:id]' => 'item id',     
+                    'o-module-mapping:Marker[o-module-mapping:lat]' => 'latitude',
+                    'o-module-mapping:Marker[o-module-mapping:lng]' => 'longitude',
+                ],
+            ],
+
         ];
 
         if (!class_exists(\Annotate\Entity\Annotation::class)) {
             unset($mapping['o:annotation']);
+        }
+
+        if (!class_exists(\Mapping\Entity\Mapping::class)) {
+            unset($mapping['o:mappingMarker']);
         }
 
         return $mapping;

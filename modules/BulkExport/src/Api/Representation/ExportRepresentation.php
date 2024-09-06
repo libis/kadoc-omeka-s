@@ -14,15 +14,15 @@ class ExportRepresentation extends AbstractEntityRepresentation
         $job = $this->job();
         return [
             'o:id' => $this->id(),
-            'o-bulk:exporter' => $exporter ? $exporter->getReference() : null,
+            'o-module-bulk:exporter' => $exporter ? $exporter->getReference() : null,
             'o:owner' => $owner ? $owner->getReference() : null,
             'o:job' => $job ? $job->getReference() : null,
-            'o-bulk:comment' => $this->comment(),
+            'o-module-bulk:comment' => $this->comment(),
             'o:status' => $this->status(),
             'o:started' => $this->started(),
             'o:ended' => $this->ended(),
-            'o:filename' => $this->filename(),
-            'o-bulk:writer_params' => $this->writerParams(),
+            'o-module-bulk:filename' => $this->filename(),
+            'o-module-bulk:writer_params' => $this->writerParams(),
         ];
     }
 
@@ -33,7 +33,7 @@ class ExportRepresentation extends AbstractEntityRepresentation
 
     public function getJsonLdType()
     {
-        return 'o-bulk:Export';
+        return 'o-module-bulk:Export';
     }
 
     public function exporter(): ?ExporterRepresentation

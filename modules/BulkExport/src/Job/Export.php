@@ -91,17 +91,15 @@ class Export extends AbstractJob
         }
 
         $data = [
-            'o:filename' => $params['filename'],
+            'o-module-bulk-export:filename' => $params['filename'],
         ];
         $this->api()->update('bulk_exports', $export->id(), $data, [], ['isPartial' => true]);
 
         $services = $this->getServiceLocator();
-        $config = $services->get('Config');
-        $baseFiles = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-        $baseUrl = $config['file_store']['local']['base_uri'] ?: $services->get('Router')->getBaseUrl() . '/files';
+        $baseUrl = $services->get('Config')['file_store']['local']['base_uri'] ?: $services->get('Router')->getBaseUrl() . '/files';
         $this->logger->notice(
-            'The export is available at {url} (size: {size} bytes).', // @translate
-            ['url' => $baseUrl . '/bulk_export/' . $params['filename'], 'size' => filesize($baseFiles . '/bulk_export/' .$params['filename'])]
+            'The export is available at {url}.', // @translate
+            ['url' => $baseUrl . '/bulk_export/' . $params['filename']]
         );
     }
 
@@ -196,21 +194,23 @@ class Export extends AbstractJob
 
         if ($siteSlug) {
             try {
-                $site = $this->api()->read('sites', ['slug' => $siteSlug])->getContent();
+                $response = $this->api()->read('sites', ['slug' => $siteSlug]);
+                $site = $response->getContent();
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
             }
         } else {
             $defaultSiteId = $services->get('Omeka\Settings')->get('default_site');
             try {
-                $site = $this->api()->read('sites', ['id' => $defaultSiteId])->getContent();
+                $response = $this->api()->read('sites', ['id' => $defaultSiteId]);
+                $site = $response->getContent();
                 $siteSlug = $site->slug();
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
             }
         }
 
         if (empty($site)) {
-            $site = $this->api()->search('sites', ['limit' => 1])->getContent();
-            $site = $site ? reset($site) : null;
+            $response = $this->api()->search('sites', ['limit' => 1]);
+            $site = $response ? reset($response->getContent()) : null;
             $siteSlug = $site ? $site->slug() : '***';
         }
 

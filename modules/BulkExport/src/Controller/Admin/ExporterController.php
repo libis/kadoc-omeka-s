@@ -9,15 +9,27 @@ use BulkExport\Form\ExporterStartForm;
 use BulkExport\Interfaces\Configurable;
 use BulkExport\Interfaces\Parametrizable;
 use BulkExport\Job\Export as JobExport;
+use BulkExport\Traits\ServiceLocatorAwareTrait;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Session\Container;
 use Laminas\View\Model\ViewModel;
 use Log\Stdlib\PsrMessage;
 
 class ExporterController extends AbstractActionController
 {
+    use ServiceLocatorAwareTrait;
+
+    /**
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function __construct(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->setServiceLocator($serviceLocator);
+    }
+
     public function addAction()
     {
         return $this->editAction();
@@ -45,9 +57,6 @@ class ExporterController extends AbstractActionController
             $data = $this->params()->fromPost();
             $form->setData($data);
             if ($form->isValid()) {
-                if (!isset($data['o:label']) || (string) $data['o:label'] === '') {
-                    $data['o:label'] = $this->translate('[No label]'); // @translate
-                }
                 if ($entity) {
                     $response = $this->api($form)->update('bulk_exporters', $this->params('id'), $data, [], ['isPartial' => true]);
                 } else {
@@ -242,17 +251,17 @@ class ExporterController extends AbstractActionController
                     case 'start':
                         $exportData = [];
                         $exportData['o:owner'] = $this->identity();
-                        $exportData['o-bulk:comment'] = trim((string) $session['comment']) ?: null;
-                        $exportData['o-bulk:exporter'] = $exporter->getResource();
+                        $exportData['o-module-bulk:comment'] = trim((string) $session['comment']) ?: null;
+                        $exportData['o-module-bulk:exporter'] = $exporter->getResource();
                         if ($writer instanceof Parametrizable) {
-                            $exportData['o-bulk:writer_params'] = $writer->getParams();
+                            $exportData['o-module-bulk:writer_params'] = $writer->getParams();
                         }
 
                         // Add some default params.
                         // TODO Make all writers parametrizable.
                         // @see \BulkExport\Controller\OutputController::output().
-                        $exportData['o-bulk:writer_params']['site_slug'] = null;
-                        $exportData['o-bulk:writer_params']['is_admin_request'] = true;
+                        $exportData['o-module-bulk:writer_params']['site_slug'] = null;
+                        $exportData['o-module-bulk:writer_params']['is_admin_request'] = true;
 
                         $response = $this->api()->create('bulk_exports', $exportData);
                         if (!$response) {
@@ -275,7 +284,7 @@ class ExporterController extends AbstractActionController
                         try {
                             $job = $useBackground
                                 ? $dispatcher->dispatch(JobExport::class, $args)
-                                : $dispatcher->dispatch(JobExport::class, $args, $export->getServiceLocator()->get(\Omeka\Job\DispatchStrategy\Synchronous::class));
+                                : $dispatcher->dispatch(JobExport::class, $args, $this->getServiceLocator()->get(\Omeka\Job\DispatchStrategy\Synchronous::class));
                             $urlHelper = $this->url();
                             $message = $useBackground
                                 ? 'Export started in background (job {link_open_job}#{jobId}{link_close}, {link_open_log}logs{link_close}). This may take a while.' // @translate

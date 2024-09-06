@@ -8,8 +8,8 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><a href="<?php echo $site->url();?>">Home</a></li>
-        <li><a href="<?php echo $site->url().'/page/schoolerfgoed';?>">Schoolerfgoed</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/page/schoolerfgoed">Schoolerfgoed</a></li>
         <li>Thema's</li>
       </ul>
     </nav>
@@ -42,12 +42,12 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
             </div>
               <div class="featured-content" style="background:#fff;">
 
-                    <a class="card-link-wrapper" href="<?php echo $site->url().'/themas?q=&facet[item_set_id][0]='.$itemSet->id();?>">
+                    <a class="card-link-wrapper" href="<?php echo '/s/start/themas?q=&facet[item_set_id][0]='.$itemSet->id();?>">
 
                       <h3 class="title is-3 is-family-secondary" style="margin-bottom:0rem;">
-                          <span ><a style="border-bottom:2px solid #3b9c7c;" href="<?php echo $site->url().'/themas?q=&facet[item_set_id][0]='.$itemSet->id();?>"><?php echo $heading; ?></a></span></h3>
+                          <span ><a style="border-bottom:2px solid #3b9c7c;" href="<?php echo '/s/start/themas?q=&facet[item_set_id][0]='.$itemSet->id();?>"><?php echo $heading; ?></a></span></h3>
                     </a>
-                    <div class="link is-family-secondary"><a href="<?php echo $site->url().'/themas?q=&facet[item_set_id][0]='.$itemSet->id();?>">Lees meer</a></div>
+                    <div class="link is-family-secondary"><a href="<?php echo '/s/start/themas?q=&facet[item_set_id][0]='.$itemSet->id();?>">Lees meer</a></div>
               </div>
 
           </div>

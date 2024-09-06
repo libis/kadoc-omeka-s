@@ -3,6 +3,7 @@
 namespace BulkExport\Formatter;
 
 use BulkExport\Traits\OpenDocumentTextTemplateTrait;
+use Log\Stdlib\PsrMessage;
 use PhpOffice\PhpWord;
 
 class Odt extends AbstractFieldsFormatter
@@ -23,10 +24,10 @@ class Odt extends AbstractFieldsFormatter
     public function format($resources, $output = null, array $options = []): FormatterInterface
     {
         if (!extension_loaded('zip') || !extension_loaded('xml')) {
-            $this->logger->err(
+            $this->services->get('Omeka\Logger')->err(new PsrMessage(
                 'To process export to "{format}", the php extensions "zip" and "xml" are required.', // @translate
                 ['format' => $this->getLabel()]
-            );
+            ));
             $this->hasError = true;
             return $this;
         }

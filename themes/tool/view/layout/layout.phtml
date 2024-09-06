@@ -1,0 +1,201 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$siteTitle = $site->title();
+$this->htmlElement('html')->setAttribute('lang', $this->lang());
+$this->htmlElement('html')->setAttribute('class', "has-navbar-fixed-top");
+$this->headMeta()->setCharset('utf-8');
+$this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
+$this->headTitle($siteTitle)->setSeparator(' · ');
+$this->headTitle()->append($this->setting('installation_title', 'Omeka S'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/style.min.css'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/selectize.css'));
+//$this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
+//$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700italic,700');
+$this->headScript()->prependFile($this->assetUrl('js/default.js'));
+$this->headScript()->prependFile($this->assetUrl('js/slick.js'));
+$this->headScript()->prependFile($this->assetUrl('js/clamp.min.js'));
+$this->headScript()->prependFile($this->assetUrl('js/selectize.js'));
+
+$this->headScript()->prependFile($this->assetUrl('js/global.js', 'Omeka'));
+$this->headScript()->prependFile($this->assetUrl('vendor/jquery/jquery.min.js', 'Omeka'));
+$this->trigger('view.layout');
+$userBar = $this->userBar();
+
+$url = $this->serverUrl(true);
+//echo 'url:'.$url;
+if (strpos($url, 'page/home') !== false) {
+    $home = true;
+}else{
+  $home = false;
+}
+?>
+<?php echo $this->doctype(); ?>
+<?php echo $this->htmlElement('html'); ?>
+    <head>
+        <?php echo $this->headMeta(); ?>
+        <?php echo $this->headTitle(); ?>
+        <?php echo $this->headLink(); ?>
+        <?php echo $this->headStyle(); ?>
+        <?php echo $this->headScript(); ?>
+        <META HTTP-EQUIV="Access-Control-Allow-Origin" CONTENT="https://https://lib.is">
+        <script src="https://kit.fontawesome.com/582fb8c29f.js" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/colcade@0/colcade.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+         <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho&display=swap" rel="stylesheet">
+         <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Lisu+Bosa:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Shippori+Mincho&display=swap" rel="stylesheet">
+         <!-- Google tag (gtag.js) --> 
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-LP6SCS31MC"></script>
+        <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-LP6SCS31MC'); </script>
+    </head>
+
+    <?php echo $this->htmlElement('body'); ?>
+    <?php echo $userBar; ?>
+
+    <header>      
+      <nav class="navbar is-hidden-mobile section" role="navigation" aria-label="main navigation" style="margin-top:-6rem;z-index:31;padding-bottom:1rem;">
+        <div class="container">
+          <div class="columns" style="">
+            <div class="column is-6">
+              <div class="logo">
+                <a href="<?php echo $site->url();?>">
+                  <img src="<?php echo $this->assetUrl('img/Toon.png'); ?>" alt="<?php echo $escape($siteTitle); ?>" />
+                </a>
+                <div class="has-text-centered"><span class="archief">Actief met zorgarchief</span></div>
+              </div>
+            </div>
+            <div class="column is-6 nav-right">
+              <?php
+                echo $site->publicNav()->menu()->renderMenu(null, [
+                    'maxDepth' => $this->themeSetting('nav_depth') - 1
+                ]);
+              ?>
+              <br><br><br>
+              <?php echo $this->partial('common/search-form'); ?>
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+              </a>
+            </div>
+          </div>
+        </div>         
+      </nav>
+
+      <nav class="navbar is-fixed-top navbar-small" role="navigation" aria-label="main navigation">
+        <div class="container">
+          <div class="navbar-brand">
+                <a class="navbar-item" href="<?php echo $site->url();?>">
+                  <img src="<?php echo $this->assetUrl('img/Toon.png'); ?>" alt="<?php echo $escape($siteTitle); ?>" />
+                </a>
+                <!--<div class=""><span class="archief">Actief met<br> zorgarchief</span></div>-->
+
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+          </div>
+
+          <div id="navbarBasicExample" class="navbar-menu">
+           
+            <div class="navbar-end has-text-right">  
+              <div class="small-menu">
+              <?php
+                echo $site->publicNav()->menu()->renderMenu(null, [
+                    'maxDepth' => $this->themeSetting('nav_depth') - 1
+                ]);
+              ?>
+              </div>
+              <?php echo $this->partial('common/search-form'); ?>      
+                     
+            </div>
+          </div>
+        </div>        
+      </nav>
+    </header>
+
+    <section class="wrapper">  
+          <div class="main-area"><?php echo $this->content; ?></div>    
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <nav class="level">
+            <!-- Left side -->
+            <div class="level-left">
+              <div class="level-item">
+                <div class="logo-small">
+                  <img src="<?php echo $this->assetUrl('img/Toon.png'); ?>" alt="<?php echo $escape($siteTitle); ?>" />
+                </div>  
+              </div>
+              <div class="level-item">
+                
+              </div>
+            </div>
+
+            <!-- Right side -->
+            <div class="level-right">
+              <p class="level-item">
+                <div class="logos">
+                  <a href="https://kadoc.kuleuven.be/"><img alt="KU Leuven" src="<?php echo $this->assetUrl("img/kadoc.png");?>" /></a>
+                  <!--<a href="//libis.be"><img alt="Libis" src="<?php echo $this->assetUrl("img/libis_gray.png");?>" /></a>-->
+                  <a href="https://www.museumdrguislain.be/"><img alt="Museum Dr. Guislain Gent" src="<?php echo $this->assetUrl("img/MuseumDrGuislain_logo.jpg");?>" /></a>
+                  <a href="https://www.vlaanderen.be/"><img alt="Vlaanderen,verbeelding werkt" src="<?php echo $this->assetUrl("img/vlaanderen.png");?>" /></a>
+                </div>
+            </div>
+          </nav>
+          <p style="font-size:0.9rem;">
+            <a href="/page/disclaimer">Disclaimer</a><span style="font-family:helvetica;"> | ©</span> KU Leuven, built by <a href="//libis.be">LIBIS</a>
+          </p>
+      </div>
+    </footer>
+
+    <div class="search-menu modal">
+      <div class="modal-background"></div>
+        <div class="modal-content">
+          <?php echo $this->partial('common/search-form'); ?>
+        </div>
+        <button class="search-menu-close modal-close is-large"></button>
+     </div>
+
+     <div class="burger-menu modal">
+       <div class="modal-background"></div>
+         <div class="modal-content">
+           <!-- Any other Bulma elements you want -->
+           
+           <?php
+             echo $site->publicNav()->menu()->renderMenu(null, [
+                 'maxDepth' => $this->themeSetting('nav_depth') - 1
+             ]);
+           ?>
+           <br><br>
+           <?php echo $this->partial('common/search-form'); ?>
+         </div>
+         <button class="burger-menu-close modal-close is-large"></button>
+      </div>
+  </body>
+  <script>
+  $(document).ready(function() {
+    // Check for click events on the navbar burger icon
+    $(".navbar-burger").click(function() {
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        //$(".navbar-burger").toggleClass("is-active");
+        $(".burger-menu").toggleClass("is-active");
+    });
+
+    $(".showSearch").click(function() {
+    $(".search-menu").addClass("is-active");
+    });
+
+    $(".search-menu-close").click(function() {
+       $(".search-menu").removeClass("is-active");
+    });
+    $(".burger-menu-close").click(function() {
+       $(".burger-menu").removeClass("is-active");
+    });
+
+    $(".search-button").appendTo(".left-nav .navigation");
+  });
+  </script>
+</html>

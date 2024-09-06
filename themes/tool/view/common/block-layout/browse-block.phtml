@@ -1,0 +1,185 @@
+<?php
+$translate = $this->plugin('translate');
+$sitename = $block->page()->site()->title();
+?>
+<section class="section browse-block color-section">
+  <div class="container">
+  <?php if($this->heading == "Partners"):?>
+    <div class="partner-container">
+      <div class="overlay">
+  <?php endif;?>  
+  
+    <div class="columns">
+      <div class="column is-three-quarters">
+          <?php if ($this->heading && $this->heading != "Partners"): ?>
+            <h2 class="title is-2 is-family-sans-serif"><?php echo $this->heading; ?></h2>
+            <?php if($block->dataValue('text')):?>
+              <div class="content">
+                <?php echo $block->dataValue('text');?>
+              </div>
+            <?php endif; ?>
+          <?php endif; ?>
+      </div>
+      <div class="column is-one-quarters">        
+        <?php if ($this->linkText && $this->link):?>
+          <div class="has-text-right">
+              <a href="<?php echo $this->link;?>" class="button is-outlined is-rounded">
+                <span><?php echo $this->linkText;?></span>
+              </a>
+          </div>
+          <?php endif;?>
+      </div>      
+    </div>
+
+    <?php if($this->resources):?>
+    <div class="columns is-multiline <?php echo $block->dataValue('columns');?>">
+      <?php
+      $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+      $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+
+      foreach ($this->resources as $resource):
+          $heading = $resource->value($headingTerm, ['default' => $translate('[Untitled]')]);
+          $body = $resource->displayDescription();
+          if($resourceType == 'item-set'):
+            $body = $resource->displayDescription();
+          endif;
+          $type = $resource->resourceTemplate();
+          if($type):
+            $type= $type->label();
+          elseif($resourceType == 'item-set'):
+            $type= 'Collectie';
+          else:
+            $type= "Object";
+          endif;
+
+          if($resourceType == 'item-set'):
+            //$media = $resource->primaryMedia();
+            $mediaurl = $resource->thumbnailDisplayUrl('square');            
+            if(!$mediaurl):
+              $mediaurl= "";
+            endif;
+          else:
+           
+            $media = $resource->thumbnail();
+            
+            if($media):           
+              if($media->getControllerName() == "asset"):
+                $mediaurl = $media->assetUrl('medium');
+              else:                  
+                if(sizeof($this->resources) <= 2):
+                  $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('large'));
+                else:
+                  $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('medium'));
+                endif;
+              endif;  
+            elseif($media = $resource->media()):
+              if(sizeof($this->resources) <= 2):
+                $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('large'));
+              else:
+                $mediaurl = str_replace('http:', '', $media[0]->thumbnailUrl('medium'));
+              endif;
+            else:
+
+              $mediaurl = "";
+            endif;
+          endif;
+
+          $url = $resource->url();
+          $date = '';
+        ?>
+
+      <?php if($this->heading == "Partners"):?>
+        <div class="column is-6">
+          <div class="partner-item equal-height">
+            <div class="columns">
+              <div class="column is-4 img-col">
+                <div class="img-box">
+                  <a class="card-link-wrapper" href="<?php echo $url;?>">
+                    <div style="padding:0.5rem;background:#fff;">
+                      <img src="<?php echo  $mediaurl;?>">
+                    </div>
+                  </a>
+                </div>
+              </div>
+              <div class="column is-8">      
+                <div class="text-box">
+                  <h3 class="title is-5 is-family-sans-serif">
+                    <?php echo $resource->displayTitle();?>
+                  </h3>
+                  <div class="content">              
+                    <?php if ($body): ?>
+                      <p>
+                        <?php $trunc = implode(" ", array_slice(explode(" ", $body), 0, 21)); ?>
+                        <?php if(strlen($body) != strlen($trunc)):?>
+                          <?php echo $trunc.' ...';?>
+                        <?php else:?>
+                          <?php echo $trunc;?>
+                        <?php endif;?>
+                      </p>
+                    <?php endif; ?>
+                  </div>
+                  <div class="has-text-right">
+                    <a class="button is-outlined is-primary is-rounded" href="<?php echo $url;?>">Meer info</a>
+                  </div>
+                </div>  
+              </div>
+            </div>
+          </div>
+        </div>                  
+      <?php else:?>
+        <div class="column <?php echo $block->dataValue('columns');?>">
+          <a class="card-link-wrapper" href="<?php echo $url;?>">
+            <div class="card equal-height">
+              <div class="card-bg card-bg-img-2"
+                style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#ccc;background-size: cover;"
+                >
+              </div>
+              <header class="card-header">
+                <p class="card-header-title title is-5">
+                    <?php echo $resource->displayTitle();?>
+                </p>
+              </header>
+              <div class="card-content">
+                <div class="content">
+                  <?php if($resource->value('schema:datePublished') && $resourceType != 'item-set'):?>
+                      <?php 
+                        $date = $resource->value('schema:datePublished');
+                        $date = date('d-m-Y',strtotime($date));
+                      ?>
+                      <p class="datering"><?php echo $date;?></p>
+                  <?php endif;?>
+                  <?php if ($body): ?>
+                    <p>
+                      <?php $trunc = implode(" ", array_slice(explode(" ", $body), 0, 21)); ?>
+                      <?php if(strlen($body) != strlen($trunc)):?>
+                        <?php echo $trunc.' ...';?>
+                      <?php else:?>
+                        <?php echo $trunc;?>
+                      <?php endif;?>
+                    </p>
+                  <?php endif; ?>
+                </div>
+                
+              </div>
+              <footer class="card-footer">
+                <div class="">
+                    <a href="<?php echo $url;?>" class="button is-rounded is-primary">
+                      <span>Lees meer</span>
+                    </a>
+                </div>
+              </footer>
+            </div>
+          </a>
+        </div>        
+      <?php endif;?>  
+      
+      <?php endforeach; ?>
+    </div>
+    <?php endif;?>
+    <?php if($this->heading == "Partners"):?>
+      </div>
+    </div>
+    <?php endif;?>  
+  </div>
+
+</section>

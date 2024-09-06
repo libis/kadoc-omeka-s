@@ -16,9 +16,7 @@ use Omeka\Job\AbstractJob as Job;
 
 abstract class AbstractWriter implements WriterInterface, Configurable, Parametrizable
 {
-    use ConfigurableTrait;
-    use ParametrizableTrait;
-    use ServiceLocatorAwareTrait;
+    use ConfigurableTrait, ParametrizableTrait, ServiceLocatorAwareTrait;
 
     /**
      * @var string
@@ -190,72 +188,51 @@ abstract class AbstractWriter implements WriterInterface, Configurable, Parametr
         return $this;
     }
 
-    protected function getOutputFilepath(): string
+    protected function saveFile()
     {
         $config = $this->getServiceLocator()->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
         $destinationDir = $basePath . '/bulk_export';
 
         $exporterLabel = $this->getParam('exporter_label', '');
-        $base = $this->slugify($exporterLabel);
+        $base = preg_replace('/[^A-Za-z0-9]/', '_', $exporterLabel);
         $base = $base ? preg_replace('/_+/', '_', $base) . '-' : '';
         $date = $this->getParam('export_started', new \DateTime())->format('Ymd-His');
         $extension = $this->getExtension();
 
         // Avoid issue on very big base.
-        $outputFilepath = null;
         $i = 0;
         do {
-            $filename = sprintf('%s%s%s.%s', $base, $date, $i ? '-' . $i : '', $extension);
-            $outputFilepath = $destinationDir . '/' . $filename;
-        } while (++$i && file_exists($outputFilepath));
+            $filename = sprintf(
+                '%s%s%s.%s',
+                $base,
+                $date,
+                $i ? '-' . $i : '',
+                $extension
+            );
 
-        return $outputFilepath;
-    }
+            $filepath = $destinationDir . '/' . $filename;
+            if (!file_exists($filepath)) {
+                try {
+                    $result = copy($this->filepath, $filepath);
+                    @unlink($this->filepath);
+                } catch (\Exception $e) {
+                    throw new \Omeka\Job\Exception\RuntimeException((string) new PsrMessage(
+                        'Export error when saving "{filename}" (temp file: "{tempfile}"): {exception}', // @translate
+                        ['filename' => $filename, 'tempfile' => $this->filepath, 'exception' => $e]
+                    ));
+                }
 
-    /**
-     * Transform the given string into a valid filename
-     *
-     * @see \Omeka\Api\Adapter\SiteSlugTrait::slugify()
-     */
-    protected function slugify(string $input): string
-    {
-        if (extension_loaded('intl')) {
-            $transliterator = \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
-            $slug = $transliterator->transliterate($input);
-        } elseif (extension_loaded('iconv')) {
-            $slug = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $input);
-        } else {
-            $slug = $input;
-        }
-        $slug = mb_strtolower($slug, 'UTF-8');
-        $slug = preg_replace('/[^a-z0-9-]+/u', '_', $slug);
-        $slug = preg_replace('/-{2,}/', '_', $slug);
-        $slug = preg_replace('/-*$/', '', $slug);
-        return $slug;
-    }
+                if (!$result) {
+                    throw new \Omeka\Job\Exception\RuntimeException((string) new PsrMessage(
+                        'Export error when saving "{filename}" (temp file: "{tempfile}").', // @translate
+                        ['filename' => $filename, 'tempfile' => $this->filepath]
+                    ));
+                }
 
-    protected function saveFile()
-    {
-        $outputFilepath = $this->getOutputFilepath();
-        $filename = basename($outputFilepath);
-
-        try {
-            $result = copy($this->filepath, $outputFilepath);
-            @unlink($this->filepath);
-        } catch (\Exception $e) {
-            throw new \Omeka\Job\Exception\RuntimeException((string) new PsrMessage(
-                'Export error when saving "{filename}" (temp file: "{tempfile}"): {exception}', // @translate
-                ['filename' => $filename, 'tempfile' => $this->filepath, 'exception' => $e]
-            ));
-        }
-
-        if (!$result) {
-            throw new \Omeka\Job\Exception\RuntimeException((string) new PsrMessage(
-                'Export error when saving "{filename}" (temp file: "{tempfile}").', // @translate
-                ['filename' => $filename, 'tempfile' => $this->filepath]
-            ));
-        }
+                break;
+            }
+        } while (++$i);
 
         $params = $this->getParams();
         $params['filename'] = $filename;
@@ -289,6 +266,8 @@ abstract class AbstractWriter implements WriterInterface, Configurable, Parametr
             'o:ApiResource' => null,
             // Modules.
             'oa:Annotation' => \Annotate\Entity\Annotation::class,
+            'o:Mapping' => \Mapping\Entity\Mapping::class,
+            'o:MappingMarker' => \Mapping\Entity\MappingMarker::class,
         ];
         return $mapping[$jsonResourceType] ?? null;
     }
@@ -314,6 +293,8 @@ abstract class AbstractWriter implements WriterInterface, Configurable, Parametr
             'o:ApiResource' => 'api_resources',
             // Modules.
             'oa:Annotation' => 'annotations',
+            'o:Mapping' => 'mappings',
+            'o:MappingMarker' => 'mapping_markers',
         ];
         return $mapping[$jsonResourceType] ?? null;
     }
@@ -339,6 +320,8 @@ abstract class AbstractWriter implements WriterInterface, Configurable, Parametr
             'o:ApiResource' => 'api resources',
             // Modules.
             'oa:Annotation' => 'annotations',
+            'o:Mapping' => 'mappings',
+            'o:MappingMarker' => 'mapping markers',
         ];
         return $mapping[$jsonResourceType] ?? null;
     }
@@ -364,6 +347,8 @@ abstract class AbstractWriter implements WriterInterface, Configurable, Parametr
             'o:ApiResource' => 'api_resource',
             // Modules.
             'oa:Annotation' => 'annotation',
+            'o:Mapping' => 'mapping',
+            'o:MappingMarker' => 'mapping_marker',
         ];
         return $mapping[$jsonResourceType] ?? null;
     }
@@ -390,6 +375,9 @@ abstract class AbstractWriter implements WriterInterface, Configurable, Parametr
             \Omeka\Api\Representation\ApiResourceRepresentation::class => 'api_resources',
             // Modules.
             \Annotate\Api\Representation\AnnotationRepresentation::class => 'annotations',
+            \Mapping\Api\Representation\MappingRepresentation::class => 'mappings',
+            \Mapping\Api\Representation\MappingMarkerRepresentation::class => 'mapping_markers',
+
         ];
         return $mapping[$class] ?? null;
     }
@@ -416,6 +404,8 @@ abstract class AbstractWriter implements WriterInterface, Configurable, Parametr
             \Omeka\Api\Representation\ApiResourceRepresentation::class => 'Api resource',
             // Modules.
             \Annotate\Api\Representation\AnnotationRepresentation::class => 'Annotation',
+            \Mapping\Api\Representation\MappingRepresentation::class => 'Mapping',
+            \Mapping\Api\Representation\MappingMarkerRepresentation::class => 'Mapping Marker',
         ];
         return $mapping[$class] ?? null;
     }

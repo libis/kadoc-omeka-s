@@ -5,8 +5,8 @@ namespace BulkExport;
 return [
     'service_manager' => [
         'factories' => [
-            Formatter\Manager::class => Service\FormatterManagerFactory::class,
-            Writer\Manager::class => Service\PluginManagerFactory::class,
+            Formatter\Manager::class => Service\Plugin\FormatterManagerFactory::class,
+            Writer\Manager::class => Service\Plugin\PluginManagerFactory::class,
         ],
     ],
     'entity_manager' => [
@@ -36,6 +36,8 @@ return [
     'view_helpers' => [
         'invokables' => [
             'bulkExport' => View\Helper\BulkExport::class,
+            // Deprecated.
+            'listFormatters' => View\Helper\ListFormatters::class,
         ],
         'factories' => [
             'bulkExporters' => Service\ViewHelper\BulkExportersFactory::class,
@@ -44,21 +46,14 @@ return [
         ],
     ],
     'form_elements' => [
-        'invokables' => [
-            Form\ExporterDeleteForm::class => Form\ExporterDeleteForm::class,
-            Form\ExporterStartForm::class => Form\ExporterStartForm::class,
-            Form\SettingsFieldset::class => Form\SettingsFieldset::class,
-            Form\SiteSettingsFieldset::class => Form\SiteSettingsFieldset::class,
-            Form\Writer\CsvWriterConfigForm::class => Form\Writer\CsvWriterConfigForm::class,
-            Form\Writer\SpreadsheetWriterConfigForm::class => Form\Writer\SpreadsheetWriterConfigForm::class,
-        ],
         'factories' => [
-            Form\ExporterForm::class => Service\Form\ExporterFormFactory::class,
-        ],
-    ],
-    'resource_page_block_layouts' => [
-        'invokables' => [
-            'bulkExport' => Site\ResourcePageBlockLayout\BulkExport::class,
+            Form\ExporterDeleteForm::class => Service\Form\FormFactory::class,
+            Form\ExporterForm::class => Service\Form\FormFactory::class,
+            Form\ExporterStartForm::class => Service\Form\FormFactory::class,
+            Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,
+            Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
+            Form\Writer\CsvWriterConfigForm::class => Service\Form\FormFactory::class,
+            Form\Writer\SpreadsheetWriterConfigForm::class => Service\Form\FormFactory::class,
         ],
     ],
     'controllers' => [
@@ -68,8 +63,10 @@ return [
         'invokables' => [
             'BulkExport\Controller\Admin\BulkExport' => Controller\Admin\BulkExportController::class,
             'BulkExport\Controller\Admin\Export' => Controller\Admin\ExportController::class,
-            'BulkExport\Controller\Admin\Exporter' => Controller\Admin\ExporterController::class,
             'BulkExport\Controller\Output' => Controller\OutputController::class,
+        ],
+        'factories' => [
+            'BulkExport\Controller\Admin\Exporter' => Service\Controller\ControllerFactory::class,
         ],
         // The aliases simplify the routing, the url assembly and allows to support module Clean url.
         'aliases' => [
@@ -78,6 +75,7 @@ return [
             'BulkExport\Controller\Media' => Controller\OutputController::class,
             'BulkExport\Controller\Resource' => Controller\OutputController::class,
             'BulkExport\Controller\Annotation' => Controller\OutputController::class,
+            'BulkExport\Controller\Mapping' => Controller\OutputController::class,
             'BulkExport\Controller\CleanUrlController' => Controller\OutputController::class,
         ],
     ],
@@ -136,7 +134,7 @@ return [
                         'options' => [
                             'route' => '/:controller:.:format',
                             'constraints' => [
-                                'controller' => 'resource|item-set|item|media|annotation',
+                                'controller' => 'resource|item-set|item|media|annotation|mapping',
                                 'format' => '[a-zA-Z0-9]+[a-zA-Z0-9.-]*',
                                 'action' => 'browse',
                             ],
@@ -151,7 +149,7 @@ return [
                         'options' => [
                             'route' => '/:controller/:id:.:format',
                             'constraints' => [
-                                'controller' => 'resource|item-set|item|media|annotation',
+                                'controller' => 'resource|item-set|item|media|annotation|mapping',
                                 'format' => '[a-zA-Z0-9]+[a-zA-Z0-9.-]*',
                                 'id' => '\d+',
                                 'action' => 'show',
@@ -254,7 +252,7 @@ return [
                         'options' => [
                             'route' => '/:controller:.:format',
                             'constraints' => [
-                                'controller' => 'resource|item-set|item|media|annotation',
+                                'controller' => 'resource|item-set|item|media|annotation|mapping',
                                 'format' => '[a-zA-Z0-9]+[a-zA-Z0-9.-]*',
                                 'action' => 'browse',
                             ],
@@ -269,7 +267,7 @@ return [
                         'options' => [
                             'route' => '/:controller/:id:.:format',
                             'constraints' => [
-                                'controller' => 'resource|item-set|item|media|annotation',
+                                'controller' => 'resource|item-set|item|media|annotation|mapping',
                                 'format' => '[a-zA-Z0-9]+[a-zA-Z0-9.-]*',
                                 'id' => '\d+',
                                 'action' => 'show',
@@ -352,11 +350,9 @@ return [
     ],
     // Writers are designed for job processing and formatters for instant process.
     'bulk_export' => [
-        // TODO Normalize writers as manageable or deprecate them
-        // @deprecated To be removed. Only difference with formatters are manual settings or admin/site settings.
+        // TODO Normalize writers as manageable or deprecate them.
         'writers' => [
             Writer\CsvWriter::class => Writer\CsvWriter::class,
-            Writer\GeoJsonWriter::class => Writer\GeoJsonWriter::class,
             Writer\JsonTableWriter::class => Writer\JsonTableWriter::class,
             Writer\OpenDocumentSpreadsheetWriter::class => Writer\OpenDocumentSpreadsheetWriter::class,
             Writer\OpenDocumentTextWriter::class => Writer\OpenDocumentTextWriter::class,
@@ -364,12 +360,12 @@ return [
             Writer\TsvWriter::class => Writer\TsvWriter::class,
         ],
     ],
-    // TODO Rss/Atom feeds.
-    // TODO Rename the key "fomatters" as "exporters" or genericize.
+    // Should be root key, so services are loaded automatically.
+    // TODO Rss/Atom  feeds
+    // TODO Rename the key "fomatters" or genericize.
     'formatters' => [
         'factories' => [
             Formatter\Csv::class => Service\Formatter\FormatterFactory::class,
-            Formatter\GeoJson::class => Service\Formatter\FormatterFactory::class,
             Formatter\Json::class => Service\Formatter\FormatterFactory::class,
             Formatter\JsonLd::class => Service\Formatter\FormatterFactory::class,
             Formatter\JsonTable::class => Service\Formatter\FormatterFactory::class,
@@ -381,7 +377,6 @@ return [
         ],
         'aliases' => [
             'csv' => Formatter\Csv::class,
-            'geojson' => Formatter\GeoJson::class,
             'json' => Formatter\Json::class,
             'json-ld' => Formatter\JsonLd::class,
             'json-table' => Formatter\JsonTable::class,

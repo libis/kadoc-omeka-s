@@ -1,0 +1,101 @@
+<?php
+use Laminas\Form\Element\Textarea;
+?>
+<h4>Color</h4>
+<?php 
+$colors = array("blue","orange","beige","red","green","pink");
+if(isset($block)):
+  $setcolor = $block->dataValue('color');
+else:
+  $setcolor = "blue";
+endif;?>
+<div class="field">
+  <div class="field-meta">
+      <label>Color of the background</label>
+  </div>
+  <div class="inputs">
+      <select type="text" class="" name="o:block[__blockIndex__][o:data][color]">
+        <?php foreach($colors as $color):?>
+          <option <?php echo ($color == $setcolor ? 'selected' : "") ?> value="<?php echo $color;?>"><?php echo $color;?></option>
+        <?php endforeach;?>  
+      </select>
+  </div>
+</div>
+<h4>Minimum height</h4>
+<?php 
+$heights = array("none","200px","300px","400px","500px");
+if(isset($block)):
+  $setheight = $block->dataValue('height');
+else:
+  $setheight = "none";
+endif;?>
+<div class="field">
+  <div class="field-meta">
+      <label>Minimum height of the block</label>
+  </div>
+  <div class="inputs">
+      <select type="text" class="" name="o:block[__blockIndex__][o:data][height]">
+        <?php foreach($heights as $height):?>
+          <option <?php echo ($height == $setheight ? 'selected' : "") ?> value="<?php echo $height;?>"><?php echo $height;?></option>
+        <?php endforeach;?>  
+      </select>
+  </div>
+</div>
+<?php if(isset($block)):
+  $line = $block->dataValue('line');
+else:
+  $line = 0;
+endif;?>
+<div class="field">
+  <div class="field-meta">
+      <label>Add a line underneath the bottom of the block</label>
+  </div>
+  <div class="inputs">
+      <input type="checkbox" class="" value="line" <?php echo ($line == 'line' ? 'checked' : '') ?> name="o:block[__blockIndex__][o:data][line]">
+  </div>
+</div>
+<hr>
+<h4>Text left</h4>
+<?php
+  $textarea = new Textarea("o:block[__blockIndex__][o:data][text1]");
+  $textarea->setAttribute('class', 'block-html full wysiwyg');
+  if ($block) {
+      $textarea->setAttribute('value', $block->dataValue('text1'));
+  }
+?>
+<?php echo $this->formRow($textarea);?>
+<h4>Link left</h4>
+<div class="field">
+  <div class="inputs">
+      <input type="text" class="" value="<?php echo (!isset($block) ? '' : $block->dataValue('link1')) ?>" name="o:block[__blockIndex__][o:data][link1]">
+  </div>
+</div>
+<h4>Link text left</h4>
+<div class="field">
+  <div class="inputs">
+      <input type="text" class="" value="<?php echo (!isset($block) ? '' : $block->dataValue('link_text1')); ?>" name="o:block[__blockIndex__][o:data][link_text1]">
+  </div>
+</div>
+<hr>
+<h4>Text right</h4>
+<?php
+  $textarea = new Textarea("o:block[__blockIndex__][o:data][text2]");
+  $textarea->setAttribute('class', 'block-html full wysiwyg');
+  if ($block) {
+      $textarea->setAttribute('value', $block->dataValue('text2'));
+  }
+?>
+<?php echo $this->formRow($textarea);?>
+<h4>Link right</h4>
+<div class="field">
+  <div class="inputs">
+      <input type="text" class="" value="<?php echo (!isset($block) ? '' : $block->dataValue('link2')) ?>" name="o:block[__blockIndex__][o:data][link2]">
+  </div>
+</div>
+<h4>Link text right</h4>
+<div class="field">
+  <div class="inputs">
+      <input type="text" class="" value="<?php echo (!isset($block) ? '' : $block->dataValue('link_text2')); ?>" name="o:block[__blockIndex__][o:data][link_text2]">
+  </div>
+</div>
+

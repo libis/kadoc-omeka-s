@@ -1,0 +1,74 @@
+/* main: style.scss */
+@font-face {
+    font-family: toon;
+    src: url(../font/Toon-Regular.otf);
+}
+/*
+@font-face {
+    font-family: bradford;
+    src: url(../font/BradfordTrial-Regular.otf);
+}
+
+@font-face {
+    font-family: bradford-light;
+    src: url(../font/BradfordTrial-Light.otf);
+}
+*/
+@font-face {
+    font-family: akzidens;
+    src: url(../font/AkzidenzGroteskPro-Md.otf);
+}
+
+$family-primary: "Shippori Mincho", serif;
+$family-secondary: 'akzidens', sans-serif;
+$family-sans-serif : "Shippori Mincho", serif;
+
+
+$primary: #000000;
+$accent: #333333;
+$beige: #ded4c8;
+$blue: #87c3ff;
+$orange: #ff7b00;
+$green: #2e783e;
+$pink: #fb9dc5;
+$red: #fa3612;
+
+
+$info: #00407a;
+$dark: #00407a;
+$text: #000000;
+$link: $primary;
+$navbar-item-color: $primary;
+$section-padding: 3rem 1.5rem 3rem 1.5rem;
+$navbar-height:6rem;
+$border: #b3b3b3;
+//$body-background-color: #f1f1f1;
+
+//card
+$card-shadow: none;
+$card-header-background-color: transparent !default
+$card-header-padding: 0.75rem 1rem !default
+$card-header-shadow: none;
+$card-header-weight: 600 !default
+$card-content-background-color: transparent !default
+$card-content-padding: 1.5rem !default
+$card-footer-background-color: transparent !default
+$card-footer-padding: 0.75rem !default
+$card-footer-border-top: 1px solid $border;
+
+//box
+$box-radius: 0px;
+$box-shadow: none;
+$box-background-color: #fff;
+$box-color: $text;
+$box-padding: 1.5rem !default;
+
+$modal-background-background-color:rgba($primary,0.86);
+
+//form
+$control-radius:0;
+$input-radius:0;
+
+
+
+@import "../../../../node_modules/bulma/bulma.sass";

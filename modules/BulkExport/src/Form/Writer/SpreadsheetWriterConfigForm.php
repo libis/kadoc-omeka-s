@@ -8,7 +8,9 @@ class SpreadsheetWriterConfigForm extends FieldsWriterConfigForm
 {
     public function init()
     {
-        $this
+        parent::init();
+
+        return $this
             ->add([
                 'name' => 'separator',
                 'type' => Element\Text::class,
@@ -22,8 +24,7 @@ It is recommended to use a character that is never used, like "|", or a random s
                     'value' => '|',
                 ],
             ])
-        ;
-
-        parent::init();
+            ->appends()
+            ->addInputFilters();
     }
 }

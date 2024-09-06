@@ -134,10 +134,3 @@ SQL;
         $connection->executeStatement($sql);
     }
 }
-
-if (version_compare($oldVersion, '3.4.19', '<')) {
-    $message = new Message(
-        'It is now possible to export resources as GeoJSON for values filled via Value Suggest Geonames.' // @translate
-    );
-    $messenger->addSuccess($message);
-}

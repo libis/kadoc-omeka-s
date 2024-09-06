@@ -92,12 +92,12 @@ class SettingsFieldset extends Fieldset
                     'element_group' => 'export',
                     'label' => 'Format of linked resources', // @translate
                     'value_options' => [
-                        'id' => 'Id', // @translate
                         'identifier' => 'Identifier (property below)', // @translate
+                        'id' => 'Id', // @translate
                         'identifier_id' => 'Identifier or id', // @translate
-                        'url_title' => 'Omeka url and title', // @translate
-                        'title' => 'Title', // @translate
                         'url' => 'Omeka url', // @translate
+                        'title' => 'Title', // @translate
+                        'url_title' => 'Omeka url and title', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -136,17 +136,6 @@ class SettingsFieldset extends Fieldset
                 'attributes' => [
                     'id' => 'bulkexport_format_uri',
                     'value' => 'uri_label',
-                ],
-            ])
-            ->add([
-                'name' => 'bulkexport_language',
-                'type' => Element\Text::class,
-                'options' => [
-                    'element_group' => 'export',
-                    'label' => 'Language', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'bulkexport_language',
                 ],
             ])
         ;

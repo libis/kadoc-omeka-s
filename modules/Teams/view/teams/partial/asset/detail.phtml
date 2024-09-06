@@ -1,0 +1,16 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+?>
+
+<div class="meta-group">
+    <h4><?php echo $translate('Teams'); ?></h4>
+    <div class="value">
+        <ul>
+            <?php foreach ($this->teams as $team):
+            ?><li><?php echo $team->getTeam()->getName() ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+</div>
+

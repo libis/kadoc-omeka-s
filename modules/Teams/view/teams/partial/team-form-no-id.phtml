@@ -1,0 +1,67 @@
+<?php
+//TODO refactor into Zend form
+$escape = $this->plugin('escapeHtml');
+$removeStr = $escape($this->translate('Remove team'));
+$teamTemplate = '
+<tr>
+    <td class="team-name"></td>
+    <td>
+        <ul class="actions">
+            <li>
+                <a href="#" class="o-icon-delete new" title="' . $removeStr . '" aria-label="' . $removeStr . '"></a>
+            </li>
+        </ul>
+        <input type="hidden" name="add_team[]">
+    </td>
+</tr>';
+?>
+<fieldset id="teams" class="section">
+    <legend id="teams-legend"><?php echo $this->translate('Teams'); ?></legend>
+    <table id="team-resources" data-tablesaw-mode="stack" class="tablesaw tablesaw-stack">
+        <thead>
+        <tr>
+            <th><?php echo $this->translate('Team'); ?></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--        --><?php
+        //        if (count($this->teams)>0):
+
+        //            $updateRight = $team->userIsAllowed('update');
+        ?>
+
+        <?php
+
+        if ($this->default_team) {
+            $team = $this->default_team; ?>
+                <tr>
+                    <td>
+                        <span><?php echo $team->getName()?> (default)</span>
+
+                        <input type="hidden" name="add_team[]" value="<?php echo $escape($team->getId()) ?>">
+                    </td>
+                    <td>
+                        <ul class="actions" style="float:right">
+                            <li>
+                                <?php if ($this->roleAuth()->teamAuthorized('delete', 'resource',$team->getId())): ?>
+                                    <a href="#" class="o-icon-delete new" title="<?php echo $removeStr; ?>" aria-label="<?php echo $removeStr; ?>"></a>
+                                <?php endif; ?>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+
+                </tr>
+
+
+            <?php
+        }?>
+
+        </tbody>
+    </table>
+    <button id="team-selector-button" class="mobile-only"><?php echo $this->translate('Add a team'); ?></button>
+    <span id="team-template" data-template="<?php echo $escape($teamTemplate); ?>"></span>
+    <?php echo $this->addTeam(); ?>
+</fieldset>

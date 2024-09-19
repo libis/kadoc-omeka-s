@@ -18,7 +18,7 @@ endif;
       <ul>
         <li><a href="/">Home</a></li>
         <?php if($type == 'Nieuwsbericht'):?>
-        <li><a href="<?php echo "/s/toon/item/browse?resource_template_id=27";?>">Nieuws</a></li>
+        <li><a href="<?php echo "/item/browse?resource_template_id=27";?>">Nieuws</a></li>
         <?php elseif($type == 'Actor (organisatie)'):?>
         <li><a href="<?php echo "/page/project";?>">Partner</a></li>
         <?php elseif($type == "Tool"):?>              
@@ -37,7 +37,7 @@ endif;
     <?php if($type == "Tool" && $types = $resource->value("dcterms:type", ["all" => true])):?>
           <div class="tags are-normal" style="margin-bottom:0;margin-top:0.5rem;">
           <? foreach($types as $dctype):?>
-              <a href="<?php echo "/s/toon/draaiboek-zoeken?facet[type][]=".$dctype;?>" class="tag is-white is-medium"><?= $dctype ?></a></a>
+              <a href="<?php echo "/s/toon/draaiboek-zoeken?facet[type][]=".$dctype;?>" class="tag is-info"><?= $dctype ?></a></a>
           <?php endforeach;?>    
           </div>
     <?php endif;?>  

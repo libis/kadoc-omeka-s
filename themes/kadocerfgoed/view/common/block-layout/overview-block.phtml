@@ -1,38 +1,5 @@
 <!-- overview blocks -->
-<style>
-  .featured-section .column:first-of-type:hover #feature-1 {
-    background-color: #f5e300;
-  }
-  .featured-section .column:hover #feature-2{
-    background-color: #00b7e7;
-  }
-  .featured-section .column:last-of-type:hover #feature-3{
-    background-color: #f0a43d;
-  }
-  .featured-section .column:first-of-type #feature-1 {
-    background-color: #f5e30080;
-  }
-  .featured-section .column #feature-2{
-    background-color: #00b7e780;
-  }
-  .featured-section .column:last-of-type #feature-3{
-    background-color: #f0a43d80;
-  }
-  .featured-section .column:first-of-type #feature-1 h3 span {
-    font-family: Montserrat Bold;
-  }
-  .featured-section .column #feature-2 h3 span {
-    font-family: Montserrat Bold;
-  }
-  .featured-section .column:last-of-type #feature-3 h3 span {
-    border-bottom: 2px solid #f0a43d;
-    font-family: Montserrat Bold;
-  }
-  .featured-section .column:last-of-type:hover #feature-3 h3 span {
-    border-bottom: 2px solid white;
-    color: white;
-  }
-</style>
+
 <?php if($attachments):?>
   <section class="section color-section featured-section">
     <div class="container">
@@ -52,26 +19,30 @@
                 endif;
             ?>
             <div class="column">
+            <form id="theme-form<?php echo $i;?>" action="https://slimerfgoed.be/s/kadocerfgoed/page/thema" method="POST">
+              <input name="tag" value="<?php echo $block->dataValue('link'.$i);?>" hidden>
+              <a type="submit" href="#" onclick="onSubmit(<?php echo $i;?>)">
 
-              <a href="<?php echo $block->dataValue('link'.$i);?>">
-              <div class="featured-block" style="background:url(<?php echo  $url;?>) no-repeat center 20%;background-color:#f5e300;background-size: cover;">
-                <div class="overlay"></div>
-              </div>
-              <div class="featured-content" id="feature-<?php echo $i;?>">
-                  <!-- make whole card clickable -->
-                  <!--<div class="content-type is-size-7">
-                    Content
-                  </div>-->
-                  <h3 class="title is-3 is-family-secondary">
-                      <span><?php echo $block->dataValue('title'.$i);?></span>
-                  </h3>
-                  <p class="subtitle is-5"><?php echo $block->dataValue('text'.$i);?></p>
+              <div class="card equal-height">              
+            <div class="bg-block" style="background:url(<?php echo  $url;?>) no-repeat center 20%;background-color:#aaa;background-size: cover;aspect-ratio:1/1;">
+            <div class="overlay"></div>
 
-                  <?php if($block->dataValue('link'.$i)):?>
-                      <div class="link is-family-secondary"><a href="<?php echo $block->dataValue('link'.$i);?>">Lees meer</a></div>
-                  <?php endif;?>
+            <div class="card-content" id="feature-<?php echo $i;?>">
+              <div class="content">
+              <div class="card-top">
+              <h3 class="title is-2 is-family-secondary has-text-white" id="title-<?php echo $i;?>">
+              <?php echo $block->dataValue('title'.$i);?>
+              </h3>
+            </div>
+            <div class="has-text-white card-body">
+            <h2 class="subtitle is-5 has-text-white"><?php echo $block->dataValue('text'.$i);?></h2>
+              </div> 
               </div>
+            </div>
+            </div>
+          </div>
               </a>
+              </form>
               <?php if($i == 1 && sizeof($attachments) == 4):?>
               <?php else:?>
                 </div>
@@ -85,3 +56,9 @@
     Om dit blok te gebruiken moet je 3 afbeeldingen (attachments) selecteren.
   </p>
 <?php endif;?>
+
+<script>
+     function onSubmit(x) {
+     document.getElementById("theme-form" + x).submit();
+   }
+</script>

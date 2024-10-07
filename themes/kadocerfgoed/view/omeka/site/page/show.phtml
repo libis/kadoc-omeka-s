@@ -11,13 +11,17 @@ $type = $this->pagesMetadata('type') ?: null;
 $next = $this->pagesMetadata('next',$page) ?: null;
 $previous = $this->pagesMetadata('previous',$page) ?: null;
 ?>
-
+<style>
+  .breadcrumb li + li::before {
+    color:#f0a43d;
+  }
+</style>
 <?php if($page->title() != 'Home'):?>
-<section class="section breadcrumb-section white-section">
+<section class="breadcrumb-section white-section">
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><a href="<?php echo $site->url();?>">Home</a></li>
+        <li><a href="<?php echo $site->url();?>/page/home">Home</a></li>
         <?php if($activePage['depth'] !== 0):?>
           <li><?php echo $nav->breadcrumbs()->setSeparator('</li><li>');?></li>
         <?php else:?>

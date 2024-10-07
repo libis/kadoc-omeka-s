@@ -16,6 +16,8 @@ $defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
 
 $filterLocale = (bool) $this->siteSetting('filter_locale_values');
 $lang = $filterLocale ? $this->lang() : null;
+
+$summary = $this->pageMetadata('summary');
 ?>
 <style>
 .carousel {
@@ -67,8 +69,15 @@ $lang = $filterLocale ? $this->lang() : null;
             </div>
             </div>
             <div class="column is-6">
-                <h1 class="title is-1"><?php echo $itemSet->displayTitle();?></h1>
-                    <p><?php echo $itemSetDescription; ?></p>
+            <div class="arrow-left"></div>
+                <h1 class="title is-3"><?php echo $heading;?></h1>
+                    <p><?php 
+                    if($summary):
+                    echo $summary; 
+                    else:
+                        echo $itemSetDescription;
+                    endif;
+                    ?></p>
             </div>
  
         </div>

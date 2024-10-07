@@ -36,11 +36,14 @@ if (strpos($url, 'page/home') !== false) {
         <?php echo $this->headStyle(); ?>
         <?php echo $this->headScript(); ?>
         <script src="https://kit.fontawesome.com/582fb8c29f.js" crossorigin="anonymous"></script>
+       
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/css/bulma-carousel.min.css">
-        <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&family=Raleway:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
-        <script src="https://unpkg.com/colcade@0/colcade.js"></script>
-		<!-- Global site tag (gtag.js) - Google Analytics -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,400;0,700;1,900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-208068755-1"></script>
 		<script>
 		  window.dataLayer = window.dataLayer || [];
@@ -98,7 +101,7 @@ if (strpos($url, 'page/home') !== false) {
         border-top: 10px solid transparent;
         border-bottom: 10px solid transparent; 
         
-        border-left:10px solid #f5e300; 
+        border-left:10px solid #edced3; 
         float: left;
         margin-top: 10px;
         margin-right: 5px;
@@ -112,11 +115,19 @@ if (strpos($url, 'page/home') !== false) {
       }
       .wrapper a {
         font-family: Montserrat SemiBold;
-        color: #007082;
+        color: #e29ca7;
       }
       .navbar .navigation li>a, .wrapper .button, .footer .button {
         font-family: Montserrat SemiBold;
         color: #2d2d30;
+        border-bottom: solid 0.15em #f0a43d00;
+        transition: text-decoration-color 900ms;
+      }
+      .navbar .navigation li>a {
+        font-size: 1.1em;
+      }
+      .navbar .navigation li>a:hover {
+        border-bottom-color: #e29ca7;
       }
       body .wrapper div>.title {
         font-family: Montserrat Bold !important;
@@ -133,9 +144,216 @@ if (strpos($url, 'page/home') !== false) {
     .colour-button {
         transition: all 1s ease;
     }
-    .value-piece::after{
+    .value-piece::after {
       content:"" !important;
     }
+    .card {
+      border-radius: 4px;
+    }
+    .is-clickable{
+      cursor: pointer !important;
+    }
+
+
+.bouncy-button {
+  min-width: 15em;
+	display: inline-block;
+	font-family: "Montserrat", "Trebuchet MS", Helvetica, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	position: relative;
+	padding: 0.8em 1.4em;
+	padding-left: 4.7em;
+	background: #e29ca7;
+	border: none;
+	color: white;
+	transition: 0.2s;
+	&:before,
+	&:after {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		padding-top: inherit;
+		padding-bottom: inherit;
+		width: 2.8em;
+		content: "\00a0";
+		font-family: "FontAwesome", sans-serif;
+		font-size: 1.2em;
+		text-align: center;
+
+		transition: 0.2s;
+		transform-origin: 50% 60%;
+	}
+	&:before {
+		background: #cb8c96;
+	}
+	&:hover {
+		background: #d67584;
+    cursor: pointer;
+    &:before{
+      background: #c26977;
+    }
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+		outline: none;
+	}
+}
+
+.arrow {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\F054";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+.share {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\F1e0";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+.download {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\F019";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+.disclaimer {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\f15c";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+.contact {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\f0e0";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+.viewall {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\f06e";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+.map {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\f041";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+.react {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\f1d7";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+@-webkit-keyframes bounceright {
+	from {
+		-webkit-transform: translateX(0);
+	}
+	to {
+		-webkit-transform: translateX(3px);
+	}
+}
+
     </style>
     </head>
 
@@ -146,7 +364,7 @@ if (strpos($url, 'page/home') !== false) {
         <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation" style="background-color:<?php echo $primColor;?>;">
           <div class="container">
           <div class="navbar-brand">
-            <a class="navbar-item" href="<?php echo $site->url(); ?>" id="logosite">
+            <a class="navbar-item" href="<?php echo $site->url(); ?>/page/home" id="logosite">
               <?php if ($this->themeSetting('logo')): ?>
                   <img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" alt="<?php echo $escape($siteTitle); ?>" style="height: 3.5rem;"/>
               <?php else: ?>
@@ -156,20 +374,21 @@ if (strpos($url, 'page/home') !== false) {
           </div>
           <div class="navbar-menu">
             <div class="navbar-start">
+
+            </div> 
+            <div class="navbar-end" style="text-transform:uppercase;">
                 <?php
                   echo $site->publicNav()->menu()->renderMenu(null, [
                       'maxDepth' => $this->themeSetting('nav_depth', 0)
                   ]);
                 ?>
-            </div> 
-            <div class="navbar-end">
               <div class="navbar-item">
-                 <button class="button is-primary is-hidden" id="showNav">
+                 <button class="button is-primary is-hidden" id="showNv" style="background-color: #f0a43d;">
                     <span class="icon is-small">
                       <i class="fas fa-bars"></i>
                     </span>
                   </button>
-                 <button class="button is-primary" id="showSearch" style="background-color: #f0a43d;">
+                 <button class="button is-primary" id="showSearch" style="background-color: #edced3;color:#2d2d30;">
                     <span class="icon is-small">
                       <i class="fas fa-search"></i>
                     </span>
@@ -188,24 +407,27 @@ if (strpos($url, 'page/home') !== false) {
       </div>
     </div>
 
-    <footer class="footer" style="background-color:white;position:absolute;z-index:-1;">
+    <footer class="footer" style="background-color:white;position:relative;z-index:-1;padding-top:1.5rem;bottom:0;">
         <div class="container">
           <nav class="level">
             <!-- Left side -->
             <div class="level-left">
               <div class="level-item">
-                <a target="_blank" href="https://kadoc.kuleuven.be"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/kadoc.PNG" /></a>
+                <a target="_blank" href="https://slimerfgoed.be/s/kadocerfgoed/page/disclaimer"><button class="disclaimer bouncy-button">Disclaimer</button></a>
               </div>
               <div class="level-item">
-                <a target="_blank" style="color:black;" href="https://libis.be"><button class="button colour-button" style="box-shadow: #f0a43d -5px -5px, inset white -5px -5px;background-color: #f0a43d;border-color:black;border-width:3px;">Disclaimer</button></a>
-              </div>
-              <div class="level-item">
-                <a target="_blank" style="color:black;" href="https://libis.be"><button class="button colour-button" style="box-shadow: #f0a43d -5px -5px, inset white -5px -5px;background-color: #f0a43d;border-color:black;border-width:3px;">Contact</button></a>
+                <a target="_blank" href="https://slimerfgoed.be/s/kadocerfgoed/page/contact"><button class="contact bouncy-button">Contact</button></a>
               </div>
             </div>
 
             <!-- Right side -->
             <div class="level-right">
+              <div class="level-item">
+                <a target="_blank" href="https://kadoc.kuleuven.be"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/kadoc.PNG" /></a>
+              </div>
+              <div class="level-item">
+                <a target="_blank" href="https://www.vlaanderen.be/"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/Logo_Vlaanderen.png" /></a>
+              </div>
               <div class="level-item">
                 <a target="_blank" href="https://libis.be"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/libissmall.png" /></a>
               </div>

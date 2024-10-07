@@ -8,7 +8,7 @@ $not = array();
 <div class="value-block">
 <?php foreach ($values as $term => $propertyData): ?>
   <?php if(!in_array($propertyData['property']->label(),$not)):?>
-    <div class="value-piece" style="overflow-wrap:break-word;">
+    <div class="value-piece" style="overflow-wrap:break-word;" <?php if(!$propertyData['values'][0]->isPublic()):?>hidden<?php endif;?>>
         <span class="is-family-secondary value-title">
         <?php if ($propertyData['alternate_label']): ?>
           <?php if(substr($propertyData['alternate_label'], -1) == '?'):?>
@@ -41,6 +41,7 @@ $not = array();
             }
             if (!$value->isPublic()) {
                 $class[] = 'private';
+                continue;
             }
             ?>
             <!-- <?php if($i > 0):?>

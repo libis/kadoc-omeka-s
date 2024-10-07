@@ -18,17 +18,53 @@ $escapeAttr = $plugins->get('escapeHtmlAttr');
     .colour-button {
         transition: all 1s ease;
     }
+    .chevron-link:hover {
+        transform: scaleX(0.95);
+    }
 </style>
-<div class="container block links">
+<!-- <div class="container block links">
     <?php if (!empty($heading)): ?>
     <h2><?= $escape($heading) ?></h2>
     <?php endif; ?>
 
     <ul class="list-links">
     <?php foreach ($links as $url => $label): ?>
-        <li style="padding-left:2rem;">
+        <li style="padding-left:2rem;padding-bottom:1.5em;">
             <a href="<?= $escapeAttr($url) ?>"<?php if (filter_var($url, FILTER_VALIDATE_URL)): ?> target="_blank"<?php endif; ?>>
-                <button class="button colour-button" style="box-shadow: #00b7e7 -5px -5px, inset white -5px -5px;background-color: #00b7e7;border-color:black;border-width:3px;"><?= $escape($label) ?></button>
+                <button class="button colour-button" style="box-shadow: #00b7e7 -5px -5px, inset white -5px -5px;background-color: #00b7e7;border-color:black;border-width:1.5px;font-weight:bold;"><?= $escape($label) ?></button>
+            </a>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+</div> -->
+
+<!-- <div class="container block links">
+    <?php if (!empty($heading)): ?>
+    <h2><?= $escape($heading) ?></h2>
+    <?php endif; ?>
+
+    <ul class="list-links">
+    <?php foreach ($links as $url => $label): ?>
+        <li class="chevron-link" style="padding-bottom:1.5em;text-align:center;">
+            <a href="<?= $escapeAttr($url) ?>"<?php if (filter_var($url, FILTER_VALIDATE_URL)): ?> target="_blank"<?php endif; ?>>
+                <i class="fa fa-chevron-right"></i>
+                <i class="fa fa-chevron-right"></i>
+                <span style="font-weight:bold;font-size:1.5em;"><?= $escape($label) ?></span>
+                <i class="fa fa-chevron-left"></i>
+                <i class="fa fa-chevron-left"></i>
+                
+            </a>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+</div> -->
+
+<div class="container block links">
+<ul class="list-links">
+    <?php foreach ($links as $url => $label): ?>
+        <li style="padding-bottom:1.5em;">
+            <a href="<?= $escapeAttr($url) ?>"<?php if (filter_var($url, FILTER_VALIDATE_URL)): ?> target="_blank"<?php endif; ?>>
+                <button class="arrow bouncy-button"><?= $escape($label) ?></button>
             </a>
         </li>
     <?php endforeach; ?>

@@ -1,0 +1,89 @@
+<section class="section text-image-block <?php echo ($block->dataValue('highlight') ? 'highlight-section' : '');?>">
+  <div class="container">
+    <div class="columns <?php echo ($block->dataValue('reverse') ? ' reverse' : '');?> <?php echo ($block->dataValue('highlight') ? ' hightlight-columns' : '');?>">
+      <div class="column column-text <?php echo ($block->dataValue('highlight') ? 'hightlight' : '');?>">
+        <div class="text-box">
+          <?php if($block->dataValue('title')):?>
+          <div class="arrow-left"></div>
+          <h2 class="title is-3 is-family-secondary is-centered"><span><?php echo $block->dataValue('title');?></span></h2>
+          <?php endif;?>
+          <div class="content" style="font-size:1.25rem;">
+            <p><?php echo $block->dataValue('text');?></p>
+          </div>
+          <!--<div class="has-text-right">
+            <?php if($block->dataValue('link')):?>
+                <a class="button is-primary" href="<?php echo $block->dataValue('link');?>"><?php echo $block->dataValue('label');?></a>
+            <?php endif;?>
+          </div>-->
+        </div>
+      </div>
+      <div class="column column-img">
+        <?php if($attachments):
+        $i=0;
+          $media = $attachments[0]->media();
+          if($media):
+            $url = $media->thumbnailUrl('large');
+            $url = str_replace('http:', '', $url);
+            if($block->dataValue('itemurl')):
+              $url = $media->item()->url();
+              $url = str_replace('http:', '', $itemUrl);
+              ?>
+            <?php endif;?>
+
+              <div class="img-box is-clickable" style="background-image: url('<?php echo $url;?>')" class="item-textimg-<?php echo $i;?>" onclick="moreInfoTextImg(<?php echo $i;?>);">
+                <?php if($block->dataValue('highlight')):?>
+                  <div class="content">
+                    <div class="to-end">
+                      <h3 class="title is-3 is-family-secondary">
+                          <span><?php echo $block->dataValue('label');?></span>
+                      </h3>
+                    </div>
+                  </div>
+                <?php endif;?>
+              </div>
+
+          <?php endif;?>
+        <?php endif;?>
+      </div>
+    </div>
+  </div>
+</section>
+
+<?php $a=0;?>
+<?php foreach($attachments as $item):
+$media = $item->media();?>
+<div class="modal" id="modal-imgtext-<?php echo $a;?>" style="justify-content:center;z-index:31;" onclick="closeModal();">
+    <div class="modal-background"></div>
+    <div class="modal-content">    
+        <div class="container" style="background-color: aliceblue;width: fit-content;">
+        <img src="<?php echo $media->originalUrl(); ?>">
+        <div class="column">
+        <?php echo $item->item()->displayValues();?>
+        <div class="has-text-right">
+        <a href="<?php echo $media->originalUrl(); ?>" class="button is-warning" download="<?php echo $item->item()->displayTitle();?>">Download</a>
+        </div>
+        </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+<?php $a++;?>
+<?php endforeach;?>
+
+<script>
+    function moreInfoTextImg(x) {
+        let id = '#modal-imgtext-' + x;
+        $( id ).addClass("is-active");
+    }
+    function closeModal(){
+        let modal = '.modal';
+        $( modal ).removeClass("is-active");
+    }
+    //somehow try and get rid of carrousel arrows
+    $(document).ready(function() {
+        let prev = "slider-container > .slider-navigation-previous";
+        let next = ".slider-navigation-next";
+        $( prev ).addClass("is-hidden");
+        $( next ).addClass("is-hidden");
+    });
+</script>

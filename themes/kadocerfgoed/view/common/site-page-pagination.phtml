@@ -30,7 +30,7 @@ $nextText = $translate('>');
             <a href="<?php echo $prevPage->siteUrl();?>"><i class="fa fa-chevron-left" style="font-size:3.5rem;"></i></a>
         </div>
     <?php endif;?>
-    <?php if($this->pageMetadata('type',$nextPage) == 'sub'):?>
+    <?php if($nextPage && $this->pageMetadata('type') == 'sub' && $this->pageMetadata('type',$nextPage) == 'sub'):?>
         <div class="slider-next-page">
         <a href="<?php echo $nextPage->siteUrl();?>"><i class="fa fa-chevron-right" style="font-size:3.5rem;"></i></a>
     </div>

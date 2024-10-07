@@ -10,20 +10,20 @@
       <?php endif;?>
       <div class="columns">
         <?php if($block->dataValue('text') && !$block->dataValue('text2')):?>
-          <div class="column is-two-thirds">
-            <div class="text-box">
+          <div class="column is-10">
+            <div class="text-box" style="font-size:1.25rem;">
               <?php echo $block->dataValue('text');?>
             </div>
           </div>
         <?php endif;?>
         <?php if($block->dataValue('text') && $block->dataValue('text2')):?>       
           <div class="column">
-            <div class="text-box">
+            <div class="text-box" style="font-size:1.25rem;">
               <?php echo $block->dataValue('text');?>
             </div>
           </div>
           <div class="column">
-            <div class="text-box">
+            <div class="text-box" style="font-size:1.25rem;">
               <?php echo $block->dataValue('text2');?>
             </div>
           </div>

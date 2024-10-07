@@ -8,7 +8,7 @@
               $url = $media->thumbnailUrl('large');
               $url = str_replace('http:', '', $url);
             ?>
-            <div class="column">
+            <div class="column" style="text-align:center;">
               <img src="<?= $url;?>" class="item-<?php echo $i;?> is-clickable" onclick="moreInfo(<?php echo $i;?>);" />
               <figcaption><?php echo $attachments[0]->caption();?></figcaption>
             </div>

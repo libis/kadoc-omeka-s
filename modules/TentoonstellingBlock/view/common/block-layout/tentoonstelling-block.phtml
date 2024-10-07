@@ -41,6 +41,8 @@ $subNav = new Navigation($newPages);
     endif;
   endif;
 
+  $api = $this->api()->read('items',$block->dataValue('author'));
+  $author = $api->getContent();
 ?>
 <header>
 <?php if($url):?>
@@ -52,15 +54,15 @@ $subNav = new Navigation($newPages);
     <div class="hero-body">
       <div class="container">
         <div class="columns">
-          <div class="column hero-left is-info is-12">
-            <div class="hero-text is-size-5">
+          <div class="column hero-left is-info is-12" style="align-content:end;">
+            <div class="hero-text is-size-5" style="text-align:left;padding:0rem 2rem;">
+              <h1 class="title is-family-secondary is-1"><span><?php echo $block->dataValue('title');?></span></h1>
               <?php if($block->dataValue('sec_title')):?>
                  <h2 class="subtitle is-size-6"><?php echo $block->dataValue('sec_title');?></h2>
               <?php endif;?>
-              <h1 class="title is-family-secondary is-1"><span><?php echo $block->dataValue('title');?></span></h1>
               <div class="link">
-                <a class="button is-primary is-inverted is-outlined is-large" href="#">
-                  <span><?php echo $block->dataValue('author');?></span>
+                <a class="button is-primary is-inverted is-outlined is-large" href="<?php echo $block->page()->site()->url() . '/item/' . $block->dataValue('author');?>">
+                  <span><?php echo $author->value('schema:givenName') . " " . $author->value('schema:familyName');?></span>
                   <span class="icon is-small">
                     <i class="fas fa-angle-right"></i>
                   </span>
@@ -78,20 +80,22 @@ $subNav = new Navigation($newPages);
    </div>
  </section>
  </header>
- <div class="block item-set-showcase section">
-<button title="tooltip" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="level button is-warning" onclick="copyLink()"><i class="fa fa-share-alt"></i> Delen</button>
+ <div class="block item-set-showcase section container">
+<button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="level bouncy-button share is-warning" onclick="copyLink()">Delen</button>
     <div class="item-set resource columns">
-        <div class="column is-8">
+        <div class="column is-9">
         <div class="level"><?php echo $block->dataValue('text');?></div>
-            <a href="<?php echo $newPages[0]['label'];?>" class="button" style="background-color:#00b7e7;color:aliceblue;">Start Tentoonstelling</a>
+            <a href="<?php echo strtolower($newPages[0]['label']);?>" class="bouncy-button arrow" style="color:aliceblue;font-weight:bold;font-size:1.25em;">Tentoonstelling starten</a>
         </div>
-<aside class="menu column is-4 box" style="padding: 1.25rem 2rem;">
+<aside class="menu column is-3 box" style="padding: 1.25rem 2rem;">
+  <h2 class="title is-3">Inhoudstabel</h2>
     <ul class="menu-list">
     
         <?= $this->navigation($subNav)->menu()->renderMenu(null, ['maxDepth' => 1]);?>
 
     </ul>
 </aside>
+</div>
 </div>
 <script>
   function copyLink() {
@@ -103,6 +107,6 @@ $subNav = new Navigation($newPages);
   navigator.clipboard.writeText(copyText.value);
 
   // Tooltip the copied text
-  copyText.title = "Copied link: " + copyText.value;
+  copyText.title = "Link gekopieerd: " + copyText.value;
 } 
 </script>

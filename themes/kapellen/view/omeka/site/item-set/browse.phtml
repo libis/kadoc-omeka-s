@@ -79,7 +79,7 @@ $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse')
     ?>
         <div class="column is-3">
           <div class="card equal-height">
-              <a class="card-link-wrapper" href="<?php echo $itemSet->url();?>">
+              <a class="card-link-wrapper" href="<?php echo '/s/kapellen/zoek-kapellen?q=&facet[item_set_id][0]='.$itemSet->id();?>">
                 <div class="card-bg card-bg-img-2"
                   style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#70a6d7;background-size: cover;"
                   >

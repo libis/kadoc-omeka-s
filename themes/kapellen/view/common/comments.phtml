@@ -1,0 +1,33 @@
+<?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var \Comment\Api\Representation\CommentRepresentation[] $comments
+ * @var bool $commentThreaded
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$url = $plugins->get('url');
+$setting = $plugins->get('setting');
+$assetUrl = $plugins->get('assetUrl');
+$partial = $plugins->get('partial');
+
+$this->headLink()->appendStylesheet($assetUrl('css/comment.css', 'Comment'));
+$this->headScript()->appendFile($assetUrl('js/comment.js', 'Comment'), 'text/javascript', ['defer' => 'defer']);
+
+// Required to manage the base path.
+$addUrl = $url('site/comment', ['action' => 'add'], true);
+?>
+
+<div style="max-width:700px;" id="comments" class="comments" data-comment-url="<?= $addUrl ?>">
+    <?php if ($label = $setting('comment_comments_label')): ?>
+    <h6 class="title" style="margin-bottom:0.6rem;font-size:1.3rem;">Reacties</h6>
+    <?php endif; ?>
+    <?php if (empty($comments)): ?>
+    <p><?= $translate('Er zijn nog geen reacties') ?></p>
+    <?php elseif ($setting('comment_threaded')): ?>
+        <?= $partial('common/comments-thread', ['comments' => $comments, 'parent_id' => null]) ?>
+    <?php else: ?>
+        <?= $partial('common/comments-list', ['comments' => $comments]) ?>
+    <?php endif; ?>
+</div>

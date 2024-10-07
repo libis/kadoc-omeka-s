@@ -1,0 +1,610 @@
+<?php
+namespace Teams\Controller;
+
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
+use Omeka\Api\Exception\InvalidArgumentException;
+use Omeka\Api\Request;
+use Teams\Entity\TeamAsset;
+use Teams\Entity\TeamResource;
+use Teams\Entity\TeamResourceTemplate;
+use Teams\Entity\TeamSite;
+use Teams\Entity\TeamUser;
+use Teams\Form\TeamItemsetAddRemoveForm;
+use Teams\Form\TeamSitesAddRemoveForm;
+use Teams\Form\TeamUpdateForm;
+use Laminas\EventManager\Event;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\Stdlib\ArrayObject;
+use Laminas\View\Model\ViewModel;
+
+class UpdateController extends AbstractActionController
+{
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @param EntityManager $entityManager
+     */
+    public function __construct(EntityManager $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
+    public function createNamedParameter(
+        QueryBuilder $qb,
+        $value,
+        $prefix = 'omeka_'
+    ) {
+        $index = 0;
+        $placeholder = $prefix . $index;
+        $index++;
+        $qb->setParameter($placeholder, $value);
+        return ":$placeholder";
+    }
+
+    public function addTeamUser(int $team_id, int $user_id, int $role_id)
+    {
+        if (! $this->teamAuth()->teamAuthorized($this->identity(), 'update', 'team', $team_id)){
+            $this->messenger()->addError("You aren't authorized to change this team");
+            return null;
+        } else {
+            $team = $this->entityManager->find('Teams\Entity\Team', $team_id);
+            $user = $this->entityManager->find('Omeka\Entity\User', $user_id);
+            $role = $this->entityManager->find('Teams\Entity\TeamRole', $role_id);
+            $team_user = new TeamUser($team, $user, $role);
+            $this->entityManager->persist($team_user);
+
+            //flushing here because this is a mini-form and we want to see the name pop up
+            //more efficient solution would be to have JS handle the popping and batch update
+            $this->entityManager->flush();
+            return $team_user;
+        }
+    }
+
+    public function removeTeamUser(int $team_id, int $user)
+    {
+        if (! $this->teamAuth()->teamAuthorized($this->identity(), 'update', 'team', $team_id)){
+            $this->messenger()->addError("You aren't authorized to change this team");
+        } else {
+            $this->messenger()->addError("removed user");
+
+            $em = $this->entityManager;
+            $team_user = $em->find('Teams\Entity\TeamUser', ['team' => $team_id, 'user' => $user]);
+            $em->remove($team_user);
+
+            //flushing here because this is a mini-form and we want to see the name pop up
+            //more efficient solution would be to have JS handle the popping and batch update
+            $em->flush();
+        }
+    }
+
+    public function updateRole(int $team_id, int $user_id, int $role_id)
+    {
+        if (! $this->teamAuth()->teamAuthorized($this->identity(), 'update', 'team', $team_id)){
+            $this->messenger()->addError("You aren't authorized to change this team");
+        } else {
+            $em = $this->entityManager;
+            $team_user = $em->find('Teams\Entity\TeamUser', ['team' => $team_id, 'user'=>$user_id]);
+            $user_role = $em->find('Teams\Entity\TeamRole', $role_id);
+            $team_user->setRole($user_role);
+            $em->flush();
+        }
+
+    }
+
+    public function processItemSets(int $item_set_id)
+    {
+        $resource_array = array();
+        if ((int)$item_set_id>0) {
+            $item_set_id = (int)$item_set_id;
+
+            //TODO: why isn't this a list?
+            //add all items belonging to itemset
+            foreach ($this->api()->search('items', ['item_set_id'=>$item_set_id, 'bypass_team_filter' => true])->getContent() as $item):
+                $resource_array += [$item->id() => true];
+
+            //add all media belonging to to the item
+            foreach ($this->api()->search('media', ['item_id'=>$item->id(), 'bypass_team_filter' => true])->getContent() as $media):
+                    $resource_array += [$media->id()=>true];
+            endforeach;
+            endforeach;
+        }
+        //add itemset itself
+        $resource_array += [$item_set_id => true];
+
+        return $resource_array;
+    }
+
+    public function processResources($request, $team, $existing_resources, $existing_resources_templates, $existing_assets, bool $delete = false)
+    {
+        $resource_array = array();
+        $resource_template_array = array();
+        $asset_array = array();
+
+
+        if ($delete == false) {
+            $collection = 'addCollections';
+        } else {
+            $collection = 'rmCollections';
+        }
+
+        //get ids of itemsets and their descendents
+        if (isset($request->getPost($collection)['o:itemset'])) {
+            foreach ($request->getPost($collection)['o:itemset'] as $item_set_id):
+                    $resource_array += $this->processItemSets($item_set_id);
+            endforeach;
+        }
+
+        //get ids of things the user owns
+        if (isset($request->getPost($collection)['o:user'])) {
+            foreach ($request->getPost($collection)['o:user'] as $user_id):
+                    if ((int)$user_id > 0) {
+                        $user_id = (int)$user_id;
+                        foreach ($this->api()->search('items', ['owner_id' => $user_id, 'bypass_team_filter'=>true])->getContent() as $item):
+
+                            $resource_array += [$item->id() => true];
+
+                        foreach ($this->api()->search('media', ['item_id'=>$item->id(), 'bypass_team_filter' => true])->getContent() as $media):
+                                $resource_array += [$media->id() => true];
+                        endforeach;
+
+                        endforeach;
+
+                        //also get the users itemsets
+                        foreach ($this->api()->search('item_sets', ['owner_id' => $user_id, 'bypass_team_filter'=>true])->getContent() as $itemSet):
+                            $resource_array += $this->processItemSets($itemSet->id());
+                        endforeach;
+
+                        //also ge the user's resource templates
+                        $rts = $this->entityManager->getRepository('Omeka\Entity\ResourceTemplate')->findBy(['owner'=>$user_id]);
+                        foreach ($rts as $rt):
+                            $resource_template_array[$rt->getId()] = true;
+                        endforeach;
+
+                        //also get the user's assets
+                        $assets = $this->entityManager->getRepository('Omeka\Entity\Asset')->findBy(['owner' => $user_id]);
+                        foreach ($assets as $asset):
+                            $asset_array[$asset->getId()] = true;
+                        endforeach;
+                    }
+            endforeach;
+        }
+
+        if ($delete == false) {
+            //remove elements that are already part of the team to prevent integrity constraint violation
+
+            //resources remove existing from the add list
+            foreach ($existing_resources as $resource):
+                    $rid = $resource->getResource()->getId();
+                if (array_key_exists($rid, $resource_array)) {
+                    unset($resource_array[$rid]);
+                }
+            endforeach;
+
+            //resource templates remove existing from the add list
+            foreach ($existing_resources_templates as $resource):
+                    $rid = $resource->getResourceTemplate()->getId();
+                if (array_key_exists($rid, $resource_template_array)) {
+                    unset($resource_template_array[$rid]);
+                }
+            endforeach;
+
+            //assets remove existing from the add list
+            foreach ($existing_assets as $asset):
+                $asset_id = $asset->getAsset()->getId();
+                if (array_key_exists($asset_id, $asset_array)) {
+                    unset($asset_array[$asset_id]);
+                }
+            endforeach;
+
+            //add the resources to the team
+            foreach ($resource_array as $resource_id => $value):
+                $resource = $this->entityManager->getRepository('Omeka\Entity\Resource')
+                    ->findOneBy(['id'=>$resource_id]);
+                if ($resource) {
+                    $team_resource = new TeamResource($team, $resource);
+                    $this->entityManager->persist($team_resource);
+                } else {
+                    $this->logger()->err('The team resource could not be generated for this request because the resource could not be found');
+                }
+
+            endforeach;
+
+            //add the resource templates to the team
+            foreach ($resource_template_array as $resource_id => $value):
+                $resource = $this->entityManager->getRepository('Omeka\Entity\ResourceTemplate')
+                    ->findOneBy(['id'=>$resource_id]);
+                if ($resource) {
+                    $team_resource = new TeamResourceTemplate($team, $resource);
+                    $this->entityManager->persist($team_resource);
+                } else {
+                    $this->logger()->err('The team resource template could not be generated for this request because the resource template could not be found');
+
+                }
+
+            endforeach;
+
+            //add assets to the team
+            foreach ($asset_array as $asset_id => $value):
+                $asset = $this->entityManager->getRepository('Omeka\Entity\Asset')
+                    ->findOneBy(['id' => $asset_id]);
+                if ($asset) {
+                    $team_asset = new TeamAsset($team, $asset);
+                    $this->entityManager->persist($team_asset);
+                } else {
+                    $this->logger()->err('The team asset could not be generated for this request because the asset could not be found');
+                }
+
+
+            endforeach;
+
+            $this->entityManager->flush();
+        } else {
+            //remove resources
+            foreach (array_keys($resource_array) as $resource_id):
+                    $team_resource = $this->entityManager->getRepository('Teams\Entity\TeamResource')
+                        ->findOneBy(['resource'=>$resource_id, 'team'=>$team]);
+            if ($team_resource) {
+                $this->entityManager->remove($team_resource);
+            }
+            endforeach;
+
+            //remove resource templates
+            foreach (array_keys($resource_template_array) as $resource_id):
+                    $team_resource_template = $this->entityManager->getRepository('Teams\Entity\TeamResourceTemplate')
+                        ->findOneBy(['resource_template'=>$resource_id, 'team'=>$team]);
+            if ($team_resource_template) {
+                $this->entityManager->remove($team_resource_template);
+            }
+            endforeach;
+            $this->entityManager->flush();
+
+            //remove assets
+            foreach (array_keys($asset_array) as $asset_id):
+                $team_asset = $this->entityManager->getRepository('Teams\Entity\TeamAsset')
+                    ->findOneBy(['asset'=>$asset_id, 'team'=>$team]);
+                if ($team_asset) {
+                    $this->entityManager->remove($team_asset);
+                }
+            endforeach;
+            $this->entityManager->flush();
+
+        }
+    }
+
+    public function processAssets($request, $team, $existing_resources, $existing_resources_templates, bool $delete = false)
+    {
+
+    }
+    public function tempteamUpdateAction()
+    {
+        $id = $this->params()->fromRoute('id');
+        $team_id = $this->params()->fromRoute('id');
+
+        $resource_form = $this->getForm(AvailableResourcesForm::class);
+        $sites_form = $this->getForm(AvailableSitesForm::class);
+        $user_form = $this->getForm(AvailableSitesForm::class);
+    }
+
+    public function teamUpdateAction()
+    {
+        $team_id = $this->params()->fromRoute('id');
+        $team = $this->entityManager->getRepository('Teams\Entity\Team')->findOneBy(['id' => $team_id]);
+        $team_sites = $this->entityManager
+            ->getRepository('Teams\Entity\TeamSite')
+            ->findBy(['team'=>$team_id]);
+
+        $current_sites = [];
+        $valueOptions = [];
+
+//        get current sites for the team and populate the sites chosen select element
+//        set up the sites form TODO:refactor most of this into the form, which is only used here
+        foreach ($team_sites as $team_site) {
+            $current_sites[] = $team_site->getSite()->getId();
+        }
+
+        $all_sites = $this->api()->search('sites', ['bypass_team_filter'=>true])->getContent();
+        foreach ($all_sites as $site) {
+            if ($site->owner()) {
+                $owner = $site->owner()->name();
+            } else {
+                $owner = 'No One';
+            }
+            $site_name = $site->title() . ' (' . $owner . ')';
+            $site_id = $site->id();
+
+
+            $valueOption = [];
+            $valueOption['value'] = $site_id;
+            $valueOption['label'] = $site_name;
+            if (in_array($site_id, $current_sites)) {
+                $valueOption['attributes'] = ['selected' => true];
+            }
+            $valueOptions[] = $valueOption;
+        }
+
+        $sitesForm = $this->getForm(TeamSitesAddRemoveForm::class);
+        $sites = $sitesForm->get('teamSites')->get('o:site');
+        $sites->setAttribute('multiple', true);
+        $sites->setAttribute('id', 'sites');
+
+        $sites->setEmptyOption('None');
+        $sites->setValueOptions($valueOptions);
+
+        //set up the item set form
+        $itemsetForm = $this->getForm(TeamItemsetAddRemoveForm::class);
+        $userId = $this->identity()->getId();
+        //TODO rename this to TeamDetail form or find a way to string these all together
+        $form = $this->getForm(TeamUpdateForm::class);
+
+        //TODO: get team with a one line entity manager call
+        $criteria = ['id' => $team_id];
+        $qb = $this->entityManager->createQueryBuilder();
+        $entityClass = 'Teams\Entity\Team';
+
+        $qb->select('omeka_root')->from($entityClass, 'omeka_root');
+        foreach ($criteria as $field => $value) {
+            $qb->andWhere($qb->expr()->eq(
+                "omeka_root.$field",
+                $this->createNamedParameter($qb, $value)
+            ));
+        }
+        $qb->setMaxResults(1);
+
+        $entity = $qb->getQuery()->getOneOrNullResult();
+
+
+        $data = $this->api()->read('team', ['id'=>$team_id])->getContent();
+        $request = new Request('update', 'team');
+        $event = new Event('api.hydrate.pre', $this, [
+            'entity' => $entity,
+            'request' => $request,
+        ]);
+        $this->getEventManager()->triggerEvent($event);
+
+
+        //TODO (refactor) this is probably a stupid way to do this
+
+        //get all of the users and put them in an associative array id:name
+        $all_u_array = array();
+        $all_u_collection = $this->api()->search('users')->getContent();
+        foreach ($all_u_collection as $u):
+            $all_u_array[$u->id()] = $u->name();
+        endforeach;
+
+        //get the team's users and put them in an associative array id:name
+        $team_u_array = array();
+        $team_u_collection = $this->api()->read('team', ['id'=>$team_id])->getContent()->teamUsers();
+        foreach ($team_u_collection as $team_user):
+            $team_u_array[$team_user->getUser()->getId()] = $team_user->getUser()->getName();
+        endforeach;
+
+        //get the users available to be added to the team
+        $available_u_array = array_diff($all_u_array, $team_u_array);
+
+        //TODO (refactor) was trying to see if there was an easier way to get these objects into an array but consistency is more important
+        $role_query = $this->entityManager->createQuery('select partial r.{id, name} from Teams\Entity\TeamRole r');
+        $roles = $role_query->getResult();
+        $roles_array =  $role_query->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        //create an array object to hold the contents to pre-fill the form with
+        //TODO (emulate) this is the procedure to use to populate forms. Copy this.
+        $fill = new ArrayObject;
+        $fill['o:name'] = $data->getJsonLd()['o:name'];
+        $fill['o:description'] = $data->getJsonLd()['o:description'];
+        $form->bind($fill);
+
+        //is it a post request?
+        //TODO (refactor) clean up this, only send what is needed
+        $request = $this->getRequest();
+        $view = new ViewModel(['team'=>$team,
+            'form' => $form,
+            'id'=>$team_id,
+            'roles'=> $roles,
+            'roles_array' => $roles_array,
+            'all_u_collection' => $all_u_collection,
+            'team_u_collection' => $team_u_collection,
+            'team_u_array'=>$team_u_array,
+            'available_u_array'=>$available_u_array,
+            'ident' => $userId,
+            'itemsetForm' => $itemsetForm,
+            'sitesForm' => $sitesForm,
+        ]);
+        if (! $request->isPost()) {
+            return $view;
+        }
+
+        $em = $this->entityManager;
+        $qb = $em->createQueryBuilder();
+        $existing_resources = $qb->select('tr')
+            ->from('Teams\Entity\TeamResource', 'tr')
+            ->where('tr.team = :team_id')
+            ->setParameter('team_id', $team_id)
+            ->getQuery()
+            ->getResult();
+
+        $existing_resource_templates = $qb->select('trt')
+            ->from('Teams\Entity\TeamResourceTemplate', 'trt')
+            ->where('trt.team = :team_id')
+            ->setParameter('team_id', $team_id)
+            ->getQuery()
+            ->getResult();
+
+        $existing_assets = $qb->select('ta')
+            ->from('Teams\Entity\TeamAsset', 'ta')
+            ->where('ta.team = :team_id')
+            ->setParameter('team_id', $team_id)
+            ->getQuery()
+            ->getResult();
+
+
+        $post_data = $request->getPost();
+        if (!$this->teamAuth()->teamAuthorized($this->identity(), 'update', 'team_user', $team_id)) {
+            $this->messenger()->addError("You aren't authorized to change the team details");
+            return $view;
+        } else {
+            //first update the team name and description
+            $qb = $this->entityManager->createQueryBuilder();
+            $qb->update('Teams\Entity\Team', 'team')
+                ->set('team.name', '?1')
+                ->set('team.description', '?2')
+                ->where('team.id = ?3')
+                ->setParameter(1, $post_data['o:name'])
+                ->setParameter(2, $post_data['o:description'])
+                ->setParameter(3, $team_id)
+                ->getQuery()
+                ->execute();
+        }
+
+
+            if (!$this->teamAuth()->teamAuthorized($this->identity(), 'update', 'team_user', $team_id)) {
+                $this->messenger()->addError("You aren't authorized to change team members");
+                return $view;
+            } else {
+                $current_users = $this->entityManager->getRepository('Teams\Entity\TeamUser')->findBy(['team' => $team_id]);
+
+                foreach ($current_users as $team_user) {
+                    $this->entityManager->remove($team_user);
+                }
+                $this->entityManager->flush();
+
+                if($request->getPost('o:team_users')){
+                    foreach ($request->getPost('o:team_users') as $team_user):
+                        $user = $this->entityManager->getRepository('Omeka\Entity\User')
+                            ->findOneBy(['id' => (int)$team_user['o:user']['o:id']]);
+                        $role = $this->entityManager->getRepository('Teams\Entity\TeamRole')
+                            ->findOneBy(['id' => (int)$team_user['o:team_role']['o:id']]);
+
+                        $teamUser = new TeamUser($team, $user, $role);
+                        $teamUser->setCurrent(null);
+                        $this->entityManager->persist($teamUser);
+                    endforeach;
+                    $this->entityManager->flush();
+                }
+
+            }
+
+        if (! $this->teamAuth()->teamAuthorized($this->identity(), 'update', 'team', $team_id)){
+            $this->messenger()->addError("You aren't authorized to change this team");
+            return $view;
+        } else {
+
+            //first delete then add resources to team
+            $this->processResources($request, $team, $existing_resources, $existing_resource_templates, $existing_assets, true);
+            $this->processResources($request, $team, $existing_resources, $existing_resource_templates, $existing_assets, false);
+
+            //handle new sites
+            foreach ($post_data['teamSites']['o:site'] as $site) {
+                if (!in_array($site, $current_sites)) {
+                    $site = $em->getRepository('Omeka\Entity\Site')->findOneBy(['id'=>$site]);
+                    $ts = new TeamSite($team, $site);
+                    $request = new Request('create', 'team_site');
+                    $event = new Event('api.hydrate.pre', $this, [
+                        'entity' => $ts,
+                        'request' => $request,
+                    ]);
+                    $this->getEventManager()->triggerEvent($event);
+
+                    $em->persist($ts);
+                }
+            }
+
+            //handle removed sites
+            foreach ($current_sites as $site) {
+                if (!in_array($site, $post_data['teamSites']['o:site'])) {
+                    $ts = $em->getRepository('Teams\Entity\TeamSite')->findOneBy(['team'=>$team_id, 'site'=>$site]);
+                    $request = new Request('delete', 'team_site');
+                    $event = new Event('api.hydrate.pre', $this, [
+                        'entity' => $ts,
+                        'request' => $request,
+                    ]);
+                    $this->getEventManager()->triggerEvent($event);
+                    $em->remove($ts);
+                }
+            }
+            $em->flush();
+        }
+
+        $successMessage = sprintf("Successfully updated the %s team", $team->getName());
+        $this->messenger()->addSuccess($successMessage);
+
+        return $this->redirect()->toRoute('admin/teams/detail',['id'=>$team_id]);
+    }
+
+    public function roleUpdateAction()
+    {
+    }
+
+    public function userAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $data = $request->getPost();
+            $user_teams = $data['user-information']['o-module-teams:Team'];
+            //wrong!! not really able to get from the param, would need to extract from the return url
+            $user_id = $this->params('id');
+            $em = $this->entityManager;
+
+            foreach ($user_teams as $team_id):
+                $team = $em->getRepository('Teams\Entity\Team')->findOneBy(['id' => $team_id]);
+            $user = $em->getRepository('Omeka\Entity\User')->findOneBy(['id'=>$user_id]);
+            $role = $em->getRepository('Teams\Entity\TeamRole')->findOneBy(['id' => 1]);
+            $team_user = new TeamUser($team, $user, $role);
+            $team_user->setCurrent(null);
+            $em->persist($team_user);
+            endforeach;
+            $em->flush();
+            $request = $this->getRequest();
+            $return = $request->getHeader('referer');
+//            return $this->redirect()->toUrl($data['return_url']);
+            return $this->redirect()->toUrl($return);
+        }
+    }
+
+    public function currentTeamAction()
+    {
+        $user_id = $this->identity()->getId();
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $data =  $request->getPost();
+
+            $em = $this->entityManager;
+            $team_user = $em->getRepository('Teams\Entity\TeamUser');
+            $old_current = $team_user->findOneBy(['user' => $user_id, 'is_current' => 1]);
+            $new_current = $team_user->findOneBy(['user'=> $user_id, 'team'=>$data['team_id']]);
+
+            if ($old_current) {
+                $old_current->setCurrent(null);
+                $em->flush();
+            }
+            if ($new_current) {
+                $new_current->setCurrent(true);
+                $em->flush();
+                $team = $new_current->getTeam();
+
+                //the sites for the team the user just switched to
+
+                $team_sites = $team->getTeamSites();
+                $site_ids = [];
+                foreach ($team_sites as $team_site):
+                    $site_ids[] = strval($team_site->getSite()->getId());
+                endforeach;
+
+                //update so those are the user's default sites for items
+                $settingId = 'default_item_sites';
+                $settingValue = $site_ids;
+                $this->userSettings()->set($settingId, $settingValue, $user_id);
+            } else {
+                $this->messenger()->addError("Team not found");
+            }
+
+
+
+            return $this->redirect()->toUrl($data['return_url']);
+        }
+    }
+}

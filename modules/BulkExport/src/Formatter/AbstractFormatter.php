@@ -9,13 +9,6 @@ use Log\Stdlib\PsrMessage;
 abstract class AbstractFormatter implements FormatterInterface
 {
     /**
-     * Limit for the loop to avoid heavy sql requests.
-     *
-     * @var int
-     */
-    const SQL_LIMIT = 100;
-
-    /**
      * @var \Laminas\ServiceManager\ServiceLocatorInterface
      */
     protected $services;
@@ -46,7 +39,7 @@ abstract class AbstractFormatter implements FormatterInterface
     protected $logger;
 
     /**
-     * @var \Omeka\Api\Manager
+     * @var \Omeka\Mvc\Controller\Plugin\Api
      */
     protected $api;
 
@@ -222,8 +215,8 @@ abstract class AbstractFormatter implements FormatterInterface
         $this->reset();
 
         // The api is almost always required.
-        $this->api = $this->services->get('Omeka\ApiManager');
         $this->logger = $this->services->get('Omeka\Logger');
+        $this->api = $this->services->get('ControllerPluginManager')->get('api');
         $this->translator = $this->services->get('MvcTranslator');
 
         $resourceNames = [
@@ -232,6 +225,8 @@ abstract class AbstractFormatter implements FormatterInterface
             'media',
             'resources',
             'annotations',
+            'mappings',
+            'mappingMarkers'
         ];
 
         $options += [
@@ -370,10 +365,10 @@ abstract class AbstractFormatter implements FormatterInterface
         $this->handle = fopen($file, 'w+');
         if (!$this->handle) {
             $this->hasError = true;
-            $this->logger->err(
+            $this->logger->err(new PsrMessage(
                 'Unable to open output: {error}.', // @translate
                 ['error' => error_get_last()['message']]
-            );
+            ));
         }
         return $this;
     }
@@ -407,10 +402,10 @@ abstract class AbstractFormatter implements FormatterInterface
         $this->size = file_put_contents($this->output, $this->content);
         if ($this->size === false) {
             $this->hasError = true;
-            $this->logger->err(
+            $this->logger->err(new PsrMessage(
                 'Unable to save output to file: {error}.', // @translate
                 ['error' => error_get_last()['message']]
-            );
+            ));
         }
         $this->content = null;
         return $this;
@@ -437,6 +432,8 @@ abstract class AbstractFormatter implements FormatterInterface
             'api_resources' => 'o:ApiResource',
             // Modules.
             'annotations' => 'oa:Annotation',
+            'mappings' => 'o:Mapping',
+            'mappingMarkers' => 'o:MappingMarker'
         ];
         return $mapping[$resourceType] ?? null;
     }

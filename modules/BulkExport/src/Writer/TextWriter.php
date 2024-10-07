@@ -3,6 +3,7 @@
 namespace BulkExport\Writer;
 
 use BulkExport\Form\Writer\TextWriterConfigForm;
+use Log\Stdlib\PsrMessage;
 
 class TextWriter extends AbstractFieldsWriter
 {
@@ -18,7 +19,6 @@ class TextWriter extends AbstractFieldsWriter
         'format_resource',
         'format_resource_property',
         'format_uri',
-        'language',
         'resource_types',
         'metadata',
         'metadata_exclude',
@@ -31,7 +31,6 @@ class TextWriter extends AbstractFieldsWriter
         'format_resource',
         'format_resource_property',
         'format_uri',
-        'language',
         'resource_types',
         'metadata',
         'metadata_exclude',
@@ -51,10 +50,10 @@ class TextWriter extends AbstractFieldsWriter
             fwrite($this->handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
         } else {
             $this->hasError = true;
-            $this->logger->err(
+            $this->getServiceLocator()->get('Omeka\Logger')->err(new PsrMessage(
                 'Unable to open output: {error}.', // @translate
                 ['error' => error_get_last()['message']]
-            );
+            ));
         }
         return $this;
     }

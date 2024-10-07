@@ -5,7 +5,6 @@ namespace BulkExport\Formatter;
 use BulkExport\Traits\ListTermsTrait;
 use BulkExport\Traits\MetadataToStringTrait;
 use BulkExport\Traits\ResourceFieldsTrait;
-use Omeka\Api\Exception\NotFoundException;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 
 abstract class AbstractFieldsFormatter extends AbstractFormatter
@@ -38,16 +37,18 @@ abstract class AbstractFieldsFormatter extends AbstractFormatter
 
     protected function process(): void
     {
+        $this->initializeOutput();
+        if ($this->hasError) {
+            return;
+        }
+
         $this
             ->prepareFieldNames($this->options['metadata'], $this->options['metadata_exclude']);
 
         if (!count($this->fieldNames)) {
             $this->logger->warn('No metadata are used in any resources.'); // @translate
-            return;
-        }
-
-        $this->initializeOutput();
-        if ($this->hasError) {
+            $this
+                ->finalizeOutput();
             return;
         }
 
@@ -69,7 +70,7 @@ abstract class AbstractFieldsFormatter extends AbstractFormatter
                 try {
                     /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
                     $resource = $this->api->read($this->resourceType, ['id' => $resourceId])->getContent();
-                } catch (NotFoundException $e) {
+                } catch (\Omeka\Api\Exception\NotFoundException $e) {
                     continue;
                 }
                 $dataResource = $this->getDataResource($resource);

@@ -9,30 +9,20 @@ class FieldsWriterConfigForm extends AbstractWriterConfigForm
     use ResourceQueryTrait;
     use ResourceTypesSelectTrait;
 
-    public function init()
-    {
-        $this
-            ->appends()
-            ->addInputFilters();
-    }
-
-    protected function appends(): self
+    protected function appends()
     {
         return $this
-            ->appendBase()
             ->appendFormats()
             ->appendResourceTypesSelect()
             ->appendMetadataSelect()
-            ->appendResourceQuery()
-        ;
+            ->appendResourceQuery();
     }
 
-    protected function addInputFilters(): self
+    protected function addInputFilters()
     {
         return $this
             ->addInputFilterFormats()
             ->addInputFilterResourceTypes()
-            ->addInputFilterMetadata()
-        ;
+            ->addInputFilterMetadata();
     }
 }

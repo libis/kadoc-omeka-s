@@ -8,37 +8,35 @@ trait ResourceTypesSelectTrait
 {
     public function appendResourceTypesSelect()
     {
-        $this
-            ->add([
-                'name' => 'resource_types',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Resource types', // @translate
-                    'info' => 'When multiple types are selected, a column is automatically added to identify it.', // @translate
-                    'value_options' => $this->listResourceTypes(),
+        $this->add([
+            'name' => 'resource_types',
+            'type' => Element\Select::class,
+            'options' => [
+                'label' => 'Resource types', // @translate
+                'info' => 'When multiple types are selected, a column is automatically added to identify it.', // @translate
+                'value_options' => $this->listResourceTypes(),
+            ],
+            'attributes' => [
+                'id' => 'resource_types',
+                'value' => [
+                    'o:Item',
                 ],
-                'attributes' => [
-                    'id' => 'resource_types',
-                    'value' => [
-                        'o:Item',
-                    ],
-                    'required' => false,
-                    'multiple' => true,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select one or more resource type…', // @translate
-                ],
-            ]);
+                'required' => false,
+                'multiple' => true,
+                'class' => 'chosen-select',
+                'data-placeholder' => 'Select one or more resource type…', // @translate
+            ],
+        ]);
         return $this;
     }
 
     protected function addInputFilterResourceTypes()
     {
         $inputFilter = $this->getInputFilter();
-        $inputFilter
-            ->add([
-                'name' => 'resource_types',
-                'required' => false,
-            ]);
+        $inputFilter->add([
+            'name' => 'resource_types',
+            'required' => false,
+        ]);
         return $this;
     }
 
@@ -68,10 +66,15 @@ trait ResourceTypesSelectTrait
             // 'o:ApiResource' => 'Api resources', // @translate
             // Modules.
             'oa:Annotation' => 'Annotations', // @translate
+            'o:MappingMarker' => 'Markers',
         ];
 
         if (!class_exists(\Annotate\Entity\Annotation::class)) {
             unset($resourceTypes['oa:Annotation']);
+        }
+
+        if (!class_exists(\Mapping\Entity\Mapping::class)) {
+            unset($resourceTypes['o:MappingMarker']);
         }
 
         return $resourceTypes;

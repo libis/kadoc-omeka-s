@@ -1,0 +1,45 @@
+<?php $escape = $this->plugin('escapeHtml'); ?>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      <div class="column is-6">
+        <div class="toon-block toon-intro-left content">
+          <div class="text is-family-sans-serif">
+            <?php if($block->dataValue('text1')):?>
+                <?php echo $block->dataValue('text1');?>
+            <?php endif;?>
+          </div>
+          <?php if($block->dataValue('link1')):?>
+            <div class="link">
+              <a class="button is-primary is-rounded" href="<?php echo $block->dataValue('link1');?>">
+                <span><?php echo $block->dataValue('link_text1');?></span>
+                <span class="icon is-small">
+                  <i class="fas fa-angle-right"></i>
+                </span>
+              </a>
+            </div>
+          <?php endif;?>
+        </div>
+      </div>        
+      <div class="column is-6">
+        <div class="toon-block toon-intro-right content">
+          <div class="text">
+            <?php if($block->dataValue('text2')):?>
+                <?php echo $block->dataValue('text2');?>
+            <?php endif;?>
+          </div>
+          <?php if($block->dataValue('link2')):?>
+            <div class="link">
+              <a class="button is-primary is-rounded" href="<?php echo $block->dataValue('link2');?>">
+                <span><?php echo $block->dataValue('link_text2');?></span>
+                <span class="icon is-small">
+                  <i class="fas fa-angle-right"></i>
+                </span>
+              </a>
+            </div>
+          <?php endif;?>
+        </div>
+      </div>          
+    </div>
+  </div>
+ </section>

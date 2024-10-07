@@ -3,7 +3,7 @@
 namespace BulkExport\Form\Writer;
 
 use Laminas\Form\Element;
-use Omeka\Form\Element as OmekaElement;
+use Omeka\Form\Element\PropertySelect;
 
 trait FormatTrait
 {
@@ -62,7 +62,7 @@ trait FormatTrait
             ])
             ->add([
                 'name' => 'format_resource_property',
-                'type' => OmekaElement\PropertySelect::class,
+                'type' => PropertySelect::class,
                 'options' => [
                     'label' => 'Property for linked resources', // @translate
                     'term_as_value' => true,
@@ -89,17 +89,6 @@ trait FormatTrait
                 'attributes' => [
                     'id' => 'format_uri',
                     'value' => 'uri_label',
-                ],
-            ])
-            ->add([
-                'name' => 'language',
-                'type' => Element\Text::class,
-                'options' => [
-                    'element_group' => 'export',
-                    'label' => 'Language', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'language',
                 ],
             ])
         ;

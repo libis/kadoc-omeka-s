@@ -85,6 +85,16 @@ trait ResourceFieldsTrait
                         $this->fieldNames[] = 'o:resource[dcterms:identifier]';
                         $this->fieldNames[] = 'o:resource[dcterms:title]';
                         break;
+                    case 'o:MappingMarker':
+                        $this->fieldNames[] = 'o:resource[o:id]';
+                        $this->fieldNames[] = 'o:resource[dcterms:identifier]';
+                        $this->fieldNames[] = 'o:resource[dcterms:title]';
+                        break;    
+                    case 'o:Mapping':
+                        $this->fieldNames[] = 'o:resource[o:id]';
+                        $this->fieldNames[] = 'o:resource[dcterms:identifier]';
+                        $this->fieldNames[] = 'o:resource[dcterms:title]';
+                        break;    
                     default:
                         break;
                 }
@@ -194,6 +204,8 @@ trait ResourceFieldsTrait
                 'o:media[original_url]' => $this->translator->translate('Original file url'), // @translate,
                 'o:asset' => $this->translator->translate('Asset'), // @translate
                 'o:annotation' => $this->translator->translate('Annotation'), // @translate
+                'o:mapping' => $this->translator->translate('Mapping'), // @translate
+                'o:mappingMarker' => $this->translator->translate('MappingMarker'), // @translate
                 'url' => $this->translator->translate('Url'), // @translate,
                 'resource_type' => $this->translator->translate('Resource type'), // @translate,
             ];
@@ -277,6 +289,8 @@ trait ResourceFieldsTrait
             'o:ApiResource' => null,
             // Modules.
             'oa:Annotation' => \Annotate\Entity\Annotation::class,
+            'o:Mapping' => \Mapping\Entity\Mapping::class,
+            'o:MappingMarker' => \Mapping\Entity\MappingMarker::class,
         ];
         return $mapping[$jsonResourceType] ?? null;
     }

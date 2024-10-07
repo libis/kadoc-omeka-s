@@ -795,7 +795,7 @@ class ContributionRepresentation extends AbstractEntityRepresentation
             $data['o-module-mapping:mapping'] = $bounds_a;
             
             $markers_a = $proposal['mapping']['markers'][0]['proposed']['@value'];
-            if(isset( $bounds_a[array_key_first($markers_a)]["o:id"])):
+            if(isset( $markers_a[array_key_first($markers_a)]["o:id"])):
                 $markers_a[array_key_first($markers_a)]["o:id"]=null;
             endif;    
             $data['o-module-mapping:marker'] =  $markers_a;
@@ -1005,6 +1005,22 @@ class ContributionRepresentation extends AbstractEntityRepresentation
                 unset($data['o:media'][$indexProposalMedia]['file']);
             }
         }
+        
+        if (isset($markers_a)):
+            $data['kapel:latitude'][0] = [
+                'type' => 'literal',
+                'property_id' => 4741,
+                '@value' => $markers_a[array_key_first($markers_a)]['o-module-mapping:lat'],
+                'is_public' => true,
+            ];
+            
+            $data['kapel:longitude'][0] = [
+                'type' => 'literal',
+                'property_id' => 4744,
+                '@value' => $markers_a[array_key_first($markers_a)]['o-module-mapping:lng'],
+                'is_public' => true,
+            ];
+        endif;    
 
         return $data;
     }

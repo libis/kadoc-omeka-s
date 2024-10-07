@@ -125,14 +125,12 @@ class Module extends AbstractModule
 
         $config = $services->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
-        $translator = $services->get('MvcTranslator');
-
         if (!$this->checkDestinationDir($basePath . '/bulk_export')) {
             $message = new PsrMessage(
                 'The directory "{path}" is not writeable.', // @translate
                 ['path' => $basePath . '/bulk_export']
             );
-            throw new ModuleCannotInstallException((string) $message->setTranslator($translator));
+            throw new ModuleCannotInstallException((string) $message);
         }
 
         $modules = [
@@ -156,11 +154,12 @@ class Module extends AbstractModule
                 } elseif (!$version || version_compare($module->getIni('version') ?? '', $version, '>=')) {
                     continue;
                 }
-                $message = new PsrMessage(
-                    'This module requires the module "{module}", version {version} or above.', // @translate
-                    ['module' => $moduleName, 'version' => $version]
+                $translator = $services->get('MvcTranslator');
+                $message = new \Omeka\Stdlib\Message(
+                    $translator->translate('This module requires the module "%s", version %s or above.'), // @translate
+                    $moduleName, $version
                 );
-                throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+                throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
             }
         }
     }
@@ -378,10 +377,12 @@ class Module extends AbstractModule
             'item-set' => 'item-set',
             'media' => 'media',
             'annotation' => 'annotation',
+            'mapping' => 'mapping',
             'omeka\controller\site\item' => 'item',
             'omeka\controller\site\itemSet' => 'item-set',
             'omeka\controller\site\media' => 'media',
             'annotate\controller\site\annotation' => 'annotation',
+            'mapping\controller\site\mapping' => 'mapping',
             'omeka\controller\admin\item' => 'item',
             'omeka\controller\admin\itemset' => 'item-set',
             'omeka\controller\admin\media' => 'media',

@@ -147,7 +147,14 @@ endif;
                 <?php echo $link->asHtml();?>
               <?php endforeach;?>
             <?php endif;?>       
+
+            <hr>
+            <?php if($type == 'Project'):?>
+              <?php echo $this->partial('common/comment', ['resource' => $resource]); ?>
+            <?php endif;?>
            </div>
+
+           
           
          </div>
         </div>
@@ -167,19 +174,6 @@ endif;
       <?php if (isset($lightMedia)): ?>
           <?php echo $this->LightGalleryOutput($lightMedia); ?>
       <?php endif; ?>
-      <!--<?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
-      
-          <div id="other-media" class="property">
-              <h4><?php echo $this->translate('Other Media'); ?></h4>
-              <div class="values">
-                  <?php foreach($otherMedia as $media): ?>
-                  <div class="value">
-                      <?php echo $media->linkPretty(); ?>
-                  </div>
-                  <?php endforeach; ?>
-              </div>
-          </div>
-      <?php endif; ?>-->    
 
       <div class="columns">
         <div class="column is-8">
@@ -198,7 +192,6 @@ endif;
             <?php echo $item->displayValues(); ?>              
           </div>
 
-          <?php //$this->trigger('view.show.after'); ?>
           <?php
             $plugins = $this->getHelperPluginManager();
             $hasNext = $plugins->has('previousResource');
@@ -235,7 +228,11 @@ endif;
           </div>
         </div>
       </div>
+     
     </div>
+
+    
+    
   </section>  
 <?php endif;?>
 

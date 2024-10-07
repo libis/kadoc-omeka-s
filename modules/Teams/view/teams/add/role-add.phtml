@@ -1,0 +1,15 @@
+<?php
+echo $this->pageTitle("Add new role");
+
+$form = $this->form;
+if ($form){
+    $form->setAttribute('action', $this->url());
+    $form->prepare();
+
+    echo $this->form()->openTag($form);
+    echo $this->formCollection($form);
+    echo $this->form()->closeTag();
+}
+//TODO: add a generic error message in an else.
+// You can get to this state if no form was returned from the controller because of an unexpected error.
+

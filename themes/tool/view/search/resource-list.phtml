@@ -1,0 +1,127 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \AdvancedSearch\Response $response
+ * @var string $resourceName
+ * @var string $title
+ */
+
+$resources = $response->getResources($resourceName);
+
+// A check is done: when page is not first, the resources may be empty even with results.
+if (!$resources) return;
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+$assetUrl = $plugins->get('assetUrl');
+$escape = $plugins->get('escapeHtml');
+$thumbnailHelper = $plugins->get('thumbnail');
+
+$setting = $plugins->get($site ? 'siteSetting' : 'setting');
+
+$filterLocale = (bool) $setting('filter_locale_values');
+$lang = $this->lang();
+
+$headingTerm = $setting('browse_heading_property_term');
+$bodyTerm = $setting('browse_body_property_term');
+if ($headingTerm) {
+    $headingOptions = [
+        'default' => $translate('[Untitled]'),
+        'lang' => ($filterLocale ? [$lang, ''] : null)
+    ];
+} else {
+    $headingOptions = $filterLocale ? [$lang, ''] : null;
+}
+if ($bodyTerm) {
+    $bodyOptions = ['lang' => ($filterLocale ? [$lang, ''] : null)];
+} else {
+    $bodyOptions = $filterLocale ? [$lang, ''] : null;
+}
+
+$defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') . '" title="' . $translate('No media') . '"/>';
+?>
+
+<?php if ($title): ?>
+<div class="content"><h2 class="title"><?= $escape($title) ?></h2></div>
+<?php endif; ?>
+<div class="columns is-multiline">
+    <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
+    foreach ($resources as $resource):
+        $resourceType = $resource->resourceName();
+        $mediaUrl = $resource->thumbnailDisplayUrl('square');        
+        if(!$mediaUrl):
+            $mediaUrl= "/application/asset/thumbnails/default.png?v=3.2.0";
+        endif;    
+               
+        $heading = $headingTerm ? $resource->value($headingTerm, $headingOptions) : $resource->displayTitle(null, $headingOptions);
+        $body = $bodyTerm ? $resource->value($bodyTerm, $bodyOptions) : $resource->displayDescription(null, $bodyOptions);
+        $template = $resource->resourceTemplate();
+        if($template):
+            $type = $template->label();
+        else:
+            $type = "";
+        endif;
+    ?>
+
+    <div class="column is-4  resource-thumbnail resource <?= $resourceType ?>">
+        <div class="">
+        <a class="resource-link" href="<?php echo $resource->url();?>">
+            <div class="card-bg card-bg-img-2"
+                style="height:200px;width:100%;background:url(<?php echo  $mediaUrl;?>) no-repeat center 20%;background-color:#ccc;background-size: cover;"
+                >
+              </div>
+    </a>
+        </div>   
+        <div class="content resource-metadata-grid">
+            <h4 style="margin:0.3rem 0;" class="title is-5"><?= $resource->link($heading) ?></h4>        
+            <?php if($type == "Tool" && $types = $resource->value("dcterms:type", ["all" => true])):?>
+            <div class="tags are-normal">
+            <? foreach($types as $dctype):?>
+                <span class="tag is-primary"><?= $dctype ?></span>
+            <?php endforeach;?>    
+            </div>
+        <?php endif;?>
+        </div>
+    </div> 
+    <div class="content column is-8 resource-metadata">
+        <!--<h6 class="subtitle is-6"><?php echo $type;?></h6>-->
+        <h4 class="title"><?= $resource->link($heading) ?></h4>
+        <?php if($resource->value("schema:dateCreated")):?>
+        <div class="date is-small">
+            <?= $resource->value("schema:dateCreated");?>
+        </div>      
+        <?php endif;?>  
+        <?php if($type == "Tool" && $types = $resource->value("dcterms:type", ["all" => true])):?>
+            <div class="tags are-normal" style="margin-bottom:0;">
+            <? foreach($types as $dctype):?>
+                <span class="tag is-primary"><?= $dctype ?></span>
+            <?php endforeach;?>    
+            </div>
+        <?php endif;?>  
+        <div class="description">
+            <?php if ($resource->displayDescription()): ?>
+                <?php $body = $resource->displayDescription();?>   
+                <p>
+                    <?php $trunc = implode(" ", array_slice(explode(" ", $body), 0, 21)); ?>
+                    <?php if(strlen($body) != strlen($trunc)):?>
+                    <?php echo $trunc.' ...';?>
+                    <?php else:?>
+                    <?php echo $trunc;?>
+                    <?php endif;?>
+                </p>
+            <?php endif; ?>
+        </div>   
+        <?php if($resource->value("schema:creator")):?>
+            <div class="creator" style="font-size:0.9rem;margin-top:1rem;">
+                <a style="padding: 0.2rem 0;" href="/s/zorgerfgoed/collecties?facet[schema%3Acreator][]=<?php echo $resource->value("schema:creator");?>"><?php echo $resource->value("schema:creator");?></a>
+            </div>
+        <?php endif;?>
+
+        
+       
+    </div>
+
+    <?php endforeach; ?>
+</div>

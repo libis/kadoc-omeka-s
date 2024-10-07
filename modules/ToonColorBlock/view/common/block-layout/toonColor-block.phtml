@@ -1,0 +1,70 @@
+<?php $escape = $this->plugin('escapeHtml'); ?>
+<?php 
+  if($block->dataValue('height')):
+    $height = $block->dataValue('height');
+  else:
+    $height = "none";  
+  endif;  
+
+  $graphic = array(
+    "200px" => "small",
+    "300px" => "medium",
+    "400px" => "medium",
+    "500px" => "large",
+    "none" => "large"
+  );
+?>
+<section class="section">
+  <div class="container toon-color-container <?php echo "toon-".$block->dataValue('color');?>" style="min-height:<?php echo $height;?>">
+    <div class="graphic_overlay graphic-size-<?= $graphic[$height]?>">
+      <div class="columns">
+      <?php $offset = "";?>  
+      <?php if($block->dataValue('text1')):?>
+        <div class="column is-6">
+          <div class="toon-block toon-color-left content">
+            <div class="text">
+              <?php echo $block->dataValue('text1');?>              
+            </div>
+            <?php if($block->dataValue('link1')):?>
+            <div class="link">
+              <a class="button is-primary is-rounded" href="<?php echo $block->dataValue('link1');?>">
+                <span><?php echo $block->dataValue('link_text1');?></span>
+                <span class="icon is-small">
+                  <i class="fas fa-angle-right"></i>
+                </span>
+              </a>
+            </div>
+            <?php endif;?>
+          </div>
+        </div>   
+      <?php else:?>
+        <?php $offset = "is-offset-3" ?>  
+      <?php endif;?>       
+        <div class="column <?= $offset ?> is-6">
+          <div class="toon-block toon-color-right content">
+            <div class="text">
+              <?php if($block->dataValue('text2')):?>
+                  <?php echo $block->dataValue('text2');?>
+              <?php endif;?>
+            </div>
+            <?php if($block->dataValue('link2')):?>
+              <div class="link">
+                <a class="button is-primary is-rounded" href="<?php echo $block->dataValue('link2');?>">
+                  <span><?php echo $block->dataValue('link_text2');?></span>
+                  <span class="icon is-small">
+                    <i class="fas fa-angle-right"></i>
+                  </span>
+                </a>
+              </div>
+            <?php endif;?>
+          </div>
+        </div>          
+      </div>
+    </div>  
+  </div>
+  <div class="container toon-line-container">
+    <?php if($block->dataValue('line')):?>
+      <hr>
+    <?php endif;?>  
+  </div>
+ </section>

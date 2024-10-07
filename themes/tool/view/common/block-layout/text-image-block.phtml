@@ -1,0 +1,47 @@
+<section class="section text-image-block <?php echo ($block->dataValue('highlight') ? 'highlight-section' : '');?>">
+  <div class="container">
+    <div class="columns <?php echo ($block->dataValue('reverse') ? ' reverse' : '');?> <?php echo ($block->dataValue('highlight') ? ' hightlight-columns' : '');?>">
+      <div class="column column-text <?php echo ($block->dataValue('highlight') ? 'hightlight' : '');?>">
+        <div class="text-box">
+          <h2 class="title is-2 is-centered"><span><?php echo $block->dataValue('title');?></span></h2>
+          <div class="content">
+            <p><?php echo $block->dataValue('text');?></p>
+          </div>
+          <div class="has-text-right">
+            <?php if($block->dataValue('link')):?>
+                <a class="button is-primary is-rounded" href="<?php echo $block->dataValue('link');?>"><?php echo $block->dataValue('label');?></a>
+            <?php endif;?>
+          </div>
+          </div>
+      </div>
+      <div class="column column-img">
+        <?php if($attachments):
+          $media = $attachments[0]->media();
+          if($media):
+            $url = $media->thumbnailUrl('large');
+            $url = str_replace('http:', '', $url);
+            if($block->dataValue('itemurl')):
+              $url = $media->item()->url();
+              $url = str_replace('http:', '', $itemUrl);
+              ?>
+            <?php endif;?>
+            <a class="card-link-wrapper " href="<?php echo $block->dataValue('link');?>">
+              <div class="img-box">
+                <img src="<?php echo $url;?>">
+                <?php if($block->dataValue('highlight')):?>
+                  <div class="content">
+                    <div class="to-end">
+                      <h3 class="title is-3">
+                          <span><?php echo $block->dataValue('label');?></span>
+                      </h3>
+                    </div>
+                  </div>
+                <?php endif;?>
+              </div>
+            </a>
+          <?php endif;?>
+        <?php endif;?>
+      </div>
+    </div>
+  </div>
+</section>

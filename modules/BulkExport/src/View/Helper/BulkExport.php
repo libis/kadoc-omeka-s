@@ -33,22 +33,15 @@ class BulkExport extends AbstractHelper
         $plugins = $view->getHelperPluginManager();
         $url = $plugins->get('url');
         $api = $plugins->get('api');
-        $translate = $plugins->get('translate');
 
         $isAdmin = empty($options['site']) && $plugins->get('status')->isAdminRequest();
 
-        // Some options are not options, but added only to set their order.
         $options += [
             'site' => null,
-            'resourcesOrIdsOrQuery' => null,
-            'resourceType' => '',
+            'resourceType' => null,
             'exporters' => null,
-            'urls' => [],
-            'labels' => [],
-            'heading' => '',
-            'divclass' => '',
-            'isMultiple' => false,
-            'template' => self::PARTIAL_NAME,
+            'heading' => null,
+            'divclass' => null,
         ];
 
         if (!$isAdmin && is_null($options['site'])) {
@@ -60,14 +53,8 @@ class BulkExport extends AbstractHelper
         }
 
         /** @see \BulkExport\Controller\OutputController::output() */
-        // Default is query.
-        $isQuery = is_null($resourcesOrIdsOrQuery);
-        if (!$isQuery && is_array($resourcesOrIdsOrQuery)) {
-            // Check all keys: this is a list of ids if all keys are numeric and
-            // this is a query if at least one key is not numeric.
-            $isQuery = empty($resourcesOrIdsOrQuery)
-                || count($resourcesOrIdsOrQuery) > count(array_filter(array_map('is_numeric', array_keys($resourcesOrIdsOrQuery))));
-        }
+        $isQuery = is_null($resourcesOrIdsOrQuery)
+            || (is_array($resourcesOrIdsOrQuery) && !is_numeric(key($resourcesOrIdsOrQuery)));
 
         $options['resourcesOrIdsOrQuery'] = $resourcesOrIdsOrQuery;
         $options['isMultiple'] = is_array($resourcesOrIdsOrQuery);
@@ -81,6 +68,8 @@ class BulkExport extends AbstractHelper
             'media' => 'media',
             'resource' => 'resources',
             'annotation' => 'annotations',
+            'mapping' => 'mappings',
+            'mappingMarker' => 'mappingMarkers'
         ];
 
         // Prepare the query for the url.
@@ -172,17 +161,7 @@ class BulkExport extends AbstractHelper
             }
         }
 
-        $options['labels'] = [];
-        foreach (array_keys($options['urls']) as $format) {
-            $name = $options['exporters'][$format];
-            $options['labels'][$format] = in_array($format, ['ods', 'xlsx', 'xls'])
-                ? sprintf($translate('Download as spreadsheet %s'), $name) // @translate
-                : (in_array($format, ['bib.txt', 'bib.odt'])
-                    ? $translate('Download as text') // @translate
-                    : sprintf($translate('Download as %s'), $name)); // @translate
-        }
-
-        $template = $options['template'];
+        $template = $options['template'] ?? self::PARTIAL_NAME;
         unset($options['template']);
         return $template !== self::PARTIAL_NAME && $view->resolver($template)
             ? $view->partial($template, $options)

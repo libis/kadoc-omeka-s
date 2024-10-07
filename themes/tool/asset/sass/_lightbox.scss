@@ -1,0 +1,203 @@
+
+.media-render {
+    display: flex;
+    flex-basis: min-content;
+}
+
+.media-render a {
+    display: block;
+}
+
+.media-render img {
+    vertical-align: top;
+}
+
+#content #itemfiles a {
+    background-color: transparent;
+}
+
+.media.show .media-render.video {
+    //margin-bottom: $spacing-l;
+    text-align: center;
+    background-color: white;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    //padding-bottom: 2.25 * $spacing-l;
+
+    video {
+        width: auto;
+        max-height: 50vh;
+    }
+}
+
+.lg-sub-html, .lg-counter{
+    color: $primary !important;
+    font-family: $family-primary !important;
+    font-size: 1rem !important;
+}
+
+.lg-toolbar .lg-icon{
+    color: $primary !important;
+}
+
+.lg-toolbar .lg-icon:hover {
+  color: $primary !important;
+}
+
+.lg-outer[data-lg-slide-type="iframe"] .lg-flip-hor, 
+.lg-outer[data-lg-slide-type="iframe"] .lg-flip-ver, 
+.lg-outer[data-lg-slide-type="iframe"] .lg-rotate-left, 
+.lg-outer[data-lg-slide-type="iframe"] .lg-rotate-right, 
+.lg-outer[data-lg-slide-type="video"] .lg-flip-hor, 
+.lg-outer[data-lg-slide-type="video"] .lg-flip-ver, 
+.lg-outer[data-lg-slide-type="video"] .lg-rotate-left, 
+.lg-outer[data-lg-slide-type="video"] .lg-rotate-right,
+.lg-outer.lg-first-slide-loading .lg-actual-size, 
+.lg-outer.lg-first-slide-loading .lg-zoom-in, 
+.lg-outer.lg-first-slide-loading .lg-zoom-out, 
+.lg-outer[data-lg-slide-type="iframe"] .lg-actual-size, 
+.lg-outer[data-lg-slide-type="iframe"] .lg-zoom-in, 
+.lg-outer[data-lg-slide-type="iframe"] .lg-zoom-out, 
+.lg-outer[data-lg-slide-type="video"] .lg-actual-size, 
+.lg-outer[data-lg-slide-type="video"] .lg-zoom-in, 
+.lg-outer[data-lg-slide-type="video"] .lg-zoom-out {
+    display: none;
+}
+
+.media-render a.lg-icon {
+    font-family: lg !important;
+    speak: never;
+    //font-size: 1.5 * $base-font-size;
+    font-style: normal;
+    font-weight: 400;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    //height: 2 * $spacing-l;
+   // width: 2 * $spacing-l;
+    display: inline-block;
+    color: $primary;
+    opacity: .5;
+    //margin-top: $spacing-m;
+    text-align: center;
+}
+
+.media-render a.lg-icon:hover {
+    opacity: 1;
+}
+
+.lg-download:after {
+    content: '\e0f2';
+}
+
+.lg-toolbar {
+    width: 100%;
+    text-align: right;
+}
+
+.show.resource {
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    //padding: ($spacing-l - 1px) 0;
+    //margin: (2 * $spacing-l) 0;
+}
+
+
+.media-list {
+    display: flex;
+    height: 40rem;
+    text-align: left;
+    float: right;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 0;
+    margin-bottom:2rem;
+}
+
+.lg-outer .lg-object {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 100%;
+    max-height: 90% !important;
+    width: auto;
+    height: auto;
+    position: relative;
+  }
+
+@media (min-width: 768px){
+    .lg-outer .lg-thumb {
+      padding: 0 0 1rem 0 !important;
+    }
+    }
+    
+    .media-list .media.resource {
+        margin: auto auto;
+        width:100%;
+        display: none;
+    }
+    
+    .lg-backdrop{
+        background: transparent !important;
+        background: #white !important;
+    }
+    
+    .lg-outer .lg-img-wrap::before, .lg-outer .lg-item::before {
+        content: '';
+        display: inline-block;
+        height: auto !important;
+        vertical-align: middle;
+    }
+    
+    .lg-outer .lg-thumb-outer {
+        background-color: white !important;
+    }
+    
+    .media + .media {
+        border-top: none;
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+    
+    .media-list{
+        float: none;
+    }
+    
+    .lg-sub-html{
+        color: rgba($primary,1) !important;
+        font-size:0.9rem !important;
+        text-align: right !important;
+        max-width: 400px;
+        float:right;
+        padding:1.5rem !important;
+        margin-bottom:1rem;
+        background: #87c3ff;
+    }
+    
+    
+    .lg-next, .lg-prev {
+        background-color: white !important;
+    }
+    
+    .lg-next, .lg-prev {
+        color: $primary !important;
+    }
+    
+    .lg-next:hover:not(.disabled), .lg-prev:hover:not(.disabled) {
+        color: rgba($primary,0.8) !important;
+    }
+    
+    .lg-counter {
+        color: rgba($primary,.45) !important;
+    }  
+    
+    .lg-toolbar .lg-icon {
+        color: rgba($primary,.45) !important;
+    }
+    
+    .lg-toolbar .lg-icon:hover {
+        color: rgba($primary,1)!important;
+    }

@@ -51,9 +51,7 @@ figcaption{
 
   @include until($tablet) {
     display: block;
-  }
-
- 
+  } 
 
   .nav-right{
     padding-left: 3.1rem;
@@ -91,6 +89,7 @@ figcaption{
       height: 100%;
       font-size:1.3rem;
       font-weight: 400;
+      position: relative;
 
       @media screen and (min-width: 1024px){
         align-items: center;
@@ -101,9 +100,38 @@ figcaption{
         color: $primary;
         font-family: $family-primary;
       }     
+
+      > ul{
+        position: absolute;
+        top: 1.8rem;
+        background: $red;
+        padding: 0.5rem 0 0.5rem 0;
+        min-width: 250px;
+        display: none;
+        z-index: 100;        
+
+        li{         
+          font-size: 1.1rem;
+          padding: 0 0.5rem;
+
+          a{
+            border:none;
+          }          
+        }
+
+        li.active{          
+          border-left: 2px solid rgba($primary,1);    
+        }
+      }
+
+      &:hover{
+        ul{
+          display: block;
+        }
+      }
     }
 
-    .active a{
+    > li.active > a{
       border-bottom: 2px solid rgba($primary,1);      
     }
   }
@@ -221,25 +249,33 @@ figcaption{
   background: #fa3612;
   padding:2rem;
 
+  .modal-content{
+    overflow:hidden;
+    max-height: none;
+  }
+
   .modal-background{
     background-color: rgba(#fa3612,1);
   }
 }
 
 .modal{
-  z-index: 1001;
-  
+  z-index: 1001;  
 
   .navigation{
     padding-top: 1rem;
 
     li{
       padding-top: 0.5rem;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
 
       ul{
         padding-top: 0;
         padding-left: 1rem;
+
+        li{
+          font-size:1rem;
+        }        
       }
     }
     a{
@@ -1111,6 +1147,7 @@ figcaption{
   p{
     font-size: 2.5rem;
     line-height: 1.2;
+    margin-bottom: 1.5rem !important;
   }
 }
 
@@ -1121,7 +1158,14 @@ figcaption{
 
   p{
     font-size: 1.3rem;
-    margin-bottom: 3rem !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+.toon-color-container{
+  .content ul{
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
   }
 }
 
@@ -1139,7 +1183,11 @@ figcaption{
 
   p{
     font-size: 1.3rem;
-    margin-bottom: 3rem !important;
+    margin-bottom: 1rem !important;
+
+    a{
+      border-bottom: 2px solid $primary;
+    }
   }
 }
 
@@ -1192,9 +1240,13 @@ figcaption{
 
   .text-box-color-overlay{
     background: url("../img/graphic_large.png");background-size: cover;
-    height: 100%;
-    padding: 2rem;
+    height: 100%;    
+    padding: 0 2rem;
   }  
+}
+
+.text-box-block{  
+  padding: 2rem 0;
 }
 
 .partner-container{

@@ -8,7 +8,7 @@ $sitename = $block->page()->site()->title();
     <div class="partner-container">
       <div class="overlay">
   <?php endif;?>  
-  
+  <?php if (($this->heading && $this->heading != "Partners") || ($this->linkText && $this->link)): ?>
     <div class="columns">
       <div class="column is-three-quarters">
           <?php if ($this->heading && $this->heading != "Partners"): ?>
@@ -30,7 +30,7 @@ $sitename = $block->page()->site()->title();
           <?php endif;?>
       </div>      
     </div>
-
+  <?php endif;?>
     <?php if($this->resources):?>
     <div class="columns is-multiline <?php echo $block->dataValue('columns');?>">
       <?php

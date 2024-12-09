@@ -26,7 +26,9 @@
                     </h4>
                     <h3 class="title is-3" style=""><?php echo $block->dataValue('name'.$i);?></h3>
                     <span class="icon icon--phone"><i class="fas fa-university"></i></span> <a target="_blank" href="<?php echo $block->dataValue('link'.$i);?>"><?php echo $block->dataValue('tel'.$i);?></a><br>
-                    <span class="icon icon--mail"><i class="fas fa-envelope"></i></span> <a href="mailto:<?php echo $block->dataValue('mail'.$i);?>"><?php echo $block->dataValue('mail'.$i);?></a>
+                    <div class="" style="margin-top:2rem;">
+                      <a target="_blank" class="button is-primary is-outlined is-rounded" href="<?php echo $block->dataValue('personlink'.$i);?>">Contact</a>
+                    </div>                    
                   </div>  
                 </div>
             </div>

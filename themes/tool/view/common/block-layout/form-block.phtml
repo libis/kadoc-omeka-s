@@ -1,0 +1,154 @@
+<?php
+use Laminas\Mail;
+use Laminas\Mime\Message as MimeMessage;
+use Laminas\Mime\Mime;
+use Laminas\Mime\Part as MimePart;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+
+//$settings = $this->getServiceLocator()->get('Omeka\Settings');
+$siteKey = $this->setting('recaptcha_site_key');
+$secretKey = $this->setting('recaptcha_secret_key');
+
+$get  = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
+$post  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+      
+$type = isset($get["type"]) ? $get['type'] : '';
+$subject = isset($get["subject"]) ? $get['subject'] : '';
+$formmail = isset($get["mail"]) ? $get['mail'] : '';  
+?>
+
+  <div class="container">   
+    <h3 class="title">Stuur ons een bericht</h3>
+    <div class="columns">
+      <div class="column is-8">
+      <?php                
+        if($_SERVER['REQUEST_METHOD'] == 'POST'):
+          if(!isCaptchaValid($secretKey)):
+            $error = "reCaptcha is not valid";
+          else:  
+            $post  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $error = '';
+            
+            $message = "<p>Name: ".$post["naam"]."</p><p>E-mail: ".$post["email"]."</p><p>".$post["vraag"]."</p>";
+            $html = new MimePart($message);
+            $html->type = Mime::TYPE_HTML;
+            $html->charset = 'utf-8';
+            $html->encoding = Mime::ENCODING_QUOTEDPRINTABLE;
+            $body = new MimeMessage();
+            $body->setParts([$html]);
+
+            $name = $post["naam"];
+            if (!preg_match("/^[a-zA-Z-' ]*$/",$name)) {
+              $error = "Geen geldige naam";
+            }
+
+            $email = $post["mail"];
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+              $error = "Geen gelding e-mailadres";
+            }
+          endif;         
+          
+          if(!$error):            
+            $mail = new Mail\Message();
+            $mail->setBody($body);
+            $mail->setFrom("noreply_toon@kuleuven.be", $post["naam"]);
+            //mail nodig
+            $mail->addTo("celien.stevens@kuleuven.be");
+            if($formmail && filter_var($formmail, FILTER_VALIDATE_EMAIL)):             
+              $mail->addTo($formmail);
+            endif;
+            $mail->setSubject("KADOC Erfgoed: ".$post["onderwerp"]);
+
+            $transport = new Mail\Transport\Sendmail();
+            //$transport->send($mail);
+            
+            ?>
+            <article class="message is-success">
+              <div class="message-body">
+                <strong>Bedankt voor je bericht!</strong> We zullen je vraag zo spoedig mogelijk beantwoorden.
+              </div>
+            </article>   
+          <?php else:?>
+            <article class="message is-danger">
+              <div class="message-body">
+                <?php echo $error;?>
+              </div>
+            </article>
+          <?php endif;?> 
+        <?php endif;?>  
+        <form id="feedback-form" method="post">
+          <div class="field">
+            <label class="label" for="naam">Naam</label>
+            <div class="control">
+              <input class="input" type="text" id="naam" name="naam" required placeholder="">
+            </div>
+          </div>
+          <div class="label" class="field">  
+            <label for="mail">E-mail</label>
+            <div class="control">
+              <input class="input" type="mail" id="mail" name="mail"required placeholder="">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="onderwerp">Onderwerp</label>
+            <div class="control">
+              <input class="input" type="text" id="onderwerp" name="onderwerp" required placeholder="">
+            </div>
+          </div>
+        
+          <div class="label" class="field">  
+            <label for="vraag">Bericht</label>
+            <div class="control">
+              <textarea required class="textarea" id="vraag" name="vraag" placeholder=""></textarea>
+            </div>
+          </div>
+          
+          <div class="field">  
+            <button data-callback='onSubmit' data-action='submit' class="g-recaptcha button is-primary is-rounded">Bericht versturen</button>
+          </div>
+        </form> 
+      </div>  
+    </div>  
+  </div>
+<script>
+   function onSubmit(token) {
+     document.getElementById("feedback-form").submit();
+   }
+</script>
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<?php 
+function isCaptchaValid($secretKey){
+    $captcha = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : false;
+
+    if (!$captcha) {
+        return false;
+    }
+
+    $postdata = http_build_query(
+        array(
+            "secret" => $secretKey,
+            "response" => $captcha,
+            "remoteip" => $_SERVER["REMOTE_ADDR"]
+        )
+    );
+    $opts = array(
+        'http' =>
+        array(
+            "method"  => "POST",
+            "header"  => "Content-Type: application/x-www-form-urlencoded",
+            "content" => $postdata
+        )
+    );
+    $context  = stream_context_create($opts);
+    $googleApiResponse = file_get_contents("https://www.google.com/recaptcha/api/siteverify", false, $context);
+
+    if ($googleApiResponse === false) {
+        return false;
+    }
+
+    $googleApiResponseObject = json_decode($googleApiResponse);
+
+    return $googleApiResponseObject->success;
+}
+?>

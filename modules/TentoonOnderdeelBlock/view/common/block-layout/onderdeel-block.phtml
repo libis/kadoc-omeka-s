@@ -1,0 +1,195 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets
+ * @var string $thumbnailType
+ * @var string $showTitleOption
+ */
+
+$plugins = $this->getHelperPluginManager();
+$thumbnail = $plugins->get('thumbnail');
+
+$defaultThumbnail = $this->assetUrl('thumbnails/default.png', 'Omeka', true);
+$defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
+
+$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$lang = $filterLocale ? $this->lang() : null;
+
+  $escape = $this->plugin('escapeHtml');
+?>
+<style>
+.carousel {
+  overflow: hidden;
+}
+.slider-navigation-previous {
+margin-left: 1em;
+}
+.slider-navigation-next {
+margin-right: 1em;
+}
+</style>
+ <section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-6">
+                <div class="carousel" id="carousel-demo">
+                  <?php $i=0;?>
+                <?php foreach($attachments as $item):
+                    $media = $item->media();
+                    $thumbnail = $media->thumbnailUrl('large'); 
+                ?>
+                <figure class="image is-square" style="cursor:pointer;">
+                    <img src="<?php echo $thumbnail;?>" class="item-<?php echo $i;?>" onclick="moreInfo(<?php echo $i;?>);" style="object-fit:contain;background-color:#edced3;">
+                    <div style="float:left;"><?php echo $item->caption(); ?></div>
+                </figure>
+                
+                <?php $i++;?>
+                <?php endforeach;?>
+            </div>
+            </div>
+            <div class="column is-6">
+            <div class="arrow-left"></div>
+                <h1 class="title is-3"><?php echo $block->dataValue('title');?></h1>
+                    <p><?php echo $block->dataValue('text');?></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php $a=0;?>
+<?php foreach($attachments as $item):
+$media = $item->media();?>
+<?php 
+$imagesize = getimagesize($media->originalUrl());
+if($imagesize != false){
+    $width = $imagesize[0];
+    $height = $imagesize[1];
+}
+?>
+<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;" onclick="enlargeImage(<?php echo $a?>,<?php echo $width;?>,<?php echo $height;?>);">
+    <div class="modal-background"></div>
+    <div class="modal-content">    
+        <div class="container" style="background-color: aliceblue;width: fit-content;">
+        <img id="img-<?php echo $a;?>" src="<?php echo $media->originalUrl(); ?>" style="height:93vh;">
+        <div class="column">
+        <?php echo $item->item()->displayValues();?>
+        <a href="https://slimerfgoed.be/s/kadocerfgoed/item/<?php echo $item->item()->id(); ?>">Object URL</a>
+        <div class="has-text-right" style="padding-top:0.75rem;">
+        <?php if($a != 0): ?>
+        <button class="button" style="background-color: #e29ca7;color:aliceblue;" onclick="previousModal(<?php echo$a;?>);"><</button>
+        <?php endif;?>
+        <button class="button" style="background-color: #e29ca7;color:aliceblue;" onclick="nextModal(<?php echo$a;?>);">></button>
+        <?php if($media):?>
+        <a href="<?php echo $media->originalUrl(); ?>" class="button" style="background-color:#e29ca7;color:aliceblue;" download="<?php echo $item->item()->displayTitle();?>">Downloaden</a>
+        <?php endif;?>
+        </div>
+        </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal();"></button>
+</div>
+<?php $a++;?>
+<?php endforeach;?>
+
+<script>
+    function moreInfo(x) {
+        let id = '#modal-' + x;
+        $( id ).css("cursor","zoom-in");
+        $( id ).addClass("is-active");
+
+        let html = '#html'
+        $( html ).css("overflow-y","hidden");
+
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let ratio = img.clientWidth / img.clientHeight;
+        let width = 'calc(93vh * ' + ratio + ')';
+
+        img.style.height = '93vh';
+        contain.style.width = width;
+    }
+    function enlargeImage(x,y,z){
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let width = y + 'px';
+        let height = z + 'px';
+
+        contain.style.width = width;
+        img.style.height = height;      
+
+        let cursor = '#modal-' + x;
+
+        $(cursor).css("cursor","unset");
+    }
+
+    function nextModal(x){
+        let y = x + 1;
+        let current = '#modal-' + x;
+        let modal = '#modal-' + y;
+
+        if($(modal).length > 0){
+            $(modal).addClass("is-active");
+            $(current).removeClass("is-active");
+            $( modal ).css("cursor","zoom-in");
+
+            let imgi = 'img-' + y;
+            let img = document.getElementById(imgi);
+            let contain = document.getElementById(imgi).parentElement;
+            let ratio = img.clientWidth / img.clientHeight;
+            let width = 'calc(93vh * ' + ratio + ')';
+
+            img.style.height = '93vh';
+            contain.style.width = width;
+        } else {
+            $('#modal-0').addClass("is-active");
+            $(current).removeClass("is-active");
+            $( '#modal-0' ).css("cursor","zoom-in");
+
+            let imgi = 'img-0';
+            let img = document.getElementById(imgi);
+            let contain = document.getElementById(imgi).parentElement;
+            let ratio = img.clientWidth / img.clientHeight;
+            let width = 'calc(93vh * ' + ratio + ')';
+
+            img.style.height = '93vh';
+            contain.style.width = width;
+        }
+    }
+
+    function previousModal(x){
+        let y = x - 1;
+        let current = '#modal-' + x;
+        let modal = '#modal-' + y;
+
+        $(modal).addClass("is-active");
+        $(current).removeClass("is-active");
+        $( modal ).css("cursor","zoom-in");
+
+        let imgi = 'img-' + y;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let ratio = img.clientWidth / img.clientHeight;
+        let width = 'calc(93vh * ' + ratio + ')';
+
+        img.style.height = '93vh';
+        contain.style.width = width;
+    }
+
+    function closeModal(){
+        let modal = '.modal';
+        let html = '#html'
+        $( modal ).removeClass("is-active");
+        $( html ).css("overflow-y","unset");
+    }
+    //somehow try and get rid of carrousel arrows
+    $(document).ready(function() {
+        let prev = ".slider-navigation-previous";
+        let next = ".slider-navigation-next";
+        $( prev ).addClass("is-hidden");
+        $( next ).addClass("is-hidden");
+    });
+</script>
+

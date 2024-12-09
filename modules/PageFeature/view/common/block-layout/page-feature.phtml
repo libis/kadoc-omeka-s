@@ -79,7 +79,7 @@ $translate = $this->plugin('translate');
             <div class="bg-block" style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#aaa;background-size: cover; aspect-ratio:1/1;">
             <div class="overlay"></div>
 
-            <div class="card-content" id="card-<?php echo $i;?>">
+            <div class="card-content" id="card-<?php echo $i;?>" style="overflow:hidden;">
               <div class="content" style="padding-bottom:1em;">
               <div class="card-top">
               <h3 class="title is-3 is-family-secondary has-text-white" id="title-<?php echo $i;?>">
@@ -88,7 +88,7 @@ $translate = $this->plugin('translate');
             </div>
             <div class="is-hidden has-text-white" id="body-<?php echo $i;?>">
                 <?php if($page->dataValue('type')):?>
-                  <div class="has-text-centered" style="border-bottom:solid 1px white;"><?php echo ucfirst($page->dataValue('type'));?></div>
+                  <div class="has-text-weight-bold" style="border-bottom:solid 1px white;text-transform:uppercase;"><?php echo ucfirst($page->dataValue('type'));?></div>
                 <?php endif;?>
                 <?php if ($body): ?>
                   <?php

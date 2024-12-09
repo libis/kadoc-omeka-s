@@ -44,14 +44,23 @@ $not = array();
                 continue;
             }
             ?>
-            <!-- <?php if($i > 0):?>
-              <?php echo ',&nbsp;';?>
-            <?php endif;?> -->
+             <?php if($i > 0):?>
+              <?php echo ' | ';?>
+            <?php endif;?>
             <span class="<?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
-                <?php if ($language = $value->lang()): ?>
-                <span class="language"><?php echo $language; ?></span>
-                <?php endif; ?>
-                <?php echo $value->asHtml();?>
+                <?php if($valueType == 'uri'):
+                  if($value == 'Catalogus Limo'):
+                    echo '<a href="https://kuleuven.limo.libis.be/discovery/fulldisplay?docid=alma' . $value->uri() . '&context=L&vid=32KUL_KUL:KULeuven&search_scope=All_Content&tab=all_content_tab&lang=en" target="_blank">' . $value . '</a>';
+                  elseif($value == 'E-depot Teneo'):
+                    echo '<a href="https://lib.is/' . $value->uri() . '/representation" target="_blank">' . $value . '</a>';
+                  elseif($value == 'Inventaris Lias'):
+                    echo '<a href="https://abs.lias.be/Query/detail.aspx?ID=' . $value->uri() . '">' . $value . '</a>';
+                  else:
+                    echo $value->asHtml();
+                endif;
+                  ?>
+                <?php else: echo $value->asHtml();?>
+                <?php endif;?>
             </span>
 
             <?php $i++;?>

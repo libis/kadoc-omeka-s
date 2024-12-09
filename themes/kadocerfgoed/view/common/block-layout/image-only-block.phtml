@@ -1,59 +1,140 @@
+<style>
+  figcaption{
+    color:#e29ca7;
+  }
+  figcaption p {
+    display:inline-block;
+    padding-left:4px;
+  }
+</style>
+
 <div class="section image-only-section">
     <div class="container">
       <div class="columns">
-        <?php $i=0;?>
         <?php foreach($attachments as $attachment):
             $media = $attachment->media();
             if($media):
               $url = $media->thumbnailUrl('large');
               $url = str_replace('http:', '', $url);
+              $imagesize = getimagesize($media->originalUrl());
+              if($imagesize != false){
+                $width = $imagesize[0];
+                $height = $imagesize[1];
+              }
             ?>
             <div class="column" style="text-align:center;">
-              <img src="<?= $url;?>" class="item-<?php echo $i;?> is-clickable" onclick="moreInfo(<?php echo $i;?>);" />
-              <figcaption><?php echo $attachments[0]->caption();?></figcaption>
+              <img src="<?= $url;?>" class="item-<?php echo $attachment->item()->id();?> is-clickable" onclick="moreInfo(<?php echo $attachment->item()->id();?>,<?php echo $width;?>,<?php echo $height;?>);" />
+              <?php if($attachments[0]->caption()):?><figcaption><i class="fa fa-caret-right"></i><?php echo $attachments[0]->caption();?></figcaption><?php endif;?>
             </div>
             <?php endif;?>
-            <?php $i++;?>
         <?php endforeach;?>
       </div>
     </div>
 </div>
 
-<?php $a=0;?>
 <?php foreach($attachments as $item):
-$media = $item->media();?>
-<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;" onclick="closeModal();">
+$media = $item->media();
+if($media):
+  $imagesize = getimagesize($media->originalUrl());
+  if($imagesize != false){
+    $width = $imagesize[0];
+    $height = $imagesize[1];
+  }
+endif;
+?>
+<div class="modal" id="modal-<?php echo $item->item()->id();?>" style="justify-content:center;z-index:31;cursor:zoom-in;" <?php if($media):?>onclick="enlargeImage(<?php echo $item->item()->id();?>,<?php echo $width;?>,<?php echo $height;?>);"<?php endif;?>>
     <div class="modal-background"></div>
     <div class="modal-content">    
-        <div class="container" style="background-color: aliceblue;width: fit-content;">
-        <img src="<?php echo $media->originalUrl(); ?>">
+    <div class="container" style="background-color: aliceblue;width: fit-content;">
+          <?php if($media):?>
+        <img id="img-<?php echo $item->item()->id();?>" src="<?php echo $media->originalUrl(); ?>" style="height:93vh;">
+          <?php endif;?>
         <div class="column">
         <?php echo $item->item()->displayValues();?>
-        <div class="has-text-right">
-        <a href="<?php echo $media->originalUrl(); ?>" class="button is-warning" download="<?php echo $item->item()->displayTitle();?>">Download</a>
-        </div>
+        <a href="https://slimerfgoed.be/s/kadocerfgoed/item/<?php echo $item->item()->id(); ?>">Object URL</a>
+          <div class="has-text-right" style="padding-top:0.75rem;">
+        <?php if($media):?>
+            <a href="<?php echo $media->originalUrl(); ?>" class="button is-warning" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" download="<?php echo $item->item()->displayTitle();?>">Download</a>
+        <?php endif;?>
+          </div>
         </div>
         </div>
     </div>
-    <button class="modal-close is-large" aria-label="close"></button>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal();"></button>
 </div>
-<?php $a++;?>
 <?php endforeach;?>
 
 <script>
-    function moreInfo(x) {
+    function moreInfo(x,y,z) {
         let id = '#modal-' + x;
+        $( id ).css("cursor","zoom-in");
         $( id ).addClass("is-active");
+
+        let html = '#html'
+        $( html ).css("overflow-y","hidden");
+
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let ratio = img.clientWidth / img.clientHeight;
+        let width = 'calc(93vh * ' + ratio + ')';
+        let windowH = window.innerHeight * 0.93;
+
+        console.log('Height:' + z + 'Window:' + windowH);
+
+        if(z > windowH){
+          img.style.height = '93vh';
+          contain.style.width = width;
+        } else {
+          img.style.height = 'auto';
+          contain.style.width = y + 'px';
+        }
     }
+    function enlargeImage(x,y,z){
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let width = y + 'px';
+        let height = z + 'px';
+        let maxWidth = contain.style.maxWidth;
+
+        contain.style.width = width;
+        img.style.width = 'auto';
+        img.style.height = 'auto'; 
+
+        let cursor = '#modal-' + x;
+
+        $(cursor).css("cursor","unset");
+    }
+
     function closeModal(){
         let modal = '.modal';
+        let html = '#html'
         $( modal ).removeClass("is-active");
+        $( html ).css("overflow-y","unset");
     }
-    //somehow try and get rid of carrousel arrows
-    $(document).ready(function() {
-        let prev = "slider-container > .slider-navigation-previous";
-        let next = ".slider-navigation-next";
-        $( prev ).addClass("is-hidden");
-        $( next ).addClass("is-hidden");
-    });
+    
+    function showCardContent(x){
+    let id = '#card-' + x;
+    let hover = '.card-hover-' + x;
+    let idtitle = '#title-' + x;
+    $(hover).hover(function(){
+        $( id ).css("height","100%");
+        $( idtitle ).removeClass("is-hidden");
+    }, function() {
+        $( idtitle ).addClass( "is-hidden" );
+        $( id ).css("height","0%");
+    })
+    }
+
+    function copyLink() {
+    // Get the text field
+    var copyText = document.getElementById("delen");
+
+    // Copy the text inside the text field
+    navigator.clipboard.writeText(copyText.value);
+
+    // Tooltip the copied text
+    copyText.title = "Link gekopieerd: " + copyText.value;
+    } 
 </script>

@@ -2,23 +2,6 @@
 $translate = $this->plugin('translate');
 ?>
 <style>
-.zigzag {
-  display: inline-block;
-  position: relative;
-}
-
-.zigzag:after {
-  content: '';
-  height: 18px;
-  width: 100%;
-  position: absolute;
-  background: url("https://cldup.com/MiGVGBh-0U.png");
-  background-size: 30px;
-  top: 35px;
-  bottom: 0px;
-  left: 0;
-}
-
 .card-content {
   background-color: rgba(0,0,0,0.36);
   background:linear-gradient(transparent, black);
@@ -34,7 +17,7 @@ $translate = $this->plugin('translate');
 .checkbox-bigger {
   width: 1em;
   height: 1em;
-  font-size: 1.5em;
+  font-size: 1rem;
 }
 
 .checkbox {
@@ -42,7 +25,7 @@ $translate = $this->plugin('translate');
 }
 
 input[type="radio"] {
-accent-color:#00b7e7;
+accent-color:#edced3;
 }
 input[type="checkbox"] {
   accent-color: #f0a43d;
@@ -57,8 +40,8 @@ input[type="checkbox"] {
 
     <?php if($block->dataValue('text')):?>
       <div class="columns">
-        <div class="column is-8">
-          <div class="content" style="font-size:1.25em;">
+        <div class="column is-10">
+          <div class="content" style="font-size:1em;">
               <?php echo $block->dataValue('text');?>
           </div>
         </div>
@@ -70,13 +53,13 @@ input[type="checkbox"] {
     natcasesort($filters);
     $years = array();
     ?>
-    <div class="control" style="padding:1em 0;font-size:1.5rem;">
-    <button type="button" class="btn-check button is-medium is-pulled-right" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" id="btn-check-outlined" name="tag" onclick="ResetFilter()" autocomplete="off">Toon alles</button>
+    <div class="control" style="padding:1em 0;font-size:1em;">
+    <button type="button" class="bouncy-button viewall is-pulled-right" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" id="btn-check-outlined" name="tag" onclick="ResetFilter()" autocomplete="off">Alles tonen</button>
     <?php foreach ($filters as $filter):?>
       <?php if(is_numeric($filter)){
         $years[] = $filter;
       } else { ?>   
-      <button class="button is-medium" style="border-color: #edced3;background-color:white;margin-bottom:0.5em;">
+      <button class="button" style="border-color: #edced3;background-color:white;margin-bottom:0.5em;border-radius:0px;">
       <input type="radio" class="btn-check tag-button" id="<?php echo $filter;?>" name="tag" value="<?php echo $filter;?>" onclick="FilterTags()" autocomplete="off">
       <label class="radio" for="<?php echo $filter;?>">&nbsp;<?php echo ucfirst($filter);?></label>
       </button>
@@ -126,7 +109,7 @@ input[type="checkbox"] {
             <div class="card-content" id="card-<?php echo $i;?>">
               <div class="content">
               <div class="card-top">
-              <h3 class="title is-3 is-family-secondary has-text-white" id="title-<?php echo $i;?>">
+              <h3 class="title is-4 is-family-secondary has-text-white" style="text-overflow:ellipsis;" id="title-<?php echo $i;?>">
                   <?php echo $heading;?>
               </h3>
             </div>

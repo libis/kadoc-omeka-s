@@ -1,0 +1,369 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets
+ * @var string $thumbnailType
+ * @var string $showTitleOption
+ * @var string $heading
+ */
+
+$plugins = $this->getHelperPluginManager();
+$thumbnail = $plugins->get('thumbnail');
+
+$defaultThumbnail = $this->assetUrl('thumbnails/default.png', 'Omeka', true);
+$defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
+
+$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$lang = $filterLocale ? $this->lang() : null;
+
+$api = $this->api()->search('items',['item_set_id' => $block->dataValue('itemset')]);
+
+if($block->dataValue('customsort')){
+  foreach($attachments as $attachment):
+    $itemss[] = $attachment->item();
+  endforeach;
+} else {
+  $itemss = $api->getContent();
+}
+
+$itemCount = count($itemss);
+$items = array_chunk($itemss,30);
+
+$currentPage = isset($_GET['page']) && is_numeric($_GET['page']) ? $_GET['page'] : 1;
+
+$i=0;
+$authors = [];
+while($i <= $block->dataValue('numberofauthors')):
+  if($block->dataValue('author'.$i)):
+    $authors[] = $block->dataValue('author'.$i);
+  endif;
+  $i++;
+endwhile;
+?>
+<style>
+    .card-content {
+      background-color: rgba(0,0,0,0.36);
+  background:linear-gradient(transparent, black);
+  padding: 1.5rem;
+  bottom: 0;
+  position:absolute;
+  width: 100%;
+  height: 0%;
+  transition: transform 250ms;
+  transition-property: height;
+}
+.author-btn:hover {
+  color:white;
+  background-color:#e29ca7;
+}
+</style>
+<section class="section">
+    <div class="container">
+        <?php
+            $i=0;
+        ?>
+          <div class="arrow-left"></div>
+          <h1 class="title is-3 is-family-secondary"><?php echo $block->dataValue('title');?></h1>
+          <h3 class="title is-4" style="padding-left:15px;"><?php echo $block->dataValue('sec_title');?></h3>
+            <div style="padding-left:15px;">
+              <?php foreach($authors as $author): ?>
+              <?php
+                $api = $this->api()->read('items',$author);
+                $authorApi = $api->getContent();
+              ?>
+              <a class="button author-btn" style="border-color:#e29ca7;" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
+                <span><?php echo $authorApi->value('schema:givenName') . " " . $authorApi->value('schema:familyName');?></span>
+              </a>
+            <?php endforeach; ?>
+            </div>
+
+        <div class="column is-12">
+          <?php echo $block->dataValue('text');?>
+        </div>
+        <form method="post" id="download-start"><input hidden name="downloaded" value="downloaded"></form>
+        <div class="column is-12">
+          <a><button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="bouncy-button share" onclick="copyLink()">Delen</button></a>
+          <a><button data-callback='onSubmit' data-action='submit' class="bouncy-button download" onclick="startDownload();">Collectie downloaden</button></a>
+          <?php if($block->dataValue('map')): ?>
+          <a href="/s/kadocerfgoed/map-browse?item_set_id=<?php echo $block->dataValue('itemset');?>"><button class="bouncy-button map">Bekijk de collectie op de kaart</button></a>
+          <?php endif;?>
+        </div>
+        
+        <div class="columns" style="flex-wrap:wrap;padding-top:1em;">
+                <?php foreach($items[$currentPage - 1] as $item):
+                    $media = $item->media();
+                    if($media):
+                      $thumbnail = $media[0]->thumbnailUrl('large');                        
+                      $imagesize = getimagesize($media[0]->originalUrl());
+                      if($imagesize != false){
+                        $width = $imagesize[0];
+                        $height = $imagesize[1];
+                      }
+                    endif;
+                    $body = false;
+                    
+                ?>
+                <div class="column is-4" onclick="moreInfo(<?php echo $i;?>,<?php echo $width;?>,<?php echo $height;?>)" style="cursor:pointer;">
+                        
+          <div class="card equal-height card-hover-<?php echo $i;?>" onpointerenter="showCardContent(<?php echo $i;?>)";>              
+            <div class="bg-block" style="<?php if($media):?>background:url(<?php echo $thumbnail;?>)<?php endif;?> no-repeat center 20%;background-color:#aaa;background-size: cover; aspect-ratio:1/1;">
+            <div class="overlay"></div>
+
+            <div class="card-content" id="card-<?php echo $i;?>">
+              <div class="content">
+              <div class="card-top">
+              <h3 class="title is-5 is-family-secondary has-text-white is-hidden" id="title-<?php echo $i;?>" title="<?php echo $item->displayTitle();?>">
+                  <?php echo $item->displayTitle();?>
+              </h3>
+            </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        
+        </div>
+                <?php $i++;?>
+                <?php endforeach;?>
+        </div>
+        <?php if(ceil($itemCount/30) > 1): ?>
+        <div class="column is-12" style="text-align:center;">
+              <?php if($currentPage != 1):?>
+                <a href="<?php echo $block->page()->url(); ?>?page=<?php echo $currentPage-1;?>"><button class="bouncy-button">Vorige</button></a>
+              <?php endif;?>
+              <?php if($currentPage != ceil($itemCount/30)):?>
+              <a href="<?php echo $block->page()->url(); ?>?page=<?php echo $currentPage+1;?>"><button class="bouncy-button">Volgende</button></a>
+              <?php endif;?>
+        </div>
+        <?php endif;?>
+    </div>
+</section>
+
+<?php $a=0;?>
+<?php foreach($items[$currentPage - 1] as $item):
+$media = $item->media();?>
+<?php 
+if($media):
+$imagesize = getimagesize($media[0]->originalUrl());
+if($imagesize != false){
+  $width = $imagesize[0];
+  $height = $imagesize[1];
+}
+endif;
+?>
+<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;cursor:zoom-in;" <?php if($media):?>onclick="enlargeImage(<?php echo $a?>,<?php echo $width;?>,<?php echo $height;?>);"<?php endif;?>>
+    <div class="modal-background"></div>
+    <div class="modal-content">    
+        <div class="container" style="background-color: aliceblue;width: fit-content;">
+          <?php if($media):?>
+        <img id="img-<?php echo $a;?>" src="<?php echo $media[0]->originalUrl(); ?>" style="height:93vh;">
+          <?php endif;?>
+        <div class="column">
+        <?php echo $item->displayValues();?>
+        <a href="https://slimerfgoed.be/s/kadocerfgoed/item/<?php echo $item->id(); ?>">Object URL</a>
+          <div class="has-text-right" style="padding-top:0.75rem;">
+          <?php if($a != 0): ?>
+        <button class="button" style="background-color: #e29ca7;color:aliceblue;" onclick="previousModal(<?php echo$a;?>);"><</button>
+        <?php endif;?>
+        <button class="button" style="background-color: #e29ca7;color:aliceblue;" onclick="nextModal(<?php echo$a;?>);">></button>
+        <?php if($media):?>
+            <a href="<?php echo $media[0]->originalUrl(); ?>" class="button is-warning" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" download="<?php echo $item->displayTitle();?>">Download</a>
+        <?php endif;?>
+          </div>
+        </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal();"></button>
+</div>
+<?php $a++;?>
+<?php endforeach;?>
+
+<script>
+    function moreInfo(x,y,z) {
+        let id = '#modal-' + x;
+        $( id ).css("cursor","zoom-in");
+        $( id ).addClass("is-active");
+
+        let html = '#html'
+        $( html ).css("overflow-y","hidden");
+
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let ratio = img.clientWidth / img.clientHeight;
+        let width = 'calc(93vh * ' + ratio + ')';
+        let windowH = window.innerHeight * 0.93;
+
+        console.log('Height:' + z + 'Window:' + windowH);
+
+        if(z > windowH){
+          img.style.height = '93vh';
+          contain.style.width = width;
+        } else {
+          img.style.height = 'auto';
+          contain.style.width = y + 'px';
+        }
+    }
+    function enlargeImage(x,y,z){
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let width = y + 'px';
+        let height = z + 'px';
+        let maxWidth = contain.style.maxWidth;
+
+        contain.style.width = width;
+        img.style.width = 'auto';
+        img.style.height = 'auto'; 
+
+        let cursor = '#modal-' + x;
+
+        $(cursor).css("cursor","unset");
+    }
+
+    function nextModal(x){
+        let y = x + 1;
+        let current = '#modal-' + x;
+        let modal = '#modal-' + y;
+
+        if($(modal).length > 0){
+            $(modal).addClass("is-active");
+            $(current).removeClass("is-active");
+            $( modal ).css("cursor","zoom-in");
+
+            let imgi = 'img-' + y;
+            let img = document.getElementById(imgi);
+            let contain = document.getElementById(imgi).parentElement;
+            let ratio = img.clientWidth / img.clientHeight;
+            let width = 'calc(93vh * ' + ratio + ')';
+
+            img.style.height = '93vh';
+            contain.style.width = width;
+        } else {
+            $('#modal-0').addClass("is-active");
+            $(current).removeClass("is-active");
+            $( '#modal-0' ).css("cursor","zoom-in");
+
+            let imgi = 'img-0';
+            let img = document.getElementById(imgi);
+            let contain = document.getElementById(imgi).parentElement;
+            let ratio = img.clientWidth / img.clientHeight;
+            let width = 'calc(93vh * ' + ratio + ')';
+
+            img.style.height = '93vh';
+            contain.style.width = width;
+        }
+    }
+
+    function previousModal(x){
+        let y = x - 1;
+        let current = '#modal-' + x;
+        let modal = '#modal-' + y;
+
+        $(modal).addClass("is-active");
+        $(current).removeClass("is-active");
+        $( modal ).css("cursor","zoom-in");
+
+        let imgi = 'img-' + y;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let ratio = img.clientWidth / img.clientHeight;
+        let width = 'calc(93vh * ' + ratio + ')';
+
+        img.style.height = '93vh';
+        contain.style.width = width;
+    }
+
+    function closeModal(){
+        let modal = '.modal';
+        let html = '#html'
+        $( modal ).removeClass("is-active");
+        $( html ).css("overflow-y","unset");
+    }
+    
+    function showCardContent(x){
+    let id = '#card-' + x;
+    let hover = '.card-hover-' + x;
+    let idtitle = '#title-' + x;
+    $(hover).hover(function(){
+        $( id ).css("height","100%");
+        $( idtitle ).removeClass("is-hidden");
+    }, function() {
+        $( idtitle ).addClass( "is-hidden" );
+        $( id ).css("height","0%");
+    })
+    }
+
+    function copyLink() {
+    // Get the text field
+    var copyText = document.getElementById("delen");
+
+    // Copy the text inside the text field
+    navigator.clipboard.writeText(copyText.value);
+
+    // Tooltip the copied text
+    copyText.title = "Link gekopieerd: " + copyText.value;
+    } 
+
+    function startDownload(){
+      document.getElementById('download-start').submit();
+    }
+</script>
+
+<?php
+  if($itemss[0]->resourceTemplate() && $itemss[0]->resourceTemplate()->id() == 43){
+    $csvValues = ['schema:name','schema:about','schema:dateCreated','dcterms:spatial','schema:genre','schema:additionalType'];
+    $csvArray = [
+      0 => ['Titel','Persoon','Oprichtingsjaar','Gemeente','Draagvorm','Draagvorm (detail)','Object URL']
+    ];
+  } else {
+    $csvValues = ['schema:name','schema:description','schema:holdingArchive','schema:dateCreated','dcterms:identifier'];
+    $csvArray = [
+      0 => ['Titel','Beschrijving','Herkomst','Datum','Identifier','Object URL']
+    ];
+  }
+
+  $i=1;
+
+  foreach($itemss as $item){
+    $itemArray = [];
+    foreach($csvValues as $value){
+      array_push($itemArray,$item->value($value));
+    }
+    $objectUrl = 'https://slimerfgoed.be/s/kadocerfgoed/item/' . $item->id();
+    array_push($itemArray,$objectUrl);
+    $csvArray[$i] = $itemArray;
+    $i++;
+  }
+
+  function array_csv_download( $array, $filename = "export.csv", $delimiter=";" )
+  {
+      header( 'Content-Type: application/csv;charset=UTF-8' );
+      header( 'Content-Disposition: attachment; filename="' . $filename . '";' );
+  
+      // clean output buffer
+      ob_end_clean();
+      
+      $handle = fopen( 'php://output', 'w' );
+  
+      foreach ( $array as $value ) {
+          fputcsv( $handle, $value, $delimiter );
+      }
+  
+      fclose( $handle );
+  
+      // flush buffer
+      ob_flush();
+      
+      // use exit to get rid of unexpected output afterward
+      exit();
+  }
+
+
+  if(array_key_exists('downloaded',$_POST)){
+    array_csv_download($csvArray,
+      $block->dataValue('title')
+    );
+    unset($_POST["downloaded"]);
+  }
+?>

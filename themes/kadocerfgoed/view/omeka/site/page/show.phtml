@@ -13,10 +13,14 @@ $previous = $this->pagesMetadata('previous',$page) ?: null;
 ?>
 <style>
   .breadcrumb li + li::before {
-    color:#f0a43d;
+    color:#cb8c96;
+  }
+  .breadcrumb-section .breadcrumb li,.breadcrumb-section .breadcrumb a {
+    font-size: 1.1em;
+    font-weight:300;
   }
 </style>
-<?php if($page->title() != 'Home'):?>
+<?php if(!in_array($page->title(), array('Home','Disclaimer','Contact'),true)):?>
 <section class="breadcrumb-section white-section">
   <div class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">

@@ -78,9 +78,28 @@ class FormBlock extends AbstractBlockLayout
      */
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
+        $type = ['tentoonstelling','collectie','verhaal'];
+
+        $site = $block->page()->site();
+        $blocko = $block;
+        $pageBlocks = array();
+
+        $pages = $site->pages();
+        foreach ($pages as $page) {
+            foreach ($page->blocks() as $block) {
+                // A page can belong to multiple types…
+
+                if ($block->layout() === 'pageMetadata' && in_array($block->dataValue('type'), $type)) {
+                       $pageBlocks[$page->slug()] = $block;
+                }
+            }
+        }
+
+        $pages = $pageBlocks;
 
       return $view->partial('common/block-layout/form-block', [
-        'block' => $block
+        'block' => $blocko,
+        'pages' => $pages
       ]);
 
       /*return $view->partial('common/block-layout/tiles', [

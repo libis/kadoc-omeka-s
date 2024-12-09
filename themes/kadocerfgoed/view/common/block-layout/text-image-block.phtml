@@ -1,89 +1,134 @@
-<section class="section text-image-block <?php echo ($block->dataValue('highlight') ? 'highlight-section' : '');?>">
+<section class="section">
   <div class="container">
-    <div class="columns <?php echo ($block->dataValue('reverse') ? ' reverse' : '');?> <?php echo ($block->dataValue('highlight') ? ' hightlight-columns' : '');?>">
-      <div class="column column-text <?php echo ($block->dataValue('highlight') ? 'hightlight' : '');?>">
-        <div class="text-box">
-          <?php if($block->dataValue('title')):?>
-          <div class="arrow-left"></div>
-          <h2 class="title is-3 is-family-secondary is-centered"><span><?php echo $block->dataValue('title');?></span></h2>
-          <?php endif;?>
-          <div class="content" style="font-size:1.25rem;">
-            <p><?php echo $block->dataValue('text');?></p>
-          </div>
-          <!--<div class="has-text-right">
-            <?php if($block->dataValue('link')):?>
-                <a class="button is-primary" href="<?php echo $block->dataValue('link');?>"><?php echo $block->dataValue('label');?></a>
-            <?php endif;?>
-          </div>-->
+    <div class="columns" <?php if(!$block->dataValue('reverse')):?>style="flex-direction:row-reverse;"<?php endif;?></div>
+      <div class="column is-6">
+        <h3 class="title is-4"><?php echo $block->dataValue('title');?></h3>
+        <?php echo $block->dataValue('text'); ?>
+      </div>
+      <?php foreach($attachments as $attachment):
+            $media = $attachment->media();
+            if($media):
+              $url = $media->thumbnailUrl('large');
+              $url = str_replace('http:', '', $url);
+              $imagesize = getimagesize($media->originalUrl());
+              if($imagesize != false){
+                $width = $imagesize[0];
+                $height = $imagesize[1];
+              }
+        ?>
+        <div class="column is-6" style="text-align:center;">
+          <img src="<?= $url;?>" class="item-<?php echo $attachment->item()->id();?> is-clickable" onclick="moreInfo(<?php echo $attachment->item()->id();?>,<?php echo $width;?>,<?php echo $height;?>);" />
+          <?php if($attachments[0]->caption()):?><figcaption><i class="fa fa-caret-right"></i><?php echo $attachments[0]->caption();?></figcaption><?php endif;?>
         </div>
-      </div>
-      <div class="column column-img">
-        <?php if($attachments):
-        $i=0;
-          $media = $attachments[0]->media();
-          if($media):
-            $url = $media->thumbnailUrl('large');
-            $url = str_replace('http:', '', $url);
-            if($block->dataValue('itemurl')):
-              $url = $media->item()->url();
-              $url = str_replace('http:', '', $itemUrl);
-              ?>
             <?php endif;?>
-
-              <div class="img-box is-clickable" style="background-image: url('<?php echo $url;?>')" class="item-textimg-<?php echo $i;?>" onclick="moreInfoTextImg(<?php echo $i;?>);">
-                <?php if($block->dataValue('highlight')):?>
-                  <div class="content">
-                    <div class="to-end">
-                      <h3 class="title is-3 is-family-secondary">
-                          <span><?php echo $block->dataValue('label');?></span>
-                      </h3>
-                    </div>
-                  </div>
-                <?php endif;?>
-              </div>
-
-          <?php endif;?>
-        <?php endif;?>
-      </div>
+        <?php endforeach;?>
     </div>
   </div>
 </section>
 
-<?php $a=0;?>
 <?php foreach($attachments as $item):
-$media = $item->media();?>
-<div class="modal" id="modal-imgtext-<?php echo $a;?>" style="justify-content:center;z-index:31;" onclick="closeModal();">
+$media = $item->media();
+if($media):
+  $imagesize = getimagesize($media->originalUrl());
+  if($imagesize != false){
+    $width = $imagesize[0];
+    $height = $imagesize[1];
+  }
+endif;
+?>
+<div class="modal" id="modal-<?php echo $item->item()->id();?>" style="justify-content:center;z-index:31;cursor:zoom-in;" <?php if($media):?>onclick="enlargeImage(<?php echo $item->item()->id();?>,<?php echo $width;?>,<?php echo $height;?>);"<?php endif;?>>
     <div class="modal-background"></div>
     <div class="modal-content">    
-        <div class="container" style="background-color: aliceblue;width: fit-content;">
-        <img src="<?php echo $media->originalUrl(); ?>">
+    <div class="container" style="background-color: aliceblue;width: fit-content;">
+          <?php if($media):?>
+        <img id="img-<?php echo $item->item()->id();?>" src="<?php echo $media->originalUrl(); ?>" style="height:93vh;">
+          <?php endif;?>
         <div class="column">
         <?php echo $item->item()->displayValues();?>
-        <div class="has-text-right">
-        <a href="<?php echo $media->originalUrl(); ?>" class="button is-warning" download="<?php echo $item->item()->displayTitle();?>">Download</a>
-        </div>
+        <a href="https://slimerfgoed.be/s/kadocerfgoed/item/<?php echo $item->item()->id(); ?>">Object URL</a>
+          <div class="has-text-right" style="padding-top:0.75rem;">
+        <?php if($media):?>
+            <a href="<?php echo $media->originalUrl(); ?>" class="button is-warning" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" download="<?php echo $item->item()->displayTitle();?>">Download</a>
+        <?php endif;?>
+          </div>
         </div>
         </div>
     </div>
-    <button class="modal-close is-large" aria-label="close"></button>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal();"></button>
 </div>
-<?php $a++;?>
 <?php endforeach;?>
 
 <script>
-    function moreInfoTextImg(x) {
-        let id = '#modal-imgtext-' + x;
+    function moreInfo(x,y,z) {
+        let id = '#modal-' + x;
+        $( id ).css("cursor","zoom-in");
         $( id ).addClass("is-active");
+
+        let html = '#html'
+        $( html ).css("overflow-y","hidden");
+
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let ratio = img.clientWidth / img.clientHeight;
+        let width = 'calc(93vh * ' + ratio + ')';
+        let windowH = window.innerHeight * 0.93;
+
+        console.log('Height:' + z + 'Window:' + windowH);
+
+        if(z > windowH){
+          img.style.height = '93vh';
+          contain.style.width = width;
+        } else {
+          img.style.height = 'auto';
+          contain.style.width = y + 'px';
+        }
     }
+    function enlargeImage(x,y,z){
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let width = y + 'px';
+        let height = z + 'px';
+        let maxWidth = contain.style.maxWidth;
+
+        contain.style.width = width;
+        img.style.width = 'auto';
+        img.style.height = 'auto'; 
+
+        let cursor = '#modal-' + x;
+
+        $(cursor).css("cursor","unset");
+    }
+
     function closeModal(){
         let modal = '.modal';
+        let html = '#html'
         $( modal ).removeClass("is-active");
+        $( html ).css("overflow-y","unset");
     }
-    //somehow try and get rid of carrousel arrows
-    $(document).ready(function() {
-        let prev = "slider-container > .slider-navigation-previous";
-        let next = ".slider-navigation-next";
-        $( prev ).addClass("is-hidden");
-        $( next ).addClass("is-hidden");
-    });
+    
+    function showCardContent(x){
+    let id = '#card-' + x;
+    let hover = '.card-hover-' + x;
+    let idtitle = '#title-' + x;
+    $(hover).hover(function(){
+        $( id ).css("height","100%");
+        $( idtitle ).removeClass("is-hidden");
+    }, function() {
+        $( idtitle ).addClass( "is-hidden" );
+        $( id ).css("height","0%");
+    })
+    }
+
+    function copyLink() {
+    // Get the text field
+    var copyText = document.getElementById("delen");
+
+    // Copy the text inside the text field
+    navigator.clipboard.writeText(copyText.value);
+
+    // Tooltip the copied text
+    copyText.title = "Link gekopieerd: " + copyText.value;
+    } 
 </script>

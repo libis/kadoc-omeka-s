@@ -28,17 +28,27 @@ echo $this->blockAttachmentsForm($block);
   }
 ?>
 <?php echo $this->formRow($textarea);?>
+
 <h4>Author</h4>
+<?php $i=0;?>
 <div class="field">
-  <div class="inputs">
+  <div class="checkboxes">
+    <?php foreach($authors as $author):?>
+      <label class="checkbox" style="padding-right:1em;">
+        <input value="<?php echo $author->id(); ?>" type="checkbox" name="o:block[__blockIndex__][o:data][author<?php echo $i;?>]" <?php if($block): if($block->dataValue('author'.$i)):?>checked<?php endif;endif;?>>
+          <?php echo $author->value('schema:givenName') . " " . $author->value('schema:familyName'); ?>
+      </label>
+      <?php $i++;?>
+    <?php endforeach;?>
+  </div>
+  <input hidden value="<?php echo $i;?>" name="o:block[__blockIndex__][o:data][numberofauthors]">
+  <!-- <div class="inputs">
      <select name="o:block[__blockIndex__][o:data][author]">
       <?php foreach ($authors as $author):?>
         <option value="<?php echo $author->id(); ?>"><?php echo $author->value('schema:givenName') . " " . $author->value('schema:familyName');?></option>
       <?php endforeach;?>
      </select>
-  </div>
+  </div> -->
 </div>
 
 <!-- <input type="select" value="<?php echo (!isset($block) ? '' : $block->dataValue('author')) ?>" name="o:block[__blockIndex__][o:data][author]"> -->
-
-

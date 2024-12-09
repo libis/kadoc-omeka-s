@@ -4,6 +4,7 @@ $translate = $this->plugin('translate');
 <style>
 .card-content {
   background-color: rgba(0,0,0,0.36);
+  background:linear-gradient(transparent, black);
   padding: 1.5rem;
   bottom: 0;
   position:absolute;
@@ -17,7 +18,7 @@ $translate = $this->plugin('translate');
   <div class="container">
   <?php if ($this->heading): ?>
       <div class="arrow-left"></div>
-      <h2 class="title is-3 is-family-secondary"><?php echo $block->dataValue('heading');?></h2>
+      <h2 class="title is-3 is-family-secondary" style="padding-bottom: 30px;"><?php echo $block->dataValue('heading');?></h2>
     <?php endif; ?>
 
     <div class="columns is-multiline">
@@ -49,17 +50,20 @@ $translate = $this->plugin('translate');
         ?>
         <a href="<?php echo $url;?>">
           <div class="card equal-height card-hover-<?php echo $i;?>" onpointerenter="showCardContent(<?php echo $i;?>)";>              
-            <div class="bg-block" style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#aaa;background-size: cover; min-height:250px;">
+            <div class="bg-block" style="background:url(<?php echo  $mediaurl;?>) no-repeat center 20%;background-color:#aaa;background-size: cover; aspect-ratio:1/1;">
             <div class="overlay"></div>
 
             <div class="card-content" id="card-<?php echo $i;?>">
               <div class="content">
               <div class="card-top">
-              <h3 class="title is-5 is-family-secondary has-text-white" id="title-<?php echo $i;?>">
+              <h3 class="title is-3 is-family-secondary has-text-white" id="title-<?php echo $i;?>">
                   <?php echo $heading;?>
               </h3>
             </div>
             <div class="is-hidden has-text-white" id="body-<?php echo $i;?>">
+            <?php if($page->dataValue('type')):?>
+                  <div class="has-text-weight-bold" style="border-bottom:solid 1px white;text-transform:uppercase;"><?php echo ucfirst($page->dataValue('type'));?></div>
+                <?php endif;?>
                 <?php if ($body): ?>
                   <?php
                     if(strlen($body) > 200):
@@ -68,14 +72,10 @@ $translate = $this->plugin('translate');
                     endif;
                   ?>
                     <?php echo $body; ?>
-                    <hr>
                 <?php endif; ?>
                 <?php if($page->dataValue('credits')):?>
-                  <div>Door <?php echo $page->dataValue('credits'); ?></div>
+                  <div class="has-text-centered">Door <?php echo $page->dataValue('credits'); ?></div>
                 <?php endif;?> 
-                <?php if($page->dataValue('type')):?>
-                  <div><?php echo ucfirst($page->dataValue('type'));?></div>
-                <?php endif;?>
                 </div> 
               </div>
             </div>
@@ -99,7 +99,7 @@ function showCardContent(x){
     $( idbody ).removeClass( "is-hidden" );
   }, function() {
     $( idtitle ).removeClass( "is-hidden" );
-    $( id ).css("height","40%");
+    $( id ).css("height","50%");
     $( idbody ).addClass( "is-hidden" );
   })
 }

@@ -41,9 +41,26 @@ $subNav = new Navigation($newPages);
     endif;
   endif;
 
-  $api = $this->api()->read('items',$block->dataValue('author'));
-  $author = $api->getContent();
+  $i=0;
+  $authors = [];
+  while($i <= $block->dataValue('numberofauthors')):
+    if($block->dataValue('author'.$i)):
+      $authors[] = $block->dataValue('author'.$i);
+    endif;
+    $i++;
+  endwhile;
+
+  // $api = $this->api()->read('items',$block->dataValue('author'));
+  // $author = $api->getContent();
 ?>
+<style>
+  .author-btn:hover{
+    color: #edced3 !important;
+  }
+  .menu-list a {
+    display:inline-block;
+  }
+</style>
 <header>
 <?php if($url):?>
 <section class="hero is-bold" style="background:url(<?php echo $url;?>) no-repeat center center;background-size: cover;">
@@ -58,15 +75,21 @@ $subNav = new Navigation($newPages);
             <div class="hero-text is-size-5" style="text-align:left;padding:0rem 2rem;">
               <h1 class="title is-family-secondary is-1"><span><?php echo $block->dataValue('title');?></span></h1>
               <?php if($block->dataValue('sec_title')):?>
-                 <h2 class="subtitle is-size-6"><?php echo $block->dataValue('sec_title');?></h2>
+                 <h2 class="subtitle is-size-4"><?php echo $block->dataValue('sec_title');?></h2>
               <?php endif;?>
               <div class="link">
-                <a class="button is-primary is-inverted is-outlined is-large" href="<?php echo $block->page()->site()->url() . '/item/' . $block->dataValue('author');?>">
-                  <span><?php echo $author->value('schema:givenName') . " " . $author->value('schema:familyName');?></span>
+                <?php foreach($authors as $author): ?>
+                  <?php
+                  $api = $this->api()->read('items',$author);
+                  $authorApi = $api->getContent();
+                  ?>
+                <a class="button is-primary is-inverted is-outlined author-btn" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
+                  <span><?php echo $authorApi->value('schema:givenName') . " " . $authorApi->value('schema:familyName');?></span>
                   <span class="icon is-small">
-                    <i class="fas fa-angle-right"></i>
+                    <i class="fa fa-angle-right"></i>
                   </span>
                 </a>
+                <?php endforeach; ?>
               </div>
             </div>
           </div>
@@ -80,18 +103,40 @@ $subNav = new Navigation($newPages);
    </div>
  </section>
  </header>
- <div class="block item-set-showcase section container">
+ <div class="block item-set-showcase section container" style="padding-left:0;">
 <button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="level bouncy-button share is-warning" onclick="copyLink()">Delen</button>
     <div class="item-set resource columns">
-        <div class="column is-9">
+        <div class="column is-8">
         <div class="level"><?php echo $block->dataValue('text');?></div>
-            <a href="<?php echo strtolower($newPages[0]['label']);?>" class="bouncy-button arrow" style="color:aliceblue;font-weight:bold;font-size:1.25em;">Tentoonstelling starten</a>
+            <a href="<?php echo strtolower($newPages[0]['label']);?>" class="bouncy-button arrow" style="color:aliceblue;font-weight:bold;">Tentoonstelling starten</a>
         </div>
+<div class="column is-1"></div>
 <aside class="menu column is-3 box" style="padding: 1.25rem 2rem;">
-  <h2 class="title is-3">Inhoudstabel</h2>
+  <h2 class="title is-3">Inhoudstafel</h2>
     <ul class="menu-list">
-    
-        <?= $this->navigation($subNav)->menu()->renderMenu(null, ['maxDepth' => 1]);?>
+      <?php foreach($newPages as $page): ?>
+        <?php if($page['pages']): ?>
+      <li>
+      <details>
+        <summary><a href="<?php echo strtolower($page['label']);?>"><?php echo $page['label'];?></a></summary>
+        <ul>
+          <?php
+            $subpages = $page['pages'];
+          ?>
+          <?php foreach($subpages as $sub): ?>
+
+          <li><a href="<?php echo strtolower($sub['label']); ?>"><?php echo $sub['label']; ?></a></li>
+
+          <?php endforeach; ?>
+        </ul>
+      </details>
+      </li>
+      <?php else: ?>
+        <li><a href="<?php echo strtolower($page['label']); ?>"><?php echo $page['label']; ?></a></li>
+        <?php endif;?>
+<?php endforeach;?>
+
+        <!-- <?= $this->navigation($subNav)->menu()->renderMenu(null, ['maxDepth' => 1]);?> -->
 
     </ul>
 </aside>

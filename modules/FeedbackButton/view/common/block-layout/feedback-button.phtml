@@ -1,0 +1,27 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+
+$slug = $block->page()->slug();
+$type = $this->pageMetadata('type');
+?>
+<div class="container block links">
+  <form id="feedback-button" action="<?= $block->dataValue('contactUrl'); ?>" method="POST" style="padding-bottom:1.5em;">
+    <input name="slug" value="<?php echo $slug;?>" hidden>
+    <input name="type" value="<?php echo $type;?>" hidden>
+    <a type="submit" href="#" onclick="onSubmit()">
+      <button class="react bouncy-button" style="font-size: 1em;"><?= $block->dataValue('text'); ?></button>
+    </a>
+  </form>
+</div>
+
+<script>
+     function onSubmit() {
+     document.getElementById('feedback-button').submit();
+   }
+</script>

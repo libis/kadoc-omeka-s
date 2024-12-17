@@ -1,0 +1,134 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets
+ * @var string $thumbnailType
+ * @var string $showTitleOption
+ * @var string $heading
+ */
+
+$plugins = $this->getHelperPluginManager();
+$thumbnail = $plugins->get('thumbnail');
+
+$defaultThumbnail = $this->assetUrl('thumbnails/default.png', 'Omeka', true);
+$defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
+
+$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$lang = $filterLocale ? $this->lang() : null;
+
+$i=0;
+$authors = [];
+while($i <= $block->dataValue('numberofauthors')):
+  if($block->dataValue('author'.$i)):
+    $authors[] = $block->dataValue('author'.$i);
+  endif;
+  $i++;
+endwhile;
+?>
+<style>
+    .card-content {
+      background-color: rgba(0,0,0,0.36);
+  background:linear-gradient(transparent, black);
+  padding: 1.5rem;
+  bottom: 0;
+  position:absolute;
+  width: 100%;
+  height: 0%;
+  transition: transform 250ms;
+  transition-property: height;
+}
+.author-btn:hover {
+  color:white;
+  background-color:#e29ca7;
+}
+</style>
+<section class="section">
+    <div class="container">
+          <div class="arrow-left"></div>
+          <h1 class="title is-3 is-family-secondary"><?php echo $block->dataValue('title');?></h1>
+          <h3 class="title is-4" style="padding-left:15px;"><?php echo $block->dataValue('sec_title');?></h3>
+            <div style="padding-left:15px;">
+              <?php foreach($authors as $author): ?>
+              <?php
+                $api = $this->api()->read('items',$author);
+                $authorApi = $api->getContent();
+              ?>
+              <a class="button author-btn" style="border-color:#e29ca7;" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
+                <span><?php echo $authorApi->value('schema:givenName') . " " . $authorApi->value('schema:familyName');?></span>
+              </a>
+            <?php endforeach; ?>
+            </div>
+
+        <div class="column is-12">
+          <a><button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="bouncy-button share" onclick="copyLink()">Delen</button></a>
+        </div>
+
+        <div class="column is-12">
+          <?php echo $block->dataValue('text');?>
+        </div>
+        
+    </div>
+</section>
+
+<script>
+    function moreInfo(x,y,z) {
+        let id = '#modal-' + x;
+        $( id ).css("cursor","zoom-in");
+        $( id ).addClass("is-active");
+
+        let html = '#html'
+        $( html ).css("overflow-y","hidden");
+
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let ratio = img.clientWidth / img.clientHeight;
+        let width = 'calc(93vh * ' + ratio + ')';
+        let windowH = window.innerHeight * 0.93;
+
+        console.log('Height:' + z + 'Window:' + windowH);
+
+        if(z > windowH){
+          img.style.height = '93vh';
+          contain.style.width = width;
+        } else {
+          img.style.height = 'auto';
+          contain.style.width = y + 'px';
+        }
+    }
+    function enlargeImage(x,y,z){
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let width = y + 'px';
+        let height = z + 'px';
+        let maxWidth = contain.style.maxWidth;
+
+        contain.style.width = width;
+        img.style.width = 'auto';
+        img.style.height = 'auto'; 
+
+        let cursor = '#modal-' + x;
+
+        $(cursor).css("cursor","unset");
+    }
+
+    function closeModal(){
+        let modal = '.modal';
+        let html = '#html'
+        $( modal ).removeClass("is-active");
+        $( html ).css("overflow-y","unset");
+    }
+
+    function copyLink() {
+    // Get the text field
+    var copyText = document.getElementById("delen");
+
+    // Copy the text inside the text field
+    navigator.clipboard.writeText(copyText.value);
+
+    // Tooltip the copied text
+    copyText.title = "Link gekopieerd: " + copyText.value;
+    } 
+</script>

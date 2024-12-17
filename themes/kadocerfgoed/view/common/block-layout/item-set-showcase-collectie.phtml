@@ -21,7 +21,8 @@ $summary = $this->pageMetadata('summary');
 ?>
 <style>
     .card-content {
-  background-color: rgba(0,0,0,0.36);
+      background-color: rgba(0,0,0,0.36);
+  background:linear-gradient(transparent, black);
   padding: 1.5rem;
   bottom: 0;
   position:absolute;
@@ -53,19 +54,23 @@ $summary = $this->pageMetadata('summary');
                     $url = $item->url();
                     $media = $item->media();
                     if($media):
-                    $thumbnail = $media[0]->thumbnailUrl('large');
+                      $thumbnail = $media[0]->thumbnailUrl('large');                        
+                      $imagesize = getimagesize($media[0]->originalUrl());
+                      $width = $imagesize[0];
+                      $height = $imagesize[1];
                     endif;
-                    if($summary):
-                      $body = $summary;
-                    else:
-                      $body = $item->displayDescription();
-                    endif;
+                    // if($summary):
+                    //   $body = $summary;
+                    // else:
+                    //   $body = $item->displayDescription();
+                    // endif;
+                    $body = false;
                     
                 ?>
-                <div class="column is-4" onclick="moreInfo(<?php echo $i;?>)" style="cursor:pointer;">
+                <div class="column is-4" onclick="moreInfo(<?php echo $i;?>,<?php echo $width;?>,<?php echo $height;?>)" style="cursor:pointer;">
                         
           <div class="card equal-height card-hover-<?php echo $i;?>" <?php if($body):?>onpointerenter="showCardContent(<?php echo $i;?>)<?php endif;?>";>              
-            <div class="bg-block" style="background:url(<?php echo  $thumbnail;?>) no-repeat center 20%;background-color:#aaa;background-size: cover; min-height:250px;">
+            <div class="bg-block" style="background:url(<?php echo  $thumbnail;?>) no-repeat center 20%;background-color:#aaa;background-size: cover; aspect-ratio:1/1;">
             <div class="overlay"></div>
 
             <div class="card-content" id="card-<?php echo $i;?>">
@@ -75,7 +80,7 @@ $summary = $this->pageMetadata('summary');
                   <?php echo $item->displayTitle();?>
               </h3>
             </div>
-            <?php if($body):?>
+            <!-- <?php if($body):?>
             <div class="is-hidden has-text-white" id="body-<?php echo $i;?>">
                 <?php if ($body): ?>
                   <?php
@@ -87,7 +92,7 @@ $summary = $this->pageMetadata('summary');
                     <?php echo $body; ?>
                 <?php endif; ?>
                 </div>
-                <?php endif;?>
+                <?php endif;?> -->
               </div>
             </div>
             </div>
@@ -104,37 +109,85 @@ $summary = $this->pageMetadata('summary');
 <?php $a=0;?>
 <?php foreach($items as $item):
 $media = $item->media();?>
-<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;" onclick="closeModal();">
+<?php 
+if($media[0]):
+$imagesize = getimagesize($media[0]->originalUrl());
+$width = $imagesize[0];
+$height = $imagesize[1];
+endif;
+?>
+<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;cursor:zoom-in;" <?php if($media[0]):?>onclick="enlargeImage(<?php echo $a?>,<?php echo $width;?>,<?php echo $height;?>);"<?php endif;?>>
     <div class="modal-background"></div>
     <div class="modal-content">    
         <div class="container" style="background-color: aliceblue;width: fit-content;">
           <?php if($media):?>
-        <img src="<?php echo $media[0]->originalUrl(); ?>">
+        <img id="img-<?php echo $a;?>" src="<?php echo $media[0]->originalUrl(); ?>" style="height:93vh;">
           <?php endif;?>
         <div class="column">
         <?php echo $item->displayValues();?>
         <?php if($media):?>
           <div class="has-text-right">
-            <a href="<?php echo $media[0]->originalUrl(); ?>" class="button is-warning" download="<?php echo $item->displayTitle();?>">Download</a>
+            <a href="<?php echo $media[0]->originalUrl(); ?>" class="button is-warning" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" download="<?php echo $item->displayTitle();?>">Download</a>
           </div>
         <?php endif;?>
         </div>
         </div>
     </div>
-    <button class="modal-close is-large" aria-label="close"></button>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal();"></button>
 </div>
 <?php $a++;?>
 <?php endforeach;?>
 
 <script>
-    function moreInfo(x) {
+    function moreInfo(x,y,z) {
         let id = '#modal-' + x;
+        $( id ).css("cursor","zoom-in");
         $( id ).addClass("is-active");
+
+        let html = '#html'
+        $( html ).css("overflow-y","hidden");
+
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let ratio = img.clientWidth / img.clientHeight;
+        let width = 'calc(93vh * ' + ratio + ')';
+        let windowH = window.innerHeight * 0.93;
+
+        console.log('Height:' + z + 'Window:' + windowH);
+
+        if(z > windowH){
+          img.style.height = '93vh';
+          contain.style.width = width;
+        } else {
+          img.style.height = 'auto';
+          contain.style.width = y + 'px';
+        }
     }
+    function enlargeImage(x,y,z){
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let contain = document.getElementById(imgi).parentElement;
+        let width = y + 'px';
+        let height = z + 'px';
+        let maxWidth = contain.style.maxWidth;
+
+        contain.style.width = width;
+        img.style.width = 'auto';
+        img.style.height = 'auto'; 
+
+        let cursor = '#modal-' + x;
+
+        $(cursor).css("cursor","unset");
+    }
+
     function closeModal(){
         let modal = '.modal';
+        let html = '#html'
         $( modal ).removeClass("is-active");
+        $( html ).css("overflow-y","unset");
     }
+    
     function showCardContent(x){
     let id = '#card-' + x;
     let hover = '.card-hover-' + x;
@@ -146,7 +199,7 @@ $media = $item->media();?>
         $( idbody ).removeClass( "is-hidden" );
     }, function() {
         $( idtitle ).removeClass( "is-hidden" );
-        $( id ).css("height","40%");
+        $( id ).css("height","30%");
         $( idbody ).addClass( "is-hidden" );
     })
     }

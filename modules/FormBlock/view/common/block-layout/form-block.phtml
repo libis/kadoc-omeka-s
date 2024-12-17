@@ -5,31 +5,51 @@ use Laminas\Mime\Mime;
 use Laminas\Mime\Part as MimePart;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
+$tentoonstellingen = [];
+$collecties = [];
+$verhalen = [];
+
+foreach($pages as $page):
+  if($page->dataValue('type') == 'tentoonstelling'):
+    $tentoonstellingen[] = $page;
+  elseif($page->dataValue('type') == 'collecties'):
+    $collecties[] = $page;
+  else:
+    $verhalen[] = $page;
+  endif;
+endforeach;
+
 //$settings = $this->getServiceLocator()->get('Omeka\Settings');
 $siteKey = $this->setting('recaptcha_site_key');
 $secretKey = $this->setting('recaptcha_secret_key');
 
 $get  = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
 $post  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-      
-$type = isset($get["type"]) ? $get['type'] : '';
-$subject = isset($get["subject"]) ? $get['subject'] : '';
-$formmail = isset($get["mail"]) ? $get['mail'] : '';  
 ?>
+<style>
+  .select:not(.is-multiple):not(.is-loading)::after{
+    border-color: #e29ca7;
+  }
+</style>
 
   <div class="container">   
 
     <div class="columns">
       <div class="column is-8">
       <?php                
-        if($_SERVER['REQUEST_METHOD'] == 'POST'):
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['vraag'])):
           if(!isCaptchaValid($secretKey)):
-            $error = "reCaptcha is not valid";
+            $error = "reCaptcha is niet geldig";
           else:  
             $post  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
             $error = '';
+
+
+            $onderwerp = $pages[$post["onderwerp"]]->page()->title();
+            $url = '<a href="'. $this->serverUrl() . $pages[$post["onderwerp"]]->page()->url() . '">' . $onderwerp . '</a>';
+
             
-            $message = "<p>Name: ".$post["naam"]."</p><p>".$post["vraag"];
+            $message = "<p>Naam: ".$post["naam"]."</p><p>E-mailadres: ".$post["mail"]."</p><p>Onderwerp: ".$url."</p><p>".$post["vraag"];
             $html = new MimePart($message);
             $html->type = Mime::TYPE_HTML;
             $html->charset = 'utf-8';
@@ -40,12 +60,12 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
 
             $name = $post["naam"];
             if (!preg_match("/^[a-zA-Z-' ]*$/",$name)) {
-              $error = "Not a valid name";
+              $error = "Geen geldige naam";
             }
 
             $email = $post["mail"];
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-              $error = "Not a valid email address";
+              $error = "Geen geldig e-mailadres";
             }
           endif;  
          
@@ -54,14 +74,9 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
             
             $mail = new Mail\Message();
             $mail->setBody($body);
-            $mail->setFrom($post["mail"], $post["naam"]);
-            if($formmail && filter_var($formmail, FILTER_VALIDATE_EMAIL)):             
-              $mail->addTo($formmail, $collectie);
-              $mail->addCc("rebecca.vancaeneghem@kuleuven.be");
-            else:  
-              $mail->addTo("rebecca.vancaeneghem@kuleuven.be", 'Rebecca Van Caeneghem');
-            endif;
-            $mail->setSubject("KADOC Erfgoed: ".$post["onderwerp"]);
+            $mail->setFrom('no-reply-KADOC-Erfgoed@kuleuven.be', $post["naam"]);            
+            $mail->addTo("rebecca.vancaeneghem@kuleuven.be", 'Rebecca Van Caeneghem');
+            $mail->setSubject("KADOC Erfgoed: ".$onderwerp);
 
             $transport = new Mail\Transport\Sendmail();
             $transport->send($mail);
@@ -69,7 +84,7 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
             ?>
             <article class="message is-success">
               <div class="message-body">
-                <strong>Thank you!</strong> We will respond to your message as soon as possible.
+                <strong>Bedankt voor uw bericht!</strong>
               </div>
             </article>   
           <?php else:?>
@@ -88,16 +103,30 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
             </div>
           </div>
           <div class="label" class="field">  
-            <label for="mail">Email</label>
+            <label for="mail">E-mailadres</label>
             <div class="control">
               <input class="input" type="mail" id="mail" name="mail"required placeholder="">
             </div>
           </div>
 
           <div class="field">
-            <label class="label" for="onderwerp">Onderwerp</label>
-            <div class="control">
-              <input class="input" type="text" id="onderwerp" name="onderwerp" required placeholder="">
+            <label class="label" for="onderwerp">Waarop wil je reageren?</label>
+            <div class="control select">
+              <select id="category" name="category" required placeholder="Kies een categorie...">
+                <!-- <option value="" disabled selected>Kies een categorie...</option> -->
+                <option value="algemeen">Algemeen</option>
+                <option value="collectie">Collectie</option>
+                <option value="tentoonstelling">Tentoonstelling</option>
+                <option value="verhaal">Verhaal</option>
+              </select>
+            </div>
+            <div class="control select">
+              <select id="onderwerp" name="onderwerp" required>
+                <option value="algemeen" class="algemeen">Algemeen bericht</option>
+                <?php foreach($pages as $collectie): ?>
+                <option value="<?php echo $collectie->page()->slug();?>" class="<?php echo $collectie->dataValue('type'); ?>"><?php echo $collectie->page()->title() ?></option>
+                <?php endforeach;?>
+              </select>
             </div>
           </div>
         
@@ -108,19 +137,53 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
             </div>
           </div>
           
-          <div class="field">  
-            <button data-callback='onSubmit' data-action='submit' class="g-recaptcha button" style="background-color: #00b7e7;">Bericht versturen</button>
+          <div class="field" style="padding-bottom:1.5em;">  
+            <button data-sitekey="<?php echo $siteKey;?>" data-callback='onSubmit' data-action='submit' class="g-recaptcha bouncy-button react" style="background-color: #e29ca7;">Verzenden</button>
           </div>
         </form> 
       </div>  
     </div>  
   </div>
 <script>
+<?php if (isset($_POST["slug"])):;?>
+  <?php $postslug = $_POST["slug"];
+  $postcategory = $_POST["type"];
+  ?>
+
+postSlugCheck('<?php echo $postslug;?>','<?php echo $postcategory;?>');
+
+
+<?php unset($_POST["slug"]); 
+$_POST["type"];
+?>
+  <?php endif;?>
+
+function postSlugCheck(x,y){
+  let id = '#onderwerp';
+  let category = '#category';
+
+  $( id ).val(x);
+  $( category ).val(y);
+}
+
    function onSubmit(token) {
      document.getElementById("feedback-form").submit();
    }
+
+   $(document).ready(function () {
+      $(document).on('change', '#category', function () {
+          var val = $(this).val().toLowerCase();
+          $('#onderwerp option').hide().removeAttr("selected");
+          $('#onderwerp option.'+val).show();
+          $('#onderwerp option.'+val+':first').attr('selected','selected').change();
+      });
+  });
 </script>
-<script src="https://www.google.com/recaptcha/api.js"></script>
+<script src='https://www.google.com/recaptcha/api.js?
+render=onload
+& async defer'>
+</script>
+
 <?php 
 function isCaptchaValid($secretKey){
     $captcha = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : false;

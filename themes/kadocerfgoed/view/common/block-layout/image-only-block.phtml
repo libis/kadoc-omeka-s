@@ -8,7 +8,22 @@
   }
 </style>
 
-<div class="section image-only-section">
+<?php if(count($attachments) == 1):
+              $media = $attachments[0]->media();
+              if($media):
+                $url = $media->thumbnailUrl('large');
+                $url = str_replace('http:', '', $url);
+                $imagesize = getimagesize($media->originalUrl());
+                if($imagesize != false){
+                  $width = $imagesize[0];
+                  $height = $imagesize[1];
+                }
+              endif;
+?>
+<section class="hero is-bold item-<?php echo $attachments[0]->item()->id();?> is-clickable" style="background:url(<?php echo $url;?>) no-repeat center center;background-size: cover;min-height:25rem;padding:2rem 0;" onclick="moreInfo(<?php echo $attachments[0]->item()->id();?>,<?php echo $width;?>,<?php echo $height;?>);">
+</section>
+<?php else:?>
+<section class="image-only-section">
     <div class="container">
       <div class="columns">
         <?php foreach($attachments as $attachment):
@@ -22,7 +37,7 @@
                 $height = $imagesize[1];
               }
             ?>
-            <div class="column" style="text-align:center;">
+            <div class="column">
               <img src="<?= $url;?>" class="item-<?php echo $attachment->item()->id();?> is-clickable" onclick="moreInfo(<?php echo $attachment->item()->id();?>,<?php echo $width;?>,<?php echo $height;?>);" />
               <?php if($attachments[0]->caption()):?><figcaption><i class="fa fa-caret-right"></i><?php echo $attachments[0]->caption();?></figcaption><?php endif;?>
             </div>
@@ -30,7 +45,8 @@
         <?php endforeach;?>
       </div>
     </div>
-</div>
+</section>
+<?php endif;?>
 
 <?php foreach($attachments as $item):
 $media = $item->media();
@@ -54,7 +70,7 @@ endif;
         <a href="https://slimerfgoed.be/s/kadocerfgoed/item/<?php echo $item->item()->id(); ?>">Object URL</a>
           <div class="has-text-right" style="padding-top:0.75rem;">
         <?php if($media):?>
-            <a href="<?php echo $media->originalUrl(); ?>" class="button is-warning" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" download="<?php echo $item->item()->displayTitle();?>">Download</a>
+            <a href="<?php echo $media->originalUrl(); ?>" class="button is-warning" style="background-color:#e29ca7;color:aliceblue;border-radius:0px;" download="<?php echo $item->item()->displayTitle();?>">Download</a>
         <?php endif;?>
           </div>
         </div>

@@ -65,24 +65,24 @@ endwhile;
         ?>
           <div class="arrow-left"></div>
           <h1 class="title is-3 is-family-secondary"><?php echo $block->dataValue('title');?></h1>
-          <h3 class="title is-4" style="padding-left:15px;"><?php echo $block->dataValue('sec_title');?></h3>
-            <div style="padding-left:15px;">
+          <h3 class="title is-4"><?php echo $block->dataValue('sec_title');?></h3>
+            <div>
               <?php foreach($authors as $author): ?>
               <?php
                 $api = $this->api()->read('items',$author);
                 $authorApi = $api->getContent();
               ?>
-              <a class="button author-btn" style="border-color:#e29ca7;" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
+              <a class="button author-btn" style="border-color:#e29ca7;border-radius:0px;" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
                 <span><?php echo $authorApi->value('schema:givenName') . " " . $authorApi->value('schema:familyName');?></span>
               </a>
             <?php endforeach; ?>
             </div>
 
-        <div class="column is-12">
+        <div class="column is-11" style="padding-left:0px;">
           <?php echo $block->dataValue('text');?>
         </div>
         <form method="post" id="download-start"><input hidden name="downloaded" value="downloaded"></form>
-        <div class="column is-12">
+        <div class="column is-12" style="padding-left:0px;">
           <a><button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="bouncy-button share" onclick="copyLink()">Delen</button></a>
           <a><button data-callback='onSubmit' data-action='submit' class="bouncy-button download" onclick="startDownload();">Collectie downloaden</button></a>
           <?php if($block->dataValue('map')): ?>
@@ -107,10 +107,10 @@ endwhile;
                 <div class="column is-4" onclick="moreInfo(<?php echo $i;?>,<?php echo $width;?>,<?php echo $height;?>)" style="cursor:pointer;">
                         
           <div class="card equal-height card-hover-<?php echo $i;?>" onpointerenter="showCardContent(<?php echo $i;?>)";>              
-            <div class="bg-block" style="<?php if($media):?>background:url(<?php echo $thumbnail;?>)<?php endif;?> no-repeat center 20%;background-color:#aaa;background-size: cover; aspect-ratio:1/1;">
+            <div class="bg-block" style="<?php if($media):?>background:url(<?php echo $thumbnail;?>)<?php endif;?> no-repeat center 20%;background-color:#edced3;background-size: cover; aspect-ratio:1/1;">
             <div class="overlay"></div>
 
-            <div class="card-content" id="card-<?php echo $i;?>">
+            <div class="card-content" id="card-<?php echo $i;?>" style="align-content:end;">
               <div class="content">
               <div class="card-top">
               <h3 class="title is-5 is-family-secondary has-text-white is-hidden" id="title-<?php echo $i;?>" title="<?php echo $item->displayTitle();?>">
@@ -129,10 +129,10 @@ endwhile;
         <?php if(ceil($itemCount/30) > 1): ?>
         <div class="column is-12" style="text-align:center;">
               <?php if($currentPage != 1):?>
-                <a href="<?php echo $block->page()->url(); ?>?page=<?php echo $currentPage-1;?>"><button class="bouncy-button">Vorige</button></a>
+                <a href="<?php echo $block->page()->url(); ?>?page=<?php echo $currentPage-1;?>"><button class="bouncy-button previous-btn">Vorige</button></a>
               <?php endif;?>
               <?php if($currentPage != ceil($itemCount/30)):?>
-              <a href="<?php echo $block->page()->url(); ?>?page=<?php echo $currentPage+1;?>"><button class="bouncy-button">Volgende</button></a>
+              <a href="<?php echo $block->page()->url(); ?>?page=<?php echo $currentPage+1;?>"><button class="bouncy-button next-btn">Volgende</button></a>
               <?php endif;?>
         </div>
         <?php endif;?>
@@ -167,7 +167,7 @@ endif;
         <?php endif;?>
         <button class="button" style="background-color: #e29ca7;color:aliceblue;" onclick="nextModal(<?php echo$a;?>);">></button>
         <?php if($media):?>
-            <a href="<?php echo $media[0]->originalUrl(); ?>" class="button is-warning" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" download="<?php echo $item->displayTitle();?>">Download</a>
+            <a href="<?php echo $media[0]->originalUrl(); ?>" class="button is-warning" style="background-color:#e29ca7;color:aliceblue;" download="<?php echo $item->displayTitle();?>">Download</a>
         <?php endif;?>
           </div>
         </div>

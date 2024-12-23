@@ -47,24 +47,24 @@ endwhile;
     <div class="container">
           <div class="arrow-left"></div>
           <h1 class="title is-3 is-family-secondary"><?php echo $block->dataValue('title');?></h1>
-          <h3 class="title is-4" style="padding-left:15px;"><?php echo $block->dataValue('sec_title');?></h3>
-            <div style="padding-left:15px;">
+          <h3 class="title is-4"><?php echo $block->dataValue('sec_title');?></h3>
+            <div>
               <?php foreach($authors as $author): ?>
               <?php
                 $api = $this->api()->read('items',$author);
                 $authorApi = $api->getContent();
               ?>
-              <a class="button author-btn" style="border-color:#e29ca7;" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
+              <a class="button author-btn" style="border-color:#e29ca7;border-radius:0px;" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
                 <span><?php echo $authorApi->value('schema:givenName') . " " . $authorApi->value('schema:familyName');?></span>
               </a>
             <?php endforeach; ?>
             </div>
 
-        <div class="column is-12">
+        <div class="column is-12" style="padding-left:0px;">
           <a><button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="bouncy-button share" onclick="copyLink()">Delen</button></a>
         </div>
 
-        <div class="column is-12">
+        <div class="column is-12" style="padding-left:0px;">
           <?php echo $block->dataValue('text');?>
         </div>
         

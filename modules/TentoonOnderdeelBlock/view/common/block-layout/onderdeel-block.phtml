@@ -37,7 +37,11 @@ margin-right: 1em;
                   <?php $i=0;?>
                 <?php foreach($attachments as $item):
                     $media = $item->media();
-                    $thumbnail = $media->thumbnailUrl('large'); 
+                    if($media):
+                    $thumbnail = $media->thumbnailUrl('large');
+                    else:
+                    $thumbnail = '';
+                    endif;
                 ?>
                 <figure class="image is-square" style="cursor:pointer;">
                     <img src="<?php echo $thumbnail;?>" class="item-<?php echo $i;?>" onclick="moreInfo(<?php echo $i;?>);" style="object-fit:contain;background-color:#edced3;">
@@ -77,11 +81,11 @@ if($imagesize != false){
         <a href="https://slimerfgoed.be/s/kadocerfgoed/item/<?php echo $item->item()->id(); ?>">Object URL</a>
         <div class="has-text-right" style="padding-top:0.75rem;">
         <?php if($a != 0): ?>
-        <button class="button" style="background-color: #e29ca7;color:aliceblue;" onclick="previousModal(<?php echo$a;?>);"><</button>
+        <button class="button" style="background-color: #e29ca7;color:aliceblue;border-radius:0px;" onclick="previousModal(<?php echo$a;?>);"><</button>
         <?php endif;?>
-        <button class="button" style="background-color: #e29ca7;color:aliceblue;" onclick="nextModal(<?php echo$a;?>);">></button>
+        <button class="button" style="background-color: #e29ca7;color:aliceblue;border-radius:0px;" onclick="nextModal(<?php echo$a;?>);">></button>
         <?php if($media):?>
-        <a href="<?php echo $media->originalUrl(); ?>" class="button" style="background-color:#e29ca7;color:aliceblue;" download="<?php echo $item->item()->displayTitle();?>">Downloaden</a>
+        <a href="<?php echo $media->originalUrl(); ?>" class="button" style="background-color:#e29ca7;color:aliceblue;border-radius:0px;" download="<?php echo $item->item()->displayTitle();?>">Downloaden</a>
         <?php endif;?>
         </div>
         </div>

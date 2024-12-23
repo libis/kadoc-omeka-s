@@ -54,7 +54,7 @@ input[type="checkbox"] {
     $years = array();
     ?>
     <div class="control" style="padding:1em 0;font-size:1em;">
-    <button type="button" class="bouncy-button viewall is-pulled-right" style="background-color:#e29ca7;color:aliceblue;font-weight:bold;" id="btn-check-outlined" name="tag" onclick="ResetFilter()" autocomplete="off">Alles tonen</button>
+    <button type="button" class="bouncy-button viewall is-pulled-right" style="background-color:#e29ca7;color:aliceblue;" id="btn-check-outlined" name="tag" onclick="ResetFilter()" autocomplete="off">Alles tonen</button>
     <?php foreach ($filters as $filter):?>
       <?php if(is_numeric($filter)){
         $years[] = $filter;

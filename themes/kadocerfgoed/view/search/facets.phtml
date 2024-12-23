@@ -67,7 +67,7 @@ $facetLink = $plugins->get('facetLink');
       ?>
       <div class="content">
           <a class="button is-info is-inverted is-outlined is-small" title="verwijder zoekopdracht" href="<?= parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH).'?q=&'.$params ?>">
-            <span>Zoekopdracht: <?= $query->getQuery();?></span><span class="icon is-small"><i class="fas fa-times"></i></span>
+            <span>Zoekopdracht: <?= htmlspecialchars(strip_tags($query->getQuery()));?></span><span class="icon is-small"><i class="fas fa-times"></i></span>
           </a>
       </div>
       <?php endif;?>

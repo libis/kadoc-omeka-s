@@ -191,7 +191,7 @@ endif;
     <form class="has-icons-right" action="" id="search-form">
       <div class="field has-addons">
         <div class="control">
-          <input class="input is-medium" type="text" name="q" id="q" placeholder="<?php echo $zoek;?>" value="<?php echo $query->getQuery();?>"   aria-label="<?php echo $translate('Search'); ?>">
+          <input class="input is-medium" type="text" name="q" id="q" placeholder="<?php echo $zoek;?>" value="<?php echo htmlspecialchars(strip_tags($query->getQuery()));?>"   aria-label="<?php echo $translate('Search'); ?>">
           <input name="sort" type="hidden" value="<?php echo $query->getSort();?>" />
         </div>
         <div class="control">

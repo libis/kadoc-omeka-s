@@ -28,7 +28,7 @@ $itemMedia = $resource->media();
 <section class="section">
   <div class="container">
     <div class="columns">
-      <div class="column is-7">
+      <div class="column is-4">
         <div class="media-embeds" style="text-align:center;">
         <?php foreach ($itemMedia as $media):
             echo $media->render();
@@ -37,7 +37,7 @@ $itemMedia = $resource->media();
       </div>
       <div class="column is-5">
         <ul>
-          <li><?php echo $item->value('schema:givenName') . ' ' . $item->value('schema:familyName'); ?></li>
+          <li><b><?php echo $item->value('schema:givenName') . ' ' . $item->value('schema:familyName'); ?></b></li>
           <li><?php echo $item->value('schema:hasOccupation'); ?></li>
           <li><?php echo $item->value('schema:worksFor'); ?></li>
           <?php if($item->value('schema:email')):?>

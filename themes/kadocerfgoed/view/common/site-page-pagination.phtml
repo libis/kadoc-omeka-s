@@ -28,7 +28,7 @@ $nextText = $translate('>');
 </style>
 <?php if ($prevPage || $nextPage): ?>
 <div class="site-page-pagination">
-    <?php if($this->pageMetadata('type',$prevPage) == 'sub'):?>
+    <?php if($this->pageMetadata('type') == 'sub' && ($this->pageMetadata('type',$prevPage) == 'sub' || $this->pageMetadata('type',$prevPage) == 'tentoonstelling')):?>
         <div class="slider-prev-page">
             <a href="<?php echo $prevPage->siteUrl();?>"><i class="fa fa-chevron-left" style="font-size:3.5rem;"></i></a>
         </div>

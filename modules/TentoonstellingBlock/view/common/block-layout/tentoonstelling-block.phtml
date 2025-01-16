@@ -60,6 +60,26 @@ $subNav = new Navigation($newPages);
   .menu-list a {
     display:inline-block;
   }
+
+  button > a:hover{
+    border-bottom: none!important;
+  }
+
+  details>summary {
+ 
+ list-style: none;
+}
+summary::-webkit-details-marker {
+ display: none
+}
+
+summary::after {
+ content: ' ►';
+ cursor:pointer;
+}
+details[open] summary:after {
+ content: " ▼";
+}
 </style>
 <header>
 <?php if($url):?>
@@ -72,7 +92,7 @@ $subNav = new Navigation($newPages);
       <div class="container">
         <div class="columns">
           <div class="column hero-left is-info is-12" style="align-content:end;">
-            <div class="hero-text is-size-5" style="text-align:left;padding:0rem 2rem;">
+            <div class="hero-text is-size-5" style="text-align:left;padding:0rem;">
               <h1 class="title is-family-secondary is-1"><span><?php echo $block->dataValue('title');?></span></h1>
               <?php if($block->dataValue('sec_title')):?>
                  <h2 class="subtitle is-size-4"><?php echo $block->dataValue('sec_title');?></h2>
@@ -107,8 +127,8 @@ $subNav = new Navigation($newPages);
 <button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="level bouncy-button share is-warning" onclick="copyLink()">Delen</button>
     <div class="item-set resource columns">
         <div class="column is-8">
-        <div class="level"><?php echo $block->dataValue('text');?></div>
-            <a href="<?php echo strtolower($newPages[0]['label']);?>" class="bouncy-button arrow" style="color:aliceblue;font-weight:bold;">Tentoonstelling starten</a>
+        <?php echo $block->dataValue('text');?>
+            <button class="bouncy-button arrow" style="margin-top:1em;"><a href="<?php echo strtolower($newPages[0]['label']);?>" style="color:white;">Tentoonstelling starten</a></button>
         </div>
 <div class="column is-1"></div>
 <aside class="menu column is-3 box" style="padding: 1.25rem 2rem;">

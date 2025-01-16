@@ -14,9 +14,7 @@ $type = $this->pageMetadata('type');
   <form id="feedback-button" action="<?= $block->dataValue('contactUrl'); ?>" method="POST" style="padding-bottom:1.5em;">
     <input name="slug" value="<?php echo $slug;?>" hidden>
     <input name="type" value="<?php echo $type;?>" hidden>
-    <a type="submit" href="#" onclick="onSubmit()">
-      <button class="react bouncy-button" style="font-size: 1em;"><?= $block->dataValue('text'); ?></button>
-    </a>
+    <button class="react bouncy-button" type="submit" href="#" onclick="onSubmit()"><?= $block->dataValue('text'); ?></button>
   </form>
 </div>
 

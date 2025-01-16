@@ -55,6 +55,14 @@ if (strpos($url, 'page/home') !== false) {
 		  gtag('config', 'UA-208068755-1');
 		</script>
     <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .over-footer{
+        flex:1;
+      }
       @media (max-width: 1024px) {
         .navigation {
           display: none;
@@ -118,6 +126,9 @@ if (strpos($url, 'page/home') !== false) {
       .wrapper a {
         font-family: "Montserrat";
         color: #e29ca7;
+      }
+      .column a:hover{
+        border-bottom: 2px solid #e29ca7;
       }
       .navbar .navigation li>a, .wrapper .button, .footer .button {
         font-family: "Montserrat";
@@ -350,6 +361,42 @@ if (strpos($url, 'page/home') !== false) {
 	}
 }
 
+.previous-btn {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\f060";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
+.next-btn {
+	background: #e29ca7;
+	&:hover {
+		background: darken(#e29ca7, 10%);
+	}
+	&:active,
+	&:focus {
+		background: darken(#e29ca7, 30%);
+	}
+	&:after {
+		content: "\f061";
+	}
+	&:hover:after {
+		-webkit-animation: bounceright 0.3s alternate ease infinite;
+		animation: bounceright 0.3s alternate ease infinite;
+	}
+}
+
 @-webkit-keyframes bounceright {
 	from {
 		-webkit-transform: translateX(0);
@@ -428,13 +475,13 @@ if (strpos($url, 'page/home') !== false) {
             <!-- Right side -->
             <div class="level-right">
               <div class="level-item">
-                <a target="_blank" href="https://kadoc.kuleuven.be"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/kadoc.PNG" /></a>
+                <a target="_blank" href="https://kadoc.kuleuven.be"><img style="height:40px;padding:0 10px;" src="/themes/kadocerfgoed/asset/img/kadoc.PNG" /></a>
               </div>
               <div class="level-item">
-                <a target="_blank" href="https://www.vlaanderen.be/"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/Logo_Vlaanderen.png" /></a>
+                <a target="_blank" href="https://www.vlaanderen.be/"><img style="height:40px;padding:0 10px;" src="/themes/kadocerfgoed/asset/img/Logo_Vlaanderen.png" /></a>
               </div>
               <div class="level-item">
-                <a target="_blank" href="https://libis.be"><img style="height:40px;padding:0 5px;" src="/themes/kadocerfgoed/asset/img/libissmall.png" /></a>
+                <a target="_blank" href="https://libis.be"><img style="height:40px;padding:0 10px;" src="/themes/kadocerfgoed/asset/img/libissmall.png" /></a>
               </div>
             </div>
           </nav>
@@ -503,6 +550,13 @@ if (strpos($url, 'page/home') !== false) {
         $("#showNav").addClass("is-hidden");
       }
     });
+
+    $(document).keyup(function(e) {
+     if (e.key === "Escape") { // escape key maps to keycode `27`
+      $( ".modal" ).removeClass("is-active");
+      $( "#html" ).css("overflow-y","unset");
+    }
+  });
   });
   </script>
 </html>

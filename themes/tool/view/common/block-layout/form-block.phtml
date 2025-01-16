@@ -105,7 +105,7 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
           </div>
           
           <div class="field">  
-            <button data-callback='onSubmit' data-action='submit' class="g-recaptcha button is-primary is-rounded">Bericht versturen</button>
+            <button data-sitekey="<?php echo $siteKey;?>" data-callback='onSubmit' data-action='submit' class="g-recaptcha button is-primary is-rounded">Bericht versturen</button>
           </div>
         </form> 
       </div>  

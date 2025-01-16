@@ -6,7 +6,7 @@ $this->htmlElement('html')->setAttribute('class', "has-navbar-fixed-top");
 $this->headMeta()->setCharset('utf-8');
 $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
 $this->headTitle($siteTitle)->setSeparator(' · ');
-$this->headTitle()->append($this->setting('installation_title', 'Omeka S'));
+//$this->headTitle()->append($this->setting('installation_title', 'Omeka S'));
 $this->headLink()->prependStylesheet($this->assetUrl('css/style.min.css'));
 $this->headLink()->prependStylesheet($this->assetUrl('css/selectize.css'));
 //$this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));

@@ -6128,7 +6128,7 @@ a.navbar-item:focus, a.navbar-item:focus-within, a.navbar-item:hover, a.navbar-i
   margin: 0.5rem 0;
 }
 
-@media screen and (max-width: -1px) {
+@media screen and (max-width: 1px) {
   .navbar > .container {
     display: block;
   }

@@ -9,7 +9,7 @@ $this->headMeta()->setCharset('utf-8');
 $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
 $this->headTitle($siteTitle)->setSeparator(' · ');
 $this->headTitle()->append($this->setting('installation_title', 'Omeka S'));
-$this->headLink()->prependStylesheet($this->assetUrl('css/style.min.css'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/style.css'));
 //$this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
 //$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700italic,700');
 $this->headScript()->prependFile($this->assetUrl('js/default.js'));
@@ -33,15 +33,15 @@ if (strpos($url, 'page/home') !== false) {
     <head>
         <?php echo $this->headMeta(); ?>
         <?php echo $this->headTitle(); ?>
-        <?php echo $this->headLink(); ?>
-        <?php echo $this->headStyle(); ?>
         <?php echo $this->headScript(); ?>
+        <?php echo $this->headStyle(); ?>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <!-- <script src="https://kit.fontawesome.com/582fb8c29f.js" crossorigin="anonymous"></script> -->
        
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/css/bulma-carousel.min.css">
+    <?php echo $this->headLink(); ?>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,400;0,700;1,900&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -423,6 +423,11 @@ if (strpos($url, 'page/home') !== false) {
                   <?php echo $escape($siteTitle); ?>
               <?php endif; ?>
             </a>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
           </div>
           <div class="navbar-menu">
             <div class="navbar-start">
@@ -434,19 +439,6 @@ if (strpos($url, 'page/home') !== false) {
                       'maxDepth' => $this->themeSetting('nav_depth', 0)
                   ]);
                 ?>
-              <div class="navbar-item">
-                 <button class="button is-primary is-hidden" id="showNv" style="background-color: #f0a43d;">
-                    <span class="icon is-small">
-                      <i class="fa-bars"></i>
-                    </span>
-                  </button>
-                 <button class="button is-primary" id="showSearch" style="background-color: #edced3;color:#2d2d30;padding-top:0;">
-                    <span class="icon is-small">
-                      <i class="fa fa-search"></i>
-                    </span>
-                  </button>
-                  <button class="button is-primary search-menu-close modal-close is-hidden" style="top:20px;background-color: #cb8c96;"></button>
-                </div>
              </div>
           </div>
         </div>
@@ -490,24 +482,14 @@ if (strpos($url, 'page/home') !== false) {
       <?php //echo $footerContent; ?>
       <?php endif; ?>
     </footer>
-
-    <div class="search-menu modal">
-      <div class="modal-background"></div>
-        <div class="modal-content">
-          <?php echo $this->partial('common/search-form'); ?>
-        </div>
-        
-     </div>
-
      <div class="burger-menu modal">
        <div class="modal-background"></div>
          <div class="modal-content">
            <!-- Any other Bulma elements you want -->
-           <?php echo $this->partial('common/search-form'); ?>
            <?php
-             echo $site->publicNav()->menu()->renderMenu(null, [
-                 'maxDepth' => $this->themeSetting('nav_depth') - 1
-             ]);
+              echo $site->publicNav()->menu()->renderMenu(null, [
+                'maxDepth' => $this->themeSetting('nav_depth', 0)
+              ]);
            ?>
          </div>
          <button class="burger-menu-close modal-close is-large"></button>
@@ -516,10 +498,13 @@ if (strpos($url, 'page/home') !== false) {
   <script src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/js/bulma-carousel.min.js"></script>
   <script>
   $(document).ready(function() {
-    bulmaCarousel.attach('#carousel-demo', {
+    $('#carousel-demo-custom').slick ({
 			slidesToScroll: 1,
-			slidesToShow: 1
+			slidesToShow: 1,
 		});
+    $(".navbar-burger").click(function() {
+        $(".burger-menu").toggleClass("is-active");
+    });
     $(".navigation li > a").addClass("has-text-weight-bold");
     // Check for click events on the navbar burger icon
     $("#showNav").click(function() {
@@ -542,11 +527,9 @@ if (strpos($url, 'page/home') !== false) {
     });
     $(window).resize(function() {
       if ($(window).width() <= 1024) {
-        $(".navigation").addClass("is-hidden");
         $("#showNav").removeClass("is-hidden");
       }
       if ($(window).width() > 1024) {
-        $(".navigation").removeClass("is-hidden");
         $("#showNav").addClass("is-hidden");
       }
     });

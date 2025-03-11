@@ -24,52 +24,6 @@ section.is-fluid{
   font-weight: bold;
 }
 
-.navbar{
-  box-shadow: 1px 0px 5px #888;
-  .navbar-brand > a.navbar-item:hover{
-    background: white !important;
-  }
-  .navbar-item img {
-    max-height: 7rem;
-  }
-
-  .button{
-    margin-left: 5px;
-  }
-
-  .navigation{
-    display:flex;
-    flex-grow: 0;
-    flex-shrink: 0;
-    align-items: center;
-
-    li{
-      display: block;
-      line-height: 1.5;
-      padding: 0.5rem 0.75rem;
-      position: relative;
-      flex-grow: 0;
-      flex-shrink: 0;
-      height: 100%;
-      font-size:0.9rem;
-      font-weight: 400;
-
-      @media screen and (min-width: 1024px){
-        align-items: center;
-        display: flex;
-      }
-
-      a{
-        color: #333333;
-      }
-    }
-  }
-}
-
-.navbar-burger{
-  display: block;
-}
-
 //modal-menu
 .field.has-addons .control:not(:last-child){
   width: 100%;
@@ -80,16 +34,19 @@ section.is-fluid{
 }
 
 .modal{
+  height: 100%;
+
   .input{
     padding:1rem;
     border-radius: 0;
   }
 
   .navigation{
-    padding: 1rem;
+    padding: 40px 30px 0 30px;
     column-count: 2;
     background: $primary;
-    margin-top: 1rem;
+    display: block;
+    height: calc(100vh - 72px);
 
     @media only screen and (max-width: 768px) {
       column-count: 1;
@@ -107,13 +64,13 @@ section.is-fluid{
         font-style: italic;
 
         a{
-          color:white;
+          color:black;
           font-weight: 500;
         }
       }
     }
     a{
-      color:white;
+      color:black;
       font-weight: 700;
     }
   }
@@ -235,10 +192,6 @@ section.is-fluid{
 
   .card-bg{
     opacity: 0.8;
-  }
-
-  .tile-bg{
-
   }
 }
 
@@ -578,10 +531,6 @@ section.is-fluid{
     img{
       display: block;
     }
-
-    &:hover{
-      .img-box{}  //opacity: 0.8;}
-    }
   }
 
   .text{
@@ -862,14 +811,6 @@ section.is-fluid{
     color: #ccc;
     margin-left: 10px;
   }
-
-  .resource{
-
-    &::after{
-      //content:", ";
-    }
-  }
-
   .resource:last-of-type{
 
     &::after{
@@ -981,5 +922,239 @@ footer.footer{
     color: white;
     border-bottom: 1px dotted rgba(#fff,0.5);
     padding-bottom: 0.2rem;
+  }
+}
+
+.page-feature-section, .featured-section {
+  .zigzag {
+    display: inline-block;
+    position: relative;
+  }
+  
+  .zigzag:after {
+    content: '';
+    height: 18px;
+    width: 100%;
+    position: absolute;
+    background: url("https://cldup.com/MiGVGBh-0U.png");
+    background-size: 30px;
+    top: 35px;
+    bottom: 0px;
+    left: 0;
+  }
+  .card-content {
+    background-color: rgba(0,0,0,0.36);
+    background:linear-gradient(transparent, black);
+    padding: 1.5rem;
+    bottom: 0;
+    position:absolute;
+    width: 100%;
+    height: 60%;
+    transition: transform 250ms;
+    transition-property: height;
+  }
+  .card:hover {
+    .card-content {
+      height: 100%;
+    }
+  }
+}
+.page {
+  .breadcrumb li + li::before {
+    color:#cb8c96;
+  }
+  .breadcrumb-section .breadcrumb li,.breadcrumb-section .breadcrumb a {
+    font-size: 1.1rem;
+    font-weight:300;
+  }
+}
+
+.custom-carousel {
+  overflow: hidden;
+
+  .slick-arrow {
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 42px;
+    height: 42px;
+    background: #fff center center no-repeat;
+    background-size: 20px 20px;
+    border-radius: 100px;
+    margin-top: -10px;
+  }
+  .slick-arrow::before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 10px solid black;
+    padding: 0;
+    opacity: 1;
+  }
+  .slick-next {
+    transform: rotate(90deg);
+    margin-right: 10px;
+  }
+  .slick-prev {
+    transform: rotate(-90deg);
+    margin-left: 10px;
+  }
+  
+  .slick-slide {
+    height: 450px;
+
+    div {
+      height: 100%;
+
+      figure {
+        height: 100%;
+
+        img {
+          height: 100%;
+        }
+      }
+    }
+  }
+}
+
+.carousel {
+  overflow: hidden;
+}
+.slider-navigation-previous {
+margin-left: 1em;
+}
+.slider-navigation-next {
+margin-right: 1em;
+}
+
+.modal {
+  .modal-content {
+    .container  {
+      video {
+        max-width: none;
+        width: 100.1%;
+      }
+      .image-box {
+        overflow: hidden;
+
+        img {
+          max-width: none;
+        }
+        
+        img.zoom {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+}
+
+.breadcrumb-section {
+  padding: 1rem 30px 0.5rem 30px;
+}
+
+//nav 
+.navbar {
+  height: 72px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  .container {
+    margin: 0 30px;
+
+    .navbar-brand {
+      height: 100%;
+      width: -webkit-fill-available;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      color: black;
+
+      .navbar-item {
+        color: black;
+      }
+
+      .navbar-burger {
+        height: 50px;
+        width: 50px;
+        margin-left: 0;
+        display: block;
+        color: black;
+
+        span {
+          width: 40px;
+          left: 0;
+        }
+
+        span:nth-child(1) {
+          top: calc(50% - 8px);
+        }
+        span:nth-child(2) {
+          top: 50%;
+        }
+        span:nth-child(3) {
+          top: calc(50% + 8px);
+        }
+      }
+    }
+    .navbar-menu {
+      display: none;
+    }
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .navbar {
+    .container {
+      margin: 0 60px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      .navbar-brand {
+        width: auto;
+
+        .navbar-burger {
+          display: none;
+        }
+      }
+
+      .navbar-menu {
+        display: block;
+
+        .navbar-end {
+          height: 100%;
+
+          .navigation {
+            display: flex;
+            flex-direction: row;
+            gap: 25px;
+            align-items: center;
+          }
+        }
+      }
+    }
+  }
+  .breadcrumb-section {
+    padding: 1rem 60px 0.5rem 60px;
+  }
+}
+
+@media screen and (max-width: 1087px) {
+  .navbar {
+    .container {
+      display: flex;
+
+      .navbar-menu {
+        background-color: transparent;
+        box-shadow: none;
+        padding: 0;
+      }
+    }
   }
 }

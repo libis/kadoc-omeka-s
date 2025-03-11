@@ -11,45 +11,38 @@ $type = $this->pagesMetadata('type') ?: null;
 $next = $this->pagesMetadata('next',$page) ?: null;
 $previous = $this->pagesMetadata('previous',$page) ?: null;
 ?>
-<style>
-  .breadcrumb li + li::before {
-    color:#cb8c96;
-  }
-  .breadcrumb-section .breadcrumb li,.breadcrumb-section .breadcrumb a {
-    font-size: 1.1em;
-    font-weight:300;
-  }
-</style>
-<?php if(!in_array($page->title(), array('Home','Disclaimer','Contact'),true)):?>
-<section class="breadcrumb-section white-section">
-  <div class="container">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><a href="<?php echo $site->url();?>/page/home">Home</a></li>
-        <?php if($activePage['depth'] !== 0):?>
-          <li><?php echo $nav->breadcrumbs()->setSeparator('</li><li>');?></li>
-        <?php else:?>
-          <li><?php echo $page->title();?></li>
-        <?php endif;?>
-      </ul>
-    </nav>
+<div class="page">
+  <?php if(!in_array($page->title(), array('Home','Disclaimer','Contact'),true)):?>
+    <section class="breadcrumb-section white-section">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+          <ul>
+            <li><a href="<?php echo $site->url();?>/page/home">Home</a></li>
+            <?php if($activePage['depth'] !== 0):?>
+              <li><?php echo $nav->breadcrumbs()->setSeparator('</li><li>');?></li>
+            <?php else:?>
+              <li><?php echo $page->title();?></li>
+            <?php endif;?>
+          </ul>
+        </nav>
+      </div>
+    </section>
+  <?php endif;?>
+
+  <div class="has-text-centered">
+    <?php if($previous && ($this->pageMetadata('type',$previous) == 'tentoonstelling' || $this->pageMetadata('type',$previous) == 'tentoonstelling')):?>
+      <a class="button is-outlined" href="<?php echo $previous->url();?>">Vorige</a>
+    <?php endif;?>
+    <?php if($next  && ($this->pageMetadata('type',$next) == 'tentoonstelling'|| $this->pageMetadata('type',$next) == 'tentoonstelling')):?>
+      <a class="button is-outlined" href="<?php echo $next->url();?>">Volgende</a>
+    <?php endif;?>
   </div>
-</section>
-<?php endif;?>
 
-<div class="has-text-centered">
-  <?php if($previous && ($this->pageMetadata('type',$previous) == 'tentoonstelling' || $this->pageMetadata('type',$previous) == 'tentoonstelling')):?>
-    <a class="button is-outlined" href="<?php echo $previous->url();?>">Vorige</a>
-  <?php endif;?>
-  <?php if($next  && ($this->pageMetadata('type',$next) == 'tentoonstelling'|| $this->pageMetadata('type',$next) == 'tentoonstelling')):?>
-    <a class="button is-outlined" href="<?php echo $next->url();?>">Volgende</a>
-  <?php endif;?>
+  <?php //$this->trigger('view.show.before'); ?>
+    <?php echo $this->content; ?>
+  <?php //$this->trigger('view.show.after'); ?>
+  <?php if ($showPagePagination): ?>
+    <?php echo $this->sitePagePagination(); ?>
+  <?php endif; ?>
 </div>
-
-<?php //$this->trigger('view.show.before'); ?>
-<?php echo $this->content; ?>
-<?php //$this->trigger('view.show.after'); ?>
-<?php if ($showPagePagination): ?>
-<?php echo $this->sitePagePagination(); ?>
-<?php endif; ?>
  

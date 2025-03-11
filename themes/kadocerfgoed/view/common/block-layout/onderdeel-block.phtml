@@ -1,0 +1,249 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets
+ * @var string $thumbnailType
+ * @var string $showTitleOption
+ */
+
+$plugins = $this->getHelperPluginManager();
+$thumbnail = $plugins->get('thumbnail');
+
+$defaultThumbnail = $this->assetUrl('thumbnails/default.png', 'Omeka', true);
+$defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
+
+$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$lang = $filterLocale ? $this->lang() : null;
+
+$escape = $this->plugin('escapeHtml');
+?>
+ <section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-6">
+                <div class="custom-carousel" id="carousel-demo-custom">
+                  <?php $i=0;?>
+                <?php foreach($attachments as $item):
+                    $media = $item->media();
+                    if($media):
+                    $thumbnail = $media->thumbnailUrl('large');
+                    else:
+                    $thumbnail = '';
+                    endif;
+                ?>
+                <figure class="image image-slider-box" style="cursor:pointer;">
+                    <img src="<?php echo $thumbnail;?>" class="item-<?php echo $i;?>" onclick="moreInfo(<?php echo $i;?>);" style="object-fit:contain;background-color:#edced3;">
+                    <div style="float:left;"><?php echo $item->caption(); ?></div>
+                </figure>
+                
+                <?php $i++;?>
+                <?php endforeach;?>
+            </div>
+            </div>
+            <div class="column is-6">
+            <div class="arrow-left"></div>
+                <h1 class="title is-3"><?php echo $block->dataValue('title');?></h1>
+                    <p><?php echo $block->dataValue('text');?></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php $a=0;?>
+<?php foreach($attachments as $item):
+$media = $item->media();?>
+
+<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;" onclick="enlargeImage(<?php echo $a?>);">
+    <div class="modal-background"></div>
+    <div class="modal-content">    
+        <div class="container" style="background-color: aliceblue;width: fit-content;">
+            <div class="image-box">
+                <img id="img-<?php echo $a;?>" src="<?php echo $media->originalUrl(); ?>">
+            </div>
+        <div class="column">
+        <?php echo $item->item()->displayValues();?>
+        <a href="https://slimerfgoed.be/s/kadocerfgoed/item/<?php echo $item->item()->id(); ?>">Object URL</a>
+        <div class="has-text-right" style="padding-top:0.75rem;">
+        <?php if($a != 0): ?>
+        <button class="button" style="background-color: #e29ca7;color:aliceblue;border-radius:0px;" onclick="previousModal(<?php echo$a;?>);"><</button>
+        <?php endif;?>
+        <button class="button" style="background-color: #e29ca7;color:aliceblue;border-radius:0px;" onclick="nextModal(<?php echo$a;?>);">></button>
+        <?php if($media):?>
+        <a href="<?php echo $media->originalUrl(); ?>" class="button" style="background-color:#e29ca7;color:aliceblue;border-radius:0px;" download="<?php echo $item->item()->displayTitle();?>">Downloaden</a>
+        <?php endif;?>
+        </div>
+        </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="closeModal();"></button>
+</div>
+<?php $a++;?>
+<?php endforeach;?>
+
+<script>
+    function moreInfo(x) {
+        let id = '#modal-' + x;
+        $( id ).css("cursor","zoom-in");
+        $( id ).addClass("is-active");
+        $( id ).addClass("zoom-in");
+
+        let html = '#html'
+        $( html ).css("overflow-y","hidden");
+
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let imageContainer = document.getElementById(imgi).parentElement;
+        let container = imageContainer.parentElement;
+        let maxWidth = '80vw';
+
+        let imgHeight = img.offsetHeight;
+        let imgWidth = img.offsetWidth;
+
+        img.style.height = '100%';
+        img.style.width = '100%'; 
+
+        container.style.maxWidth = maxWidth;
+        imageContainer.style.maxHeight = imgHeight + "px";
+        imageContainer.style.maxWidth = imgWidth + "px";
+
+        if(img.clientWidth < img.clientHeight) {
+            img.style.height = "93vh";
+            img.style.width = "auto";
+        };
+    }
+    function enlargeImage(x){
+        let imgi = 'img-' + x;
+        let img = document.getElementById(imgi);
+        let parentModal = img.closest('.modal');
+
+        if($(parentModal).hasClass('zoom-in')) { 
+            $(parentModal).css("cursor","zoom-out");
+            $(parentModal).removeClass("zoom-in");
+            $(img).addClass("zoom");
+        }
+        else {
+            $(parentModal).css("cursor","zoom-in");
+            $(parentModal).addClass("zoom-in");
+            $(img).removeClass("zoom");
+        }
+    
+    }
+    function nextModal(x){
+        let y = x + 1;
+        let current = '#modal-' + x;
+        let modal = '#modal-' + y;
+        let currentImg = $(current).find('img');
+
+        if($(modal).length > 0){
+            $(modal).addClass("is-active");
+            $(current).removeClass("is-active");
+            $( modal ).css("cursor","zoom-in");
+            $( modal ).addClass("zoom-in");
+            $(current).removeClass("zoom-in");
+            $(currentImg).removeClass("zoom");
+
+            let imgi = 'img-' + y;
+            let img = document.getElementById(imgi);
+            let imageContainer = document.getElementById(imgi).parentElement;
+            let container = imageContainer.parentElement;
+            let maxWidth = '80vw';
+
+            let imgHeight = img.offsetHeight;
+            let imgWidth = img.offsetWidth;
+
+            img.style.height = '100%';
+            img.style.width = '100%'; 
+
+            container.style.maxWidth = maxWidth;
+            imageContainer.style.maxHeight = imgHeight + "px";
+            imageContainer.style.maxWidth = imgWidth + "px";
+
+            if(img.clientWidth < img.clientHeight) {
+                img.style.height = "93vh";
+                img.style.width = "auto";
+            };
+        } 
+        else {
+            $('#modal-0').addClass("is-active");
+            $(current).removeClass("is-active");
+            $( '#modal-0' ).css("cursor","zoom-in");
+            $( '#modal-0' ).addClass("zoom-in");
+            $(current).removeClass("zoom-in");
+            $(currentImg).removeClass("zoom");
+
+            let imgi = 'img-0';
+            let img = document.getElementById(imgi);
+            let imageContainer = document.getElementById(imgi).parentElement;
+            let container = imageContainer.parentElement;
+            let maxWidth = '80vw';
+
+            let imgHeight = img.offsetHeight;
+            let imgWidth = img.offsetWidth;
+
+            img.style.height = '100%';
+            img.style.width = '100%'; 
+
+            container.style.maxWidth = maxWidth;
+            imageContainer.style.maxHeight = imgHeight + "px";
+            imageContainer.style.maxWidth = imgWidth + "px";
+
+            if(img.clientWidth < img.clientHeight) {
+                img.style.height = "93vh";
+                img.style.width = "auto";
+            };
+        }
+    }
+    function previousModal(x){
+        let y = x - 1;
+        let current = '#modal-' + x;
+        let currentImg = $(current).find('img');
+        let modal = '#modal-' + y;
+
+        $(modal).addClass("is-active");
+        $(current).removeClass("is-active");
+        $( modal ).css("cursor","zoom-in");
+        $( modal ).addClass("zoom-in");
+        $(current).removeClass("zoom-in");
+        $(currentImg).removeClass("zoom");
+
+        let imgi = 'img-' + y;
+        let img = document.getElementById(imgi);
+        let imageContainer = document.getElementById(imgi).parentElement;
+        let container = imageContainer.parentElement;
+        let maxWidth = '80vw';
+
+        let imgHeight = img.offsetHeight;
+        let imgWidth = img.offsetWidth;
+
+        img.style.height = '100%';
+        img.style.width = '100%'; 
+
+        container.style.maxWidth = maxWidth;
+        imageContainer.style.maxHeight = imgHeight - 20 + "px";
+        imageContainer.style.maxWidth = imgWidth - 30 + "px";
+
+        if(img.clientWidth < img.clientHeight) {
+            img.style.height = "93vh";
+            img.style.width = "auto";
+        };
+    }
+    function closeModal(){
+        let modal = '.modal';
+        let html = '#html';
+        let img = $(modal).find('img');
+        $( modal ).removeClass("is-active");
+        $( html ).css("overflow-y","unset");
+
+        $(modal).removeClass("zoom-in");
+        $(img).removeClass("zoom");
+    }
+    //somehow try and get rid of carrousel arrows
+    $(document).ready(function() {
+        let prev = ".slider-navigation-previous";
+        let next = ".slider-navigation-next";
+        $( prev ).addClass("is-hidden");
+        $( next ).addClass("is-hidden");
+    });
+</script>
+

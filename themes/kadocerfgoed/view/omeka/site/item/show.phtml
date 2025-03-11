@@ -101,12 +101,11 @@ $itemMedia = $resource->media();
             <?php if (isset($lightMedia)): ?>
                 <?php echo $this->LightGalleryOutput($lightMedia); ?>
             <?php endif; ?>
-                <!-- <div class="media-embeds">
                 <?php foreach ($itemMedia as $media):
                     echo $media->render();
                 endforeach;
                 ?>
-                </div> -->
+                </div>
             <?php endif; ?>
             <?php if($download):?>
               <div class="">

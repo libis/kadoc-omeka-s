@@ -20,10 +20,6 @@ $translate = $this->plugin('translate');
   font-size: 1rem;
 }
 
-.checkbox {
-  padding: 1em;
-}
-
 input[type="radio"] {
 accent-color:#edced3;
 }
@@ -54,26 +50,25 @@ input[type="checkbox"] {
     $years = array();
     ?>
     <div class="control" style="padding:1em 0;font-size:1em;">
-    <button type="button" class="bouncy-button viewall is-pulled-right" style="background-color:#e29ca7;color:aliceblue;" id="btn-check-outlined" name="tag" onclick="ResetFilter()" autocomplete="off">Alles tonen</button>
-    <?php foreach ($filters as $filter):?>
-      <?php if(is_numeric($filter)){
-        $years[] = $filter;
-      } else { ?>   
-      <button class="button" style="border-color: #edced3;background-color:white;margin-bottom:0.5em;border-radius:0px;">
-      <input type="radio" class="btn-check tag-button" id="<?php echo $filter;?>" name="tag" value="<?php echo $filter;?>" onclick="FilterTags()" autocomplete="off">
-      <label class="radio" for="<?php echo $filter;?>">&nbsp;<?php echo ucfirst($filter);?></label>
-      </button>
-  <?php };?>
-  <?php endforeach;
-  if($years):
-  natsort($years);?>
-  <?php foreach ($years as $year):?>
-  <input type="radio" class="btn-check tag-button" id="<?php echo $year;?>" name="tag" value="<?php echo $year;?>" onclick="FilterTags()" autocomplete="off">
-  <label class="radio" for="<?php echo $year;?>"><?php echo $year;?></label>
-  <?php endforeach; endif;?>
-  </div>
-  <?php endif;?>
-
+      <button type="button" class="bouncy-button viewall is-pulled-right" style="background-color:#e29ca7;color:aliceblue;" id="btn-check-outlined" name="tag" onclick="ResetFilter()" autocomplete="off">Alles tonen</button>
+      <?php foreach ($filters as $filter):?>
+        <?php if(is_numeric($filter)){
+          $years[] = $filter;
+        } else { ?>   
+          <button class="button" style="border-color: #edced3;background-color:white;margin-bottom:0.5em;border-radius:0px;">
+          <input type="radio" class="btn-check tag-button" id="<?php echo $filter;?>" name="tag" value="<?php echo $filter;?>" onclick="FilterTags()" autocomplete="off">
+          <label class="radio" for="<?php echo $filter;?>">&nbsp;<?php echo ucfirst($filter);?></label>
+          </button>
+        <?php };?>
+      <?php endforeach;?>
+      <?php if($years):
+        natsort($years);?>
+        <?php foreach ($years as $year):?>
+          <input type="radio" class="btn-check tag-button" id="<?php echo $year;?>" name="tag" value="<?php echo $year;?>" onclick="FilterTags()" autocomplete="off">
+          <label class="radio" for="<?php echo $year;?>"><?php echo $year;?></label>
+        <?php endforeach; endif;?>
+      <?php endif;?>
+    </div>
     <div class="columns is-multiline">
       <?php
       $i=0;

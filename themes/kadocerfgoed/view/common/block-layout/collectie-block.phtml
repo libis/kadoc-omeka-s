@@ -66,8 +66,8 @@ endwhile;
           <div class="arrow-left"></div>
           <h1 class="title is-3 is-family-secondary"><?php echo $block->dataValue('title');?></h1>
           <h3 class="title is-4"><?php echo $block->dataValue('sec_title');?></h3>
-            <div>
-              <?php foreach($authors as $author): ?>
+          <div class="authors">
+            <?php foreach($authors as $author): ?>
               <?php
                 $api = $this->api()->read('items',$author);
                 $authorApi = $api->getContent();
@@ -76,13 +76,13 @@ endwhile;
                 <span><?php echo $authorApi->value('schema:givenName') . " " . $authorApi->value('schema:familyName');?></span>
               </a>
             <?php endforeach; ?>
-            </div>
+          </div>
 
         <div class="column is-11" style="padding-left:0px;">
           <?php echo $block->dataValue('text');?>
         </div>
         <form method="post" id="download-start"><input hidden name="downloaded" value="downloaded"></form>
-        <div class="column is-12" style="padding-left:0px;">
+        <div class="column is-12 share-buttons" style="padding-left:0px;">
           <a><button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="bouncy-button share" onclick="copyLink()">Delen</button></a>
           <a><button data-callback='onSubmit' data-action='submit' class="bouncy-button download" onclick="startDownload();">Collectie downloaden</button></a>
           <?php if($block->dataValue('map')): ?>

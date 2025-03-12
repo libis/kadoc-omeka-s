@@ -9,27 +9,16 @@ $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
 ?>
-<style>
-    .colour-button:hover {
-        box-shadow: unset !important;
-        transform:translateX(-5px);
-        transition: all 1s ease;
-    }
-    .colour-button {
-        transition: all 1s ease;
-    }
-    .chevron-link:hover {
-        transform: scaleX(0.95);
-    }
-</style>
-<div class="container block links">
-<ul class="list-links">
-    <?php foreach ($links as $url => $label): ?>
-        <li style="padding-bottom:1.5em;">
-            <a href="<?= $escapeAttr($url) ?>"<?php if (filter_var($url, FILTER_VALIDATE_URL)): ?> target="_blank"<?php endif; ?>>
-                <button class="arrow bouncy-button"><?= $escape($label) ?></button>
-            </a>
-        </li>
-    <?php endforeach; ?>
-    </ul>
-</div>
+<section class="section links-section">
+    <div class="container block links">
+        <ul class="list-links">
+            <?php foreach ($links as $url => $label): ?>
+                <li style="padding-bottom:1.5em;">
+                    <a href="<?= $escapeAttr($url) ?>"<?php if (filter_var($url, FILTER_VALIDATE_URL)): ?> target="_blank"<?php endif; ?>>
+                        <button class="arrow bouncy-button"><?= $escape($label) ?></button>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+</section>

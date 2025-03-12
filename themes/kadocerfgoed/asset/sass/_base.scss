@@ -1,7 +1,13 @@
 /* main: style.scss */
 body{
-    //background: $primary;
-    text-rendering: optimizeLegibility;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+}
+
+.no-section {
+  display: none;
 }
 
 .subtitle{
@@ -112,14 +118,6 @@ section.is-fluid{
   background: white;
 }
 
-//catches blocks without templates like html & pageTitle
-.no-section{
-  h2{
-    font-size: 2.5rem;
-    font-family: $family-secondary;
-  }
-}
-
 //hero
 .hero-overlay{
   //background: rgba($primary,0.4);
@@ -219,6 +217,40 @@ section.is-fluid{
 }
 .card-bg-img-3{
   height: 250px;
+}
+
+//tentoonstelling block 
+.exhibition-section {
+
+  h1 {
+    span {
+      word-break: break-all;
+    }
+  }
+
+  .item-set-showcase {
+    .columns {
+      margin: 0;
+
+      .column {
+        padding: 1rem 0;
+
+        button {
+          margin-top: 2rem;
+        }
+      }
+    }
+  }
+}
+
+//collection block
+.collectie-block {
+  .authors, .share-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
 }
 
 //browse-block
@@ -645,6 +677,11 @@ section.is-fluid{
   }
 }
 
+//links block
+.links-section {
+  padding: 0 1.5rem .5rem ;
+}
+
 //search-block
 .search-page{
   h2{
@@ -896,6 +933,19 @@ section.is-fluid{
   }
 }
 
+//button
+.colour-button:hover {
+  box-shadow: unset !important;
+  transform:translateX(-5px);
+  transition: all 1s ease;
+}
+.colour-button {
+  transition: all 1s ease;
+}
+.chevron-link:hover {
+  transform: scaleX(0.95);
+}
+
 //footer
 .wrapper{
   background: #f7f7f7;
@@ -905,7 +955,10 @@ footer.footer{
   width: 100%;
   z-index: 0;
   color: white;
-  padding: 0 0;
+  padding: 1.5rem;
+  background-color: white;
+  position: relative;
+  bottom: 0;
 
   .footer-top{
     background: $text;
@@ -925,23 +978,9 @@ footer.footer{
   }
 }
 
+//
+
 .page-feature-section, .featured-section {
-  .zigzag {
-    display: inline-block;
-    position: relative;
-  }
-  
-  .zigzag:after {
-    content: '';
-    height: 18px;
-    width: 100%;
-    position: absolute;
-    background: url("https://cldup.com/MiGVGBh-0U.png");
-    background-size: 30px;
-    top: 35px;
-    bottom: 0px;
-    left: 0;
-  }
   .card-content {
     background-color: rgba(0,0,0,0.36);
     background:linear-gradient(transparent, black);
@@ -969,6 +1008,7 @@ footer.footer{
   }
 }
 
+//carousel
 .custom-carousel {
   overflow: hidden;
 
@@ -1030,6 +1070,7 @@ margin-left: 1em;
 margin-right: 1em;
 }
 
+//modal
 .modal {
   .modal-content {
     .container  {
@@ -1052,6 +1093,7 @@ margin-right: 1em;
   }
 }
 
+//breadcrumb
 .breadcrumb-section {
   padding: 1rem 30px 0.5rem 30px;
 }
@@ -1104,10 +1146,39 @@ margin-right: 1em;
     }
     .navbar-menu {
       display: none;
+
+      .navigation {
+        display: none;
+      }
     }
   }
 }
 
+//page browse section
+.page-browse-section {
+  .control {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    button {
+      height: fit-content;
+    }
+  }
+
+  .control:has(.checkbox) {
+    gap: 20px;
+  }
+}
+
+//desktop
 @media screen and (min-width: 1024px) {
   .navbar {
     .container {

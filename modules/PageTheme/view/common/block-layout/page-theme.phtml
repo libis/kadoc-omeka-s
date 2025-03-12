@@ -20,10 +20,6 @@ $translate = $this->plugin('translate');
   font-size: 1em;
 }
 
-.checkbox {
-  padding: 1em;
-}
-
 input[type="radio"] {
 accent-color:#edced3;
 transition: transform 250ms;
@@ -76,8 +72,8 @@ input[type="checkbox"] {
   <?php endforeach; endif;?>
   </div>
   <?php endif;?>
-    <div class="control" style="padding-bottom:0.5em;padding-top:2em;text-align:center;">
-      <label style="float:left;font-size:1rem;margin-top:0.9rem;">Filter op type:</label>
+    <div class="control" style="padding-bottom:1.5em;padding-top:2em;text-align:center;">
+      <label style="float:left;font-size:1rem;">Filter op type:</label>
       <label class="checkbox">
         <input type="checkbox" checked name="type" value="tentoonstelling" class="checkbox-bigger" onclick="FilterTags()"/>
         <span style="font-size:1em;">Tentoonstelling</span> 

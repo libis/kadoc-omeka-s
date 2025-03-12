@@ -37,37 +37,14 @@ if (strpos($url, 'page/home') !== false) {
         <?php echo $this->headStyle(); ?>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <!-- <script src="https://kit.fontawesome.com/582fb8c29f.js" crossorigin="anonymous"></script> -->
-       
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/css/bulma-carousel.min.css">
     <?php echo $this->headLink(); ?>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,400;0,700;1,900&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-208068755-1"></script>
-		<script>
-		  window.dataLayer = window.dataLayer || [];
-		  function gtag(){dataLayer.push(arguments);}
-		  gtag('js', new Date());
-
-		  gtag('config', 'UA-208068755-1');
-		</script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
-      body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-      }
       .over-footer{
         flex:1;
       }
-      @media (max-width: 1024px) {
-        .navigation {
-          display: none;
-        }
-      };
       .has-icons-right > .has-addons {
         display:flex;
         padding: 3.5rem;
@@ -88,22 +65,6 @@ if (strpos($url, 'page/home') !== false) {
       }
       .modal-background {
         background-color: rgba(00, 00, 00, 0.4) !important;
-      }
-      .zigzag {
-        display: inline-block;
-        position: relative;
-      }
-
-      .zigzag:after {
-        content: '';
-        height: 10px;
-        width: 100%;
-        position: absolute;
-        background: url("https://cldup.com/MiGVGBh-0U.png");
-        background-size: 18px;
-        top: 35px;
-        bottom: 0px;
-        left: 0;
       }
       .arrow-left {
         width: 0; 
@@ -451,7 +412,7 @@ if (strpos($url, 'page/home') !== false) {
       </div>
     </div>
 
-    <footer class="footer" style="background-color:white;position:relative;padding-top:1.5rem;padding-bottom:1.5rem;bottom:0;">
+    <footer class="footer">
         <div class="container">
           <nav class="level">
             <!-- Left side -->

@@ -81,87 +81,88 @@ details[open] summary:after {
  content: " ▼";
 }
 </style>
-<header>
-<?php if($url):?>
-<section class="hero is-bold" style="background:url(<?php echo $url;?>) no-repeat center center;background-size: cover;">
-<?php else:?>
-<section class="hero is-bold">
-<?php endif;?>
-  <div class="hero-overlay">
-    <div class="hero-body">
-      <div class="container">
-        <div class="columns">
-          <div class="column hero-left is-info is-12" style="align-content:end;">
-            <div class="hero-text is-size-5" style="text-align:left;padding:0rem;">
-              <h1 class="title is-family-secondary is-1"><span><?php echo $block->dataValue('title');?></span></h1>
-              <?php if($block->dataValue('sec_title')):?>
-                 <h2 class="subtitle is-size-4"><?php echo $block->dataValue('sec_title');?></h2>
-              <?php endif;?>
-              <div class="link">
-                <?php foreach($authors as $author): ?>
-                  <?php
-                  $api = $this->api()->read('items',$author);
-                  $authorApi = $api->getContent();
-                  ?>
-                <a class="button is-primary is-inverted is-outlined author-btn" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
-                  <span><?php echo $authorApi->value('schema:givenName') . " " . $authorApi->value('schema:familyName');?></span>
-                  <span class="icon is-small">
-                    <i class="fa fa-angle-right"></i>
-                  </span>
-                </a>
-                <?php endforeach; ?>
+<section class="exhibition-section">
+  <header>
+    <?php if($url):?>
+    <section class="hero is-bold" style="background:url(<?php echo $url;?>) no-repeat center center;background-size: cover;">
+    <?php else:?>
+    <section class="hero is-bold">
+    <?php endif;?>
+      <div class="hero-overlay">
+        <div class="hero-body">
+          <div class="container">
+            <div class="columns">
+              <div class="column hero-left is-info is-12" style="align-content:end;">
+                <div class="hero-text is-size-5" style="text-align:left;padding:0rem;">
+                  <h1 class="title is-family-secondary is-1"><span><?php echo $block->dataValue('title');?></span></h1>
+                  <?php if($block->dataValue('sec_title')):?>
+                    <h2 class="subtitle is-size-4"><?php echo $block->dataValue('sec_title');?></h2>
+                  <?php endif;?>
+                  <div class="link">
+                    <?php foreach($authors as $author): ?>
+                      <?php
+                      $api = $this->api()->read('items',$author);
+                      $authorApi = $api->getContent();
+                      ?>
+                    <a class="button is-primary is-inverted is-outlined author-btn" href="<?php echo $block->page()->site()->url() . '/item/' . $author;?>">
+                      <span><?php echo $authorApi->value('schema:givenName') . " " . $authorApi->value('schema:familyName');?></span>
+                      <span class="icon is-small">
+                        <i class="fa fa-angle-right"></i>
+                      </span>
+                    </a>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+              </div>
+              <div class="column hero-right" >
+                <div class="hero-overlay"></div>
               </div>
             </div>
           </div>
-          <div class="column hero-right" >
-            <div class="hero-overlay"></div>
-          </div>
         </div>
-
       </div>
-     </div>
-   </div>
- </section>
- </header>
- <div class="block item-set-showcase section container" style="padding-left:0;">
-<button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="level bouncy-button share is-warning" onclick="copyLink()">Delen</button>
+    </section>
+  </header>
+  <div class="block item-set-showcase section container">
+    <button title="Kopieert URL" id="delen" value="<?php echo $this->serverUrl() . $block->page()->url(); ?>" class="level bouncy-button share is-warning" onclick="copyLink()">Delen</button>
     <div class="item-set resource columns">
-        <div class="column is-8">
+      <div class="column is-8">
         <?php echo $block->dataValue('text');?>
-            <button class="bouncy-button arrow" style="margin-top:1em;"><a href="<?php echo strtolower($newPages[0]['label']);?>" style="color:white;">Tentoonstelling starten</a></button>
-        </div>
-<div class="column is-1"></div>
-<aside class="menu column is-3 box" style="padding: 1.25rem 2rem;">
-  <h2 class="title is-3">Inhoudstafel</h2>
-    <ul class="menu-list">
-      <?php foreach($newPages as $page): ?>
-        <?php if($page['pages']): ?>
-      <li>
-      <details>
-        <summary><a href="<?php echo strtolower($page['label']);?>"><?php echo $page['label'];?></a></summary>
-        <ul>
-          <?php
-            $subpages = $page['pages'];
-          ?>
-          <?php foreach($subpages as $sub): ?>
+        <button class="bouncy-button arrow"><a href="<?php echo strtolower($newPages[0]['label']);?>" style="color:white;">Tentoonstelling starten</a></button>
+    </div>
+  <div class="column is-1"></div>
+  <aside class="menu column is-3 box" style="padding: 1.25rem 2rem;">
+    <h2 class="title is-3">Inhoudstafel</h2>
+      <ul class="menu-list">
+        <?php foreach($newPages as $page): ?>
+          <?php if($page['pages']): ?>
+        <li>
+        <details>
+          <summary><a href="<?php echo strtolower($page['label']);?>"><?php echo $page['label'];?></a></summary>
+          <ul>
+            <?php
+              $subpages = $page['pages'];
+            ?>
+            <?php foreach($subpages as $sub): ?>
 
-          <li><a href="<?php echo strtolower($sub['label']); ?>"><?php echo $sub['label']; ?></a></li>
+            <li><a href="<?php echo strtolower($sub['label']); ?>"><?php echo $sub['label']; ?></a></li>
 
-          <?php endforeach; ?>
-        </ul>
-      </details>
-      </li>
-      <?php else: ?>
-        <li><a href="<?php echo strtolower($page['label']); ?>"><?php echo $page['label']; ?></a></li>
-        <?php endif;?>
-<?php endforeach;?>
+            <?php endforeach; ?>
+          </ul>
+        </details>
+        </li>
+        <?php else: ?>
+          <li><a href="<?php echo strtolower($page['label']); ?>"><?php echo $page['label']; ?></a></li>
+          <?php endif;?>
+  <?php endforeach;?>
 
-        <!-- <?= $this->navigation($subNav)->menu()->renderMenu(null, ['maxDepth' => 1]);?> -->
+          <!-- <?= $this->navigation($subNav)->menu()->renderMenu(null, ['maxDepth' => 1]);?> -->
 
-    </ul>
-</aside>
-</div>
-</div>
+      </ul>
+  </aside>
+  </div>
+  </div>
+</section>
 <script>
   function copyLink() {
     console.log("Clicked!");

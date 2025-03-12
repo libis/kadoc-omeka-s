@@ -33,6 +33,8 @@ RUN docker-php-ext-install -j$(nproc) iconv pdo pdo_mysql mysqli
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j "$(nproc)" gd
 
+WORKDIR /var/www/html/    
+
 RUN usermod -u 1000 www-data
 RUN wget --no-verbose "https://github.com/omeka/omeka-s/releases/download/v3.2.3/omeka-s-3.2.3.zip" -O /var/www/omeka-s.zip
 RUN unzip -q /var/www/omeka-s.zip -d /var/www/ \
@@ -41,9 +43,12 @@ RUN unzip -q /var/www/omeka-s.zip -d /var/www/ \
 &&  mv /var/www/omeka-s /var/www/html/ \
 &&  chown -R www-data:www-data /var/www/html/
 
-COPY php.ini-development /usr/local/etc/php
+# Content
+COPY .htaccess /var/www/html
+COPY themes /var/www/html/themes
+COPY modules /var/www/html/modules
 
-VOLUME /var/www/html/
+COPY php.ini-development /usr/local/etc/php
 
 COPY extra.ini /usr/local/etc/php/conf.d/
 COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini

@@ -14,6 +14,7 @@ services:
       - ./files/:/var/www/html/files/
       - ./config/:/var/www/html/config/
       - ./.htaccess:/var/www/html/.htaccess
+      - ./imagemagick-policy.xml:/var/www/html/imagemagick-policy.xml
     restart: "no"
 
 networks:

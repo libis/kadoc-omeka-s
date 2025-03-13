@@ -34,7 +34,7 @@
     "> 1% in US"
   ],
   "dependencies": {
-    "bulma": "^1.0.2",
+    "bulma": "^0.8.1",
     "masonry-layout": "^4.2.2"
   }
 }

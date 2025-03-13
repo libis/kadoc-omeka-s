@@ -148,7 +148,9 @@ $media = $item->media();?>
             <?php if($media[0]->mediaType() == "video/mp4"): ?>
               <?= $media[0]->render(); ?>
             <?php else: ?>
-              <img id="img-<?php echo $a;?>" src="<?php echo $media[0]->originalUrl(); ?>">
+              <div class="image-box">
+                <img id="img-<?php echo $a;?>" src="<?php echo $media[0]->originalUrl(); ?>">
+            </div>
             <?php endif; ?>
           <?php endif;?>
         <div class="column">
@@ -198,6 +200,7 @@ $media = $item->media();?>
 
           let imgHeight = img.offsetHeight;
           let imgWidth = img.offsetWidth;
+          console.log(imageContainer);
           imageContainer.style.maxHeight = imgHeight + "px";
           imageContainer.style.maxWidth = imgWidth + "px";
 

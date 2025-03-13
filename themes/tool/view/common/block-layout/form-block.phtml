@@ -14,6 +14,7 @@ $post  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
       
 $type = isset($get["type"]) ? $get['type'] : '';
 $subject = isset($get["subject"]) ? $get['subject'] : '';
+
 $formmail = isset($get["mail"]) ? $get['mail'] : '';  
 ?>
 
@@ -29,7 +30,7 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
             $post  = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
             $error = '';
             
-            $message = "<p>Name: ".$post["naam"]."</p><p>E-mail: ".$post["email"]."</p><p>".$post["vraag"]."</p>";
+            $message = "<p>Name: ".$post["naam"]."</p><p>E-mail: ".$post["mail"]."</p><p>Organisatie: ".$post["organisatie"]."</p><p>Functie: ".$post["functie"]."</p><p>".$post["vraag"]."</p>";
             $html = new MimePart($message);
             $html->type = Mime::TYPE_HTML;
             $html->charset = 'utf-8';
@@ -78,20 +79,34 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
         <?php endif;?>  
         <form id="feedback-form" method="post">
           <div class="field">
-            <label class="label" for="naam">Naam</label>
+            <label class="label" for="naam">Naam*</label>
             <div class="control">
               <input class="input" type="text" id="naam" name="naam" required placeholder="">
             </div>
           </div>
           <div class="label" class="field">  
-            <label for="mail">E-mail</label>
+            <label for="mail">E-mail*</label>
             <div class="control">
-              <input class="input" type="mail" id="mail" name="mail"required placeholder="">
+              <input class="input" type="mail" id="mail" name="mail" required placeholder="">
             </div>
           </div>
 
           <div class="field">
-            <label class="label" for="onderwerp">Onderwerp</label>
+            <label class="label" for="onderwerp">Organisatie</label>
+            <div class="control">
+              <input class="input" type="text" id="organisatie" name="organisatie" placeholder="">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="onderwerp">Functie</label>
+            <div class="control">
+              <input class="input" type="text" id="functie" name="functie" placeholder="">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="onderwerp">Onderwerp*</label>
             <div class="control">
               <input class="input" type="text" id="onderwerp" name="onderwerp" required placeholder="">
             </div>

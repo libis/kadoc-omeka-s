@@ -108,8 +108,10 @@ $media = $item->media();?>
         imageContainer.style.maxWidth = imgWidth + "px";
 
         if(img.clientWidth < img.clientHeight) {
-            img.style.height = "93vh";
-            img.style.width = "auto";
+            img.style.height = "100%";
+            img.style.width = "100%";
+            img.style.maxWidth = "550px";
+            img.style.objectFit = "cover";
         };
     }
     function enlargeImage(x){

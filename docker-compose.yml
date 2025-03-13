@@ -13,8 +13,7 @@ services:
       - ./modules/:/var/www/html/modules/
       - ./files/:/var/www/html/files/
       - ./config/:/var/www/html/config/
-      - ./htaccess:/var/www/html/.htaccess
-      - ./imagemagick-policy.xml:/var/www/html/imagemagick-policy.xml
+      - ./.htaccess:/var/www/html/.htaccess
     restart: "no"
 
 networks:

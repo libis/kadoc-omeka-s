@@ -99,7 +99,7 @@ endif;
       </div>
     </div>
 <?php elseif($type == "Tool"):?>
-    <div class="container" style="margin-bottom:1.5rem;">
+  <div class="container" style="margin-bottom:1.5rem;">
     <div class="zorg-lightbox">
       <?php
         $itemMedia = $resource->media();
@@ -110,75 +110,78 @@ endif;
 
         <?php if (isset($lightMedia)): ?>
             <?php echo $this->LightGalleryOutput($lightMedia); ?>
-        <?php endif; ?>
-        <!--<?php if (isset($otherMedia) && (count($otherMedia) > 0)): ?>
-        
-          <div id="other-media" class="property">
-              <h4><?php echo $this->translate('Other Media'); ?></h4>
-              <div class="values">
-                  <?php foreach($otherMedia as $media): ?>
-                  <div class="value">
-                      <?php echo $media->linkPretty(); ?>
-                  </div>
-                  <?php endforeach; ?>
-              </div>
-          </div>
-       
-        <?php endif; ?>  -->
-        </div>    
-        <?php $refs =  $item->value('dcterms:references', array('all' => true)); ?>
-        <?php $descs =  $item->value('dcterms:description', array('all' => true)); ?>
-        <?php if($refs || $descs):?>
-         <div class="text-box" >           
-           <?php if($descs):?>
-               <?php foreach($descs as $desc):?>
-                 <div style="margin-bottom:0.3rem;">
-                   <?php if ($res = $desc->valueResource()) {?>
-                     <div class="icon-text">
-                        <span class="icon">
-                          <i class="fas fa-chevron-right"></i>
-                        </span>
-                        <span><?php echo $res->link($res->displayTitle());?></span>
-                     </div>
-                   <?php }elseif($desc->type() == 'uri'){ ?>
-                     <div class="icon-text">
-                        <span class="icon">
-                          <i class="fas fa-chevron-right"></i>
-                        </span>
-                        <span><?php echo $desc->asHtml();?></span>
-                     </div>
-                   <?php }else{ ?>
-                        <?php echo $desc;?>
-                   <?php } ?>
-                 </div>
-              <?php endforeach;?>
-           <?php endif;?>
-           
-           <?php if($refs):?>
-             <hr />
-             <?php foreach($refs as $ref):?>
-               <?php $ref_e = explode("$$",$ref->__toString());?>
-               <?php //var_dump($ref_e);?>
-               <?php if($ref_e[0] != ", "):?>
-                 <?php if(substr( $ref_e[0],0, 2 ) === ", "):?>
-                  <?php $ref_e[0] = substr( $ref_e[0],2 );?>
-                 <?php endif;?>
-                 <div style="margin-bottom:0.3rem;">
-                   <?php if($ref_e[1]):?>
-                     <a target="_blank" href="<?php echo $ref_e[1]; ?>"><?php echo $ref_e[0]; ?></a>
-                   <?php else:?>
-                     <?php echo $ref_e[0]; ?>
-                   <?php endif;?>
-                 </div>
-               <?php endif;?>
-             <?php endforeach;?>
-           <?php endif;?>        
+        <?php endif; ?>      
+    </div>    
+    <?php $refs =  $item->value('dcterms:references', array('all' => true)); ?>
+    <?php $descs =  $item->value('dcterms:description', array('all' => true)); ?>    
+    <?php if($refs || $descs):?>
+      <div class="text-box" >           
+          <?php if($descs):?>
+              <?php foreach($descs as $desc):?>
+                <div style="margin-bottom:0.3rem;">
+                  <?php if ($res = $desc->valueResource()) {?>
+                    <div class="icon-text">
+                      <span class="icon">
+                        <i class="fas fa-chevron-right"></i>
+                      </span>
+                      <span><?php echo $res->link($res->displayTitle());?></span>
+                    </div>
+                  <?php }elseif($desc->type() == 'uri'){ ?>
+                    <div class="icon-text">
+                      <span class="icon">
+                        <i class="fas fa-chevron-right"></i>
+                      </span>
+                      <span><?php echo $desc->asHtml();?></span>
+                    </div>
+                  <?php }else{ ?>
+                      <?php echo $desc;?>
+                  <?php } ?>
+                </div>
+            <?php endforeach;?>
+          <?php endif;?>
+          
+          <?php if($refs):?>
+            <hr />
+            <?php foreach($refs as $ref):?>
+              <?php $ref_e = explode("$$",$ref->__toString());?>
+              <?php //var_dump($ref_e);?>
+              <?php if($ref_e[0] != ", "):?>
+                <?php if(substr( $ref_e[0],0, 2 ) === ", "):?>
+                <?php $ref_e[0] = substr( $ref_e[0],2 );?>
+                <?php endif;?>
+                <div style="margin-bottom:0.3rem;">
+                  <?php if($ref_e[1]):?>
+                    <a target="_blank" href="<?php echo $ref_e[1]; ?>"><?php echo $ref_e[0]; ?></a>
+                  <?php else:?>
+                    <?php echo $ref_e[0]; ?>
+                  <?php endif;?>
+                </div>
+              <?php endif;?>
+            <?php endforeach;?>
+          <?php endif;?>     
+
       </div>
     <?php endif;?>                
-   
+    <?php $creators =  $item->value('dcterms:creator', array('all' => true)); ?>
+    
+      <?php if($creators):?>
+        <div style="margin-top:1.5rem;">
+        <?php foreach($creators as $creator):?>
+          <div style="margin-bottom:0.3rem;">
+            <?php echo $creator->asHtml(); ?>
+          </div>
+        <?php endforeach;?>  
+        </div>
+      <?php endif;?>  
+      <?php if($item->value('dcterms:created')):?>
+        <hr>
+        <?php $date = $item->value('dcterms:created');?>
+        <?php $date = date_create($date->asHtml());?>
+        <?php echo date_format($date,"d-m-Y");?>
+      <?php endif;?>  
     </div>   
 <?php else:?>
-    <div class="container" style="margin-bottom:1.5rem;">
+    <div class="container" style="margin-bottom:2.5rem;">
       <div class="columns">
         <?php
           $itemMedia = $resource->media();

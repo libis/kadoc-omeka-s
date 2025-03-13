@@ -122,28 +122,26 @@ if (strpos($url, 'page/home') !== false) {
     <footer class="footer">
       <div class="container">
         <nav class="level">
-            <!-- Left side -->
-            <div class="level-left">
-              <div class="level-item">
-                <div class="logo-small">
-                  <img src="<?php echo $this->assetUrl('img/Toon.png'); ?>" alt="<?php echo $escape($siteTitle); ?>" />
-                </div>  
-              </div>
-              <div class="level-item">
-                
-              </div>
+            <!-- Left side -->            
+            <div class="level-item has-text-left" style="justify-content:left;">
+              <div class="logo-small">
+                <img src="<?php echo $this->assetUrl('img/Toon.png'); ?>" alt="<?php echo $escape($siteTitle); ?>" />
+              </div>  
             </div>
-
-            <!-- Right side -->
-            <div class="level-right">
-              <p class="level-item">
+                       
+            <div class="level-item" >
+                <a target="_blank" href="https://www.linkedin.com/company/toon-vlaanderen/"><span class="icon is-medium"><i class="fab fa-2x fa-linkedin"></i></span></a>
+                <a target="_blank" href="https://www.facebook.com/toon.vlaanderen"><span class="icon is-medium"><i class="fab fa-2x fa-facebook"></i></span></a>
+                <a target="_blank" href="https://www.instagram.com/toon.ldv"><span class="icon is-medium"><i class="fab fa-2x fa-instagram"></i></span></a>
+              </div>
+              <div class="level-item" style="justify-content:right;">
                 <div class="logos">
                   <a href="https://kadoc.kuleuven.be/"><img alt="KU Leuven" src="<?php echo $this->assetUrl("img/kadoc.png");?>" /></a>
                   <!--<a href="//libis.be"><img alt="Libis" src="<?php echo $this->assetUrl("img/libis_gray.png");?>" /></a>-->
                   <a href="https://www.museumdrguislain.be/"><img alt="Museum Dr. Guislain Gent" src="<?php echo $this->assetUrl("img/MuseumDrGuislain_logo.jpg");?>" /></a>
                   <a href="https://www.vlaanderen.be/"><img alt="Vlaanderen,verbeelding werkt" src="<?php echo $this->assetUrl("img/vlaanderen.png");?>" /></a>
                 </div>
-            </div>
+              </div>  
           </nav>
           <p style="font-size:0.9rem;">
             <a href="/page/disclaimer">Disclaimer</a><span style="font-family:helvetica;"> | ©</span> KU Leuven, built by <a href="//libis.be">LIBIS</a>

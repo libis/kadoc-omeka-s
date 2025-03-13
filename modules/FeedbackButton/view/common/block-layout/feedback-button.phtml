@@ -10,7 +10,7 @@ $escapeAttr = $plugins->get('escapeHtmlAttr');
 $slug = $block->page()->slug();
 $type = $this->pageMetadata('type');
 ?>
-<div class="container block links">
+<div class="container block links feedback-button-section">
   <form id="feedback-button" action="<?= $block->dataValue('contactUrl'); ?>" method="POST" style="padding-bottom:1.5em;">
     <input name="slug" value="<?php echo $slug;?>" hidden>
     <input name="type" value="<?php echo $type;?>" hidden>

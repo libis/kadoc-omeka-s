@@ -140,7 +140,7 @@ endwhile;
 <?php $a=0;?>
 <?php foreach($items[$currentPage - 1] as $item):
 $media = $item->media();?>
-<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;" <?php if($media && ($media[0]->mediaType() == "video/mp4")):?>onclick="enlargeImage(<?php echo $a?>);"<?php endif;?>>
+<div class="modal" id="modal-<?php echo $a;?>" style="justify-content:center;z-index:31;" <?php if($media && ($media[0]->mediaType() != "video/mp4")):?>onclick="enlargeImage(<?php echo $a?>);"<?php endif;?>>
     <div class="modal-background"></div>
     <div class="modal-content">    
         <div class="container" style="background-color: aliceblue;width: fit-content;">
@@ -200,7 +200,7 @@ $media = $item->media();?>
 
           let imgHeight = img.offsetHeight;
           let imgWidth = img.offsetWidth;
-          console.log(imageContainer);
+
           imageContainer.style.maxHeight = imgHeight + "px";
           imageContainer.style.maxWidth = imgWidth + "px";
 

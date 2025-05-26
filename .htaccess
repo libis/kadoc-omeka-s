@@ -14,6 +14,10 @@ RewriteRule ^.*$ - [L]
 RewriteCond %{REQUEST_URI} ^(.+)/+$
 RewriteRule .* %1 [R=307,L]
 
+# redirects for Toon
+Redirect 301 /erfgoedcollecties    https://toon.vlaanderen/s/toon/collecties?facet[schema%3Agenre][]=collectie
+Redirect 301 /erfgoedkaart    https://toon.vlaanderen/s/toon/map-browse?mapping_basemap_provider=CartoDB.Voyager
+
 # The following rewrites all other queries to index.php. The
 # condition ensures that if you are using Apache aliases to do
 # mass virtual hosting, the base path will be prepended to

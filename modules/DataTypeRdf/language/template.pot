@@ -1,0 +1,46 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-10-26 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: data/scripts/upgrade_from_rdfdatatype.php:278
+msgid "The module RdfDatatype was automatically uninstalled."
+msgstr ""
+
+#: data/scripts/upgrade_from_rdfdatatype.php:284
+msgid "The module RdfDatatype cannot be automatically uninstalled."
+msgstr ""
+
+#: src/DataType/Boolean.php:61
+msgid "true"
+msgstr ""
+
+#: src/DataType/Boolean.php:62
+msgid "false"
+msgstr ""
+
+#: src/DataType/Html.php:45
+msgid "@value"
+msgstr ""
+
+#: src/DataType/AbstractDataTypeRdf.php:15
+msgid "Data Type RDF"
+msgstr ""
+
+#: src/DataType/Boolean.php:23
+msgid "Boolean"
+msgstr ""

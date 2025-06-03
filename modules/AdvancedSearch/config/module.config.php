@@ -39,12 +39,14 @@ return [
             'facetLink' => View\Helper\FacetLink::class,
             'facetLinks' => View\Helper\FacetLinks::class,
             'facetSelect' => View\Helper\FacetSelect::class,
+            'facetSelectRange' => View\Helper\FacetSelectRange::class,
             'formMultiText' => Form\View\Helper\FormMultiText::class,
             'formNote' => Form\View\Helper\FormNote::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
+            'searchFilters' => View\Helper\SearchFilters::class,
             'searchForm' => View\Helper\SearchForm::class,
-            'searchingForm' => View\Helper\SearchingForm::class,
             'searchingFilters' => View\Helper\SearchingFilters::class,
+            'searchingForm' => View\Helper\SearchingForm::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,
             'searchPaginationPerPageSelector' => View\Helper\SearchPaginationPerPageSelector::class,
             'searchSortSelector' => View\Helper\SearchSortSelector::class,
@@ -52,10 +54,13 @@ return [
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
+            // Used in AdvancedResourceTemplate, AdvancedSearch and BlockPlus.
+            'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
+            'cleanQuery' => Service\ViewHelper\CleanQueryFactory::class,
+            'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
-            'searchFilters' => Service\ViewHelper\SearchFiltersFactory::class,
             'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
             'searchSuggesterConfirm' => Service\ViewHelper\SearchSuggesterConfirmFactory::class,
         ],
@@ -82,6 +87,7 @@ return [
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
             Form\Element\OptionalUrl::class => Form\Element\OptionalUrl::class,
             Form\Element\TextExact::class => Form\Element\TextExact::class,
+            Form\Element\UrlQuery::class => Form\Element\UrlQuery::class,
         ],
         'factories' => [
             Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,
@@ -92,11 +98,20 @@ return [
             Form\Admin\SearchSuggesterForm::class => Service\Form\SearchSuggesterFormFactory::class,
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
             Form\Element\SearchConfigSelect::class => Service\Form\Element\SearchConfigSelectFactory::class,
+            // These three elements are overridden from core in order to be able to fix prepend value "0".
+            Form\Element\ItemSetSelect::class => Service\Form\Element\ItemSetSelectFactory::class,
+            Form\Element\ResourceTemplateSelect::class => Service\Form\Element\ResourceTemplateSelectFactory::class,
+            Form\Element\SiteSelect::class => Service\Form\Element\SiteSelectFactory::class,
             Form\SearchFilter\Advanced::class => Service\Form\StandardFactory::class,
             Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
             Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
             Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
+        ],
+        'aliases' => [
+            \Omeka\Form\Element\ItemSetSelect::class => Form\Element\ItemSetSelect::class,
+            \Omeka\Form\Element\ResourceTemplateSelect::class => Form\Element\ResourceTemplateSelect::class,
+            \Omeka\Form\Element\SiteSelect::class => Form\Element\SiteSelect::class,
         ],
     ],
     'controllers' => [
@@ -118,6 +133,7 @@ return [
             'apiSearch' => Service\ControllerPlugin\ApiSearchFactory::class,
             'apiSearchOne' => Service\ControllerPlugin\ApiSearchOneFactory::class,
             'searchForm' => Service\ControllerPlugin\SearchFormFactory::class,
+            'searchResources' => Service\ControllerPlugin\SearchResourcesFactory::class,
             'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
         ],
     ],
@@ -267,6 +283,12 @@ return [
                 'pattern' => '%s.mo',
                 'text_domain' => null,
             ],
+        ],
+    ],
+    'assets' => [
+        // Override internals assets. Only for Omeka assets: modules can use another filename.
+        'internals' => [
+            'js/global.js' => 'AdvancedSearch',
         ],
     ],
     'js_translate_strings' => [

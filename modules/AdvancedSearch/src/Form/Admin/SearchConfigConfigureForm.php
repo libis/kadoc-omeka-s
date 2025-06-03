@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2018-2021
+ * Copyright Daniel Berthereau, 2018-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -93,15 +93,38 @@ class SearchConfigConfigureForm extends Form
                     'value' => 'default',
                 ],
             ])
+            // TODO Use UrlQuery instead of Text for the default query to avoid conversion each time.
             ->add([
                 'name' => 'default_query',
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Default query', // @translate
-                    'default' => 'The format of the query depends on the search form and the search engine.', // @translated
+                    'info' => 'The format of the query depends on the search form and the search engine.', // @translated
                 ],
                 'attributes' => [
                     'id' => 'default_query',
+                ],
+            ])
+            ->add([
+                'name' => 'default_query_post',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Complementary default query', // @translate
+                    'info' => 'Mainly used to specify a default sort when request is empty, but other args are possible (default pagination, selected facets…).', // @translated
+                ],
+                'attributes' => [
+                    'id' => 'default_query_post',
+                ],
+            ])
+            ->add([
+                'name' => 'hidden_query_filters',
+                'type' => AdvancedSearchElement\UrlQuery::class,
+                'options' => [
+                    'label' => 'Hidden query filter to limit results', // @translate
+                    'info' => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translated
+                ],
+                'attributes' => [
+                    'id' => 'hidden_query_filters',
                 ],
             ])
         ;
@@ -188,8 +211,8 @@ class SearchConfigConfigureForm extends Form
                 'attributes' => [
                     'id' => 'filters',
                     // field (term) = label = type = options
-                    'placeholder' => 'item_set_id = Collection = Select
-resource_class_id = Class = SelectFlat
+                    'placeholder' => 'item_set_id = Collection = Omeka/Select
+resource_class_id = Class = Omeka/SelectFlat
 dcterms:title = Title = Text
 dcterms:date = Date = DateRange
 dcterms:subject = Subject = MultiCheckbox = alpha | beta | gamma
@@ -528,7 +551,7 @@ nlres = is not linked with resource with ID
                 'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page. Format is "field = Label" and optionnally " = Select".', // @translate
+                    'info' => 'List of facets that will be displayed in the search page. Format is "field = Label" and optionnally " = Select" or " = SelectRange". With internal sql engine, "SelectRange" orders values alphabetically. With Solr, "SelectRange" works only with date and numbers.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                     'data_keys' => [

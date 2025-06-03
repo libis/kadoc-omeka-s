@@ -76,10 +76,10 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
+        $this->searchEngine = $searchConfig->engine();
+        $searchAdapter = $this->searchEngine ? $this->searchEngine->adapter() : null;
         if ($searchAdapter) {
-            $availableFields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+            $availableFields = $searchAdapter->setSearchEngine($this->searchEngine)->getAvailableFields();
             // Include the specific fields to simplify querying with main form.
             $searchFormSettings['available_fields'] = $availableFields;
             $specialFieldsToInputFields = [
@@ -126,9 +126,16 @@ class SearchRequestToResponse extends AbstractPlugin
         /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);
 
+        // Append hidden query if any (filter, date range filter, filter query).
+        $hiddenFilters = $searchConfigSettings['search']['hidden_query_filters'] ?? [];
+        if ($hiddenFilters) {
+            // TODO Convert a generic hidden query filters into a specific one?
+            // $hiddenFilters = $formAdapter->toQuery($hiddenFilters, $searchFormSettings);
+            $query->setHiddenQueryFilters($hiddenFilters);
+        }
+
         // Add global parameters.
 
-        $this->searchEngine = $searchConfig->engine();
         $engineSettings = $this->searchEngine->settings();
 
         $user = $plugins->get('identity')();
@@ -177,18 +184,28 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $hasFacets = !empty($searchConfigSettings['facet']['facets']);
         if ($hasFacets) {
-            // Set the settings.
+            // Set the settings for facets.
+            // TODO Store facets with the right keys in config form and all keys directly to avoid to rebuild it each time.
             // TODO Set all the settings of the form one time (move process into Query, and other keys).
-            $query->addFacetFields(array_keys($searchConfigSettings['facet']['facets']));
-            if (!empty($searchConfigSettings['facet']['limit'])) {
-                $query->setFacetLimit((int) $searchConfigSettings['facet']['limit']);
+            $facetLimit = empty($searchConfigSettings['facet']['limit']) ? 0 : (int) $searchConfigSettings['facet']['limit'];
+            $facetOrder = empty($searchConfigSettings['facet']['order']) ? '' : (string) $searchConfigSettings['facet']['order'];
+            $facetLanguages = empty($searchConfigSettings['facet']['languages']) ? [] : $searchConfigSettings['facet']['languages'];
+            // @deprecated Will be removed in a future version.
+            $query->setFacetLimit($facetLimit);
+            $query->setFacetOrder($facetOrder);
+            $query->setFacetLanguages($facetLanguages);
+            // $query->addFacetFields(array_keys($searchConfigSettings['facet']['facets']));
+            $facets = [];
+            foreach ($searchConfigSettings['facet']['facets'] as $facetField => $options) {
+                $facet = $options;
+                $facet['field'] = $facetField;
+                $facet['type'] = empty($options['type']) ? 'Checkbox' : $options['type'];
+                $facet['limit'] = $facetLimit;
+                $facet['order'] = $facetOrder;
+                $facet['languages'] = $facetLanguages;
+                $facets[$facetField] = $facet;
             }
-            if (!empty($searchConfigSettings['facet']['order'])) {
-                $query->setFacetOrder($searchConfigSettings['facet']['order']);
-            }
-            if (!empty($searchConfigSettings['facet']['languages'])) {
-                $query->setFacetLanguages($searchConfigSettings['facet']['languages']);
-            }
+            $query->setFacets($facets);
         }
 
         $eventManager = $services->get('Application')->getEventManager();

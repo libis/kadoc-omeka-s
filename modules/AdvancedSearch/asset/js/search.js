@@ -37,7 +37,6 @@ var Search = (function() {
             resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')
                 + ' ' + viewType;
         }
-        
         localStorage.setItem('search_view_type', viewType);
     };
 
@@ -209,19 +208,37 @@ $(document).ready(function() {
     });
 
     $('.search-facets').on('change', 'input[type=checkbox]', function() {
-        if (!$('.apply-facets').length) {
+        if (!$('.apply-facets').length && $(this).data('url')) {
             window.location = $(this).data('url');
         }
     });
 
     $('.search-facets').on('change', 'select', function() {
-        if (!$('.apply-facets').length) {
+        if (!$('#apply-facets').length) {
             // Replace the current select args by new ones.
-            // Names in facets have no index in array ("[]").
-            let url = new URL(window.location.href);
+            // Names in facets may have no index in array ("[]") when it is a multiple one.
+            // But the select may be a single select too, in which case the url is already in data.
+            let url;
+            let selectValues = $(this).val();
+            if (typeof selectValues !== 'object') {
+                let option =  $(this).find('option:selected');
+                if (option.length && option[0].value !== '') {
+                    url = option.data('url');
+                    if (url && url.length) {
+                        window.location = url;
+                    }
+                } else {
+                    url = new URL(window.location.href);
+                    url.searchParams.delete($(this).prop('name'));
+                    window.location = url.toString();
+                }
+                return;
+            }
+            // Prepare the url with the selected values.
+            url = new URL(window.location.href);
             let selectName = $(this).prop('name');
             url.searchParams.delete(selectName);
-            $(this).val().forEach((element, index) => {
+            selectValues.forEach((element, index) => {
                 url.searchParams.set(selectName.substring(0, selectName.length - 2) + '[' + index + ']', element);
             });
             window.location = url.toString();
@@ -256,8 +273,8 @@ $(document).ready(function() {
     }
 
     var view_type = localStorage.getItem('search_view_type');
-    if (view_type != "list") {
-        view_type = 'grid';
+    if (!view_type) {
+        view_type = 'list';
     }
     $('.search-view-type-' + view_type).click();
 
@@ -280,7 +297,7 @@ $(document).ready(function() {
     function disableQueryTextInput(queryType) {
         var queryText = queryType.siblings('.query-text');
         queryText.prop('disabled',
-            ['ex', 'nex', 'lex', 'nlex'].indexOf(queryType.val()) !== -1);
+            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
     };
     $(document).on('change', '.query-type', function () {
          disableQueryTextInput($(this));
@@ -288,6 +305,28 @@ $(document).ready(function() {
     // Updating querying should be done on load too.
     $('#property-queries .query-type').each(function() {
          disableQueryTextInput($(this));
+    });
+
+    /**
+     * Avoid to select "All properties" in the advanced search form by default.
+     * It should be done on load for empty request and on append for new fields.
+     * @see application/asset/js/advanced-search.js.
+     */
+    const propertyValues = $('body.search #advanced-search #property-queries .inputs > .value');
+    if (propertyValues.length === 1) {
+        const searchParams = new URLSearchParams(document.location.search);
+        if ((!searchParams.has('property[0][property]') && !searchParams.has('property[0][property][0]') && !searchParams.has('property[0][property][]'))
+            || (['', 'eq'].includes(searchParams.get('property[0][type]')) && searchParams.get('property[0][text]') === '')
+        ) {
+            const selectProperty = $(propertyValues[0]).find('.query-property');
+            selectProperty.find('option:selected').prop('selected', false);
+            selectProperty.trigger('chosen:updated');
+        }
+    }
+    $(document).on('click', '#property-queries.multi-value .add-value', function(e) {
+        const selectProperty = $(this).closest('#property-queries').find('.inputs > .value:last-child .query-property');
+        selectProperty.find('option:selected').prop('selected', false);
+        selectProperty.trigger('chosen:updated');
     });
 
 });

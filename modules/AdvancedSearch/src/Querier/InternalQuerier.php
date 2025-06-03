@@ -213,7 +213,7 @@ SQL;
 
         $fields = $this->query->getSuggestFields();
         if ($fields) {
-            $ids = $this->listPropertyIds($fields);
+            $ids = $this->getPropertyIds($fields);
             if (!$ids) {
                 // Searching inside non-existing properties outputs no result.
                 return $this->response
@@ -228,7 +228,7 @@ SQL;
 
         $excludedFields = $this->query->getExcludedFields();
         if ($excludedFields) {
-            $ids = $this->listPropertyIds($excludedFields);
+            $ids = $this->getPropertyIds($excludedFields);
             if ($ids) {
                 $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
                 $bind['excluded_property_ids'] = $ids;
@@ -408,6 +408,7 @@ SQL;
             $this->args['site_id'] = $siteId;
         }
 
+        $this->appendHiddenFilters();
         $this->filterQuery();
 
         if (!empty($this->args['property'])
@@ -483,15 +484,12 @@ SQL;
         }
 
         if ($this->engine->settingAdapter('default_search_partial_word', false)) {
-            $qs = explode(" ",$q);
-            foreach($qs as $qe):
-                $this->args['property'][] = [
-                    'joiner' => 'and',
-                    'property' => '',
-                    'type' => 'in',
-                    'text' => $qe,
-                ];
-            endforeach;
+            $this->args['property'][] = [
+                'joiner' => 'and',
+                'property' => '',
+                'type' => 'in',
+                'text' => $q,
+            ];
             return;
         }
 
@@ -532,6 +530,17 @@ SQL;
         $this->args['fulltext_search'] = $q;
     }
 
+    protected function appendHiddenFilters(): void
+    {
+        $hiddenFilters = $this->query->getHiddenQueryFilters();
+        if (!$hiddenFilters) {
+            return;
+        }
+        $this->filterQueryValues($hiddenFilters);
+        $this->filterQueryDateRange($hiddenFilters);
+        $this->filterQueryFilters($hiddenFilters);
+    }
+
     /**
      * Filter the query.
      *
@@ -539,73 +548,19 @@ SQL;
      * @todo Make core search properties groupable ("or" inside a group, "and" between group).
      *
      * Note: when a facet is selected, it is managed like a filter.
+     * For facet ranges, filters are managed as lower than / greater than.
      */
     protected function filterQuery(): void
     {
         // Don't use excluded fields for filters.
         $this->filterQueryValues($this->query->getFilters());
-
-        $multifields = $this->engine->settingAdapter('multifields', []);
-
-        $dateRangeFilters = $this->query->getDateRangeFilters();
-        foreach ($dateRangeFilters as $field => $filterValues) {
-            if ($field === 'created' || $field === 'modified') {
-                $argName = 'datetime';
-            } else {
-                $field = $this->getPropertyTerm($field)
-                    ?? $multifields[$field]['fields']
-                    ?? $this->underscoredNameToTerm($field)
-                    ?? null;
-                if (!$field) {
-                    continue;
-                }
-                $argName = 'property';
-            }
-            foreach ($filterValues as $filterValue) {
-                if (strlen($filterValue['from'])) {
-                    $this->args[$argName][] = [
-                        'joiner' => 'and',
-                        'property' => $field,
-                        'type' => 'gte',
-                        'text' => $filterValue['from'],
-                    ];
-                }
-                if (strlen($filterValue['to'])) {
-                    $this->args[$argName][] = [
-                        'joiner' => 'and',
-                        'property' => $field,
-                        'type' => 'lte',
-                        'text' => $filterValue['to'],
-                    ];
-                }
-            }
-        }
-
-        $filters = $this->query->getFilterQueries();
-        foreach ($filters as $field => $values) {
-            $field = $this->getPropertyTerm($field)
-                ?? $multifields[$field]['fields']
-                ?? $this->underscoredNameToTerm($field)
-                ?? null;
-            if (!$field) {
-                continue;
-            }
-            foreach ($values as $value) {
-                $this->args['property'][] = [
-                    'joiner' => $value['join'],
-                    'property' => $field,
-                    'type' => $value['type'],
-                    'text' => $value['value'],
-                ];
-            }
-        }
-
+        $this->filterQueryDateRange($this->query->getDateRangeFilters());
+        $this->filterQueryFilters($this->query->getFilterQueries());
         $this->argsWithoutActiveFacets = $this->args;
-
         $this->filterQueryValues($this->query->getActiveFacets(), true);
     }
 
-    protected function filterQueryValues(array $filters, bool $inList = false): void
+    protected function filterQueryValues(array $filters, bool $inListForFacets = false): void
     {
         $multifields = $this->engine->settingAdapter('multifields', []);
 
@@ -624,7 +579,8 @@ SQL;
                 // "resource_type" is used externally and "resource_name" internally.
                 case 'resource_name':
                 case 'resource_type':
-                    $this->args['resource_name'] = $flatArray($values);
+                    $values = $flatArray($values);
+                    $this->args['resource_name'] = empty($this->args['resource_name']) ? $values : array_merge($this->args['resource_name'], $values);
                     continue 2;
 
                 // "is_public" is automatically managed by this internal adapter
@@ -633,43 +589,49 @@ SQL;
                     continue 2;
 
                 case 'id':
-                    $this->args['id'] = array_filter(array_map('intval', $flatArray($values)));
+                    $values = array_filter(array_map('intval', $flatArray($values)));
+                    $this->args['id'] = empty($this->args['id']) ? $values : array_merge($this->args['id'], $values);
                     continue 2;
 
                 case 'owner_id':
                     $values = $flatArray($values);
-                    $this->args['owner_id'] = is_numeric(reset($values))
+                    $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listUserIds($values);
+                    $this->args['owner_id'] = empty($this->args['owner_id']) ? $values : array_merge($this->args['owner_id'], $values);
                     continue 2;
 
                 case 'site_id':
                     $values = $flatArray($values);
-                    $this->args['site_id'] = is_numeric(reset($values))
+                    $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listSiteIds($values);
+                    $this->args['site_id'] = empty($this->args['site_id']) ? $values : array_merge($this->args['site_id'], $values);
                     continue 2;
 
                 case 'resource_class_id':
                     $values = $flatArray($values);
-                    $this->args['resource_class_id'] = is_numeric(reset($values))
+                    $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceClassIds($values);
+                    $this->args['resource_class_id'] = empty($this->args['resource_class_id']) ? $values : array_merge($this->args['resource_class_id'], $values);
                     continue 2;
 
                 case 'resource_template_id':
                     $values = $flatArray($values);
-                    $this->args['resource_template_id'] = is_numeric(reset($values))
+                    $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceTemplateIds($values);
+                    $this->args['resource_template_id'] = empty($this->args['resource_template_id']) ? $values : array_merge($this->args['resource_template_id'], $values);
                     continue 2;
 
                 case 'item_set_id':
-                    $this->args['item_set_id'] = array_filter(array_map('intval', $flatArray($values)));
+                    $values = array_filter(array_map('intval', $flatArray($values)));
+                    $this->args['item_set_id'] = empty($this->args['item_set_id']) ? $values : array_merge($this->args['item_set_id'], $values);
                     continue 2;
 
                 default:
-                    $field = $this->getPropertyTerm($field)
+                    $field = $this->getPropertyTerms($field)
                         ?? $multifields[$field]['fields']
                         ?? $this->underscoredNameToTerm($field)
                         ?? null;
@@ -677,17 +639,46 @@ SQL;
                         break;
                     }
                     // "In list" is used for facets.
-                    if ($inList) {
-                        $this->args['property'][] = [
-                            'joiner' => 'and',
-                            'property' => $field,
-                            'type' => 'list',
-                            'text' => $flatArray($values),
-                        ];
+                    if ($inListForFacets) {
+                        $firstKey = key($values);
+                        // Check for a facet range.
+                        if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
+                            if (isset($values['from']) && $values['from'] !== '') {
+                                $this->args['property'][] = [
+                                    'joiner' => 'and',
+                                    'property' => $field,
+                                    'type' => 'gte',
+                                    'text' => $values['from'],
+                                ];
+                            }
+                            if (isset($values['to']) && $values['to'] !== '') {
+                                $this->args['property'][] = [
+                                    'joiner' => 'and',
+                                    'property' => $field,
+                                    'type' => 'lte',
+                                    'text' => $values['to'],
+                                ];
+                            }
+                        } else {
+                            $this->args['property'][] = [
+                                'joiner' => 'and',
+                                'property' => $field,
+                                'type' => 'list',
+                                'text' => $flatArray($values),
+                            ];
+                        }
                         break;
                     }
                     foreach ($values as $value) {
                         if (is_array($value)) {
+                            // Skip date range queries (for hidden queries).
+                            if (isset($value['from']) || isset($value['to'])) {
+                                continue;
+                            }
+                            // Skip queries filters (for hidden queries).
+                            if (isset($value['joiner']) || isset($value['type']) || isset($value['text']) || isset($value['join']) || isset($value['value'])) {
+                                continue;
+                            }
                             $this->args['property'][] = [
                                 'joiner' => 'and',
                                 'property' => $field,
@@ -704,6 +695,74 @@ SQL;
                         }
                     }
                     break;
+            }
+        }
+    }
+
+    protected function filterQueryDateRange(array $dateRangeFilters): void
+    {
+        $multifields = $this->engine->settingAdapter('multifields', []);
+        foreach ($dateRangeFilters as $field => $filterValues) {
+            if ($field === 'created' || $field === 'modified') {
+                $argName = 'datetime';
+            } else {
+                $field = $this->getPropertyTerms($field)
+                    ?? $multifields[$field]['fields']
+                    ?? $this->underscoredNameToTerm($field)
+                    ?? null;
+                if (!$field) {
+                    continue;
+                }
+                $argName = 'property';
+            }
+            foreach ($filterValues as $filterValue) {
+                // Skip simple and query filters (for hidden queries).
+                if (!is_array($filterValue)) {
+                    continue;
+                }
+                if (isset($filterValue['from']) && strlen($filterValue['from'])) {
+                    $this->args[$argName][] = [
+                        'joiner' => 'and',
+                        'property' => $field,
+                        'type' => 'gte',
+                        'text' => $filterValue['from'],
+                    ];
+                }
+                if (isset($filterValue['to']) && strlen($filterValue['to'])) {
+                    $this->args[$argName][] = [
+                        'joiner' => 'and',
+                        'property' => $field,
+                        'type' => 'lte',
+                        'text' => $filterValue['to'],
+                    ];
+                }
+            }
+        }
+    }
+
+    protected function filterQueryFilters(array $filters): void
+    {
+        $multifields = $this->engine->settingAdapter('multifields', []);
+        foreach ($filters as $field => $values) {
+            $field = $this->getPropertyTerms($field)
+                ?? $multifields[$field]['fields']
+                ?? $this->underscoredNameToTerm($field)
+                ?? null;
+            if (!$field) {
+                continue;
+            }
+            foreach ($values as $value) {
+                // Skip simple filters (for hidden queries).
+                if (!$value || !is_array($value)) {
+                    continue;
+                }
+                $value += ['join' => null, 'type' => null, 'value' => null];
+                $this->args['property'][] = [
+                    'joiner' => $value['join'],
+                    'property' => $field,
+                    'type' => $value['type'],
+                    'text' => $value['value'],
+                ];
             }
         }
     }
@@ -754,10 +813,12 @@ SQL;
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->services->get('ControllerPluginManager')->get('references');
 
-        $facetFields = $this->query->getFacetFields();
+        // @deprecated Will be removed in a future version.
         $facetLimit = $this->query->getFacetLimit();
         $facetOrder = $this->query->getFacetOrder();
         $facetLanguages = $this->query->getFacetLanguages();
+        // $facetFields = $this->query->getFacetFields();
+        $facets = $this->query->getFacets();
 
         $metadataFieldsToNames = [
             'resource_name' => 'resource_type',
@@ -774,9 +835,9 @@ SQL;
         // Normalize search query keys as omeka keys for items and item sets.
         $multifields = $this->engine->settingAdapter('multifields', []);
         $fields = [];
-        foreach ($facetFields as $facetField) {
+        foreach ($facets as $facetField => $facetData) {
             $fields[$facetField] = $metadataFieldsToNames[$facetField]
-                ?? $this->getPropertyTerm($facetField)
+                ?? $this->getPropertyTerms($facetField)
                 ?? $multifields[$facetField]['fields']
                 ?? $facetField;
         }
@@ -784,7 +845,7 @@ SQL;
         // Facet counts don't make a distinction by resource type, so they
         // should be merged here. This is needed as long as there is no single
         // query for resource (items and item sets together).
-        $facetCountsByField = array_fill_keys($facetFields, []);
+        $facetCountsByField = array_fill_keys(array_keys($facets), []);
 
         $facetData = $this->argsWithoutActiveFacets;
 
@@ -811,6 +872,7 @@ SQL;
         }
 
         foreach ($this->resourceTypes as $resourceType) {
+            // Default options.
             $options = [
                 'resource_name' => $resourceType,
                 // Options sql.
@@ -833,13 +895,33 @@ SQL;
                 'output' => 'associative',
             ];
 
+            // TODO Make References manages individual options for each field (limit, order, languages, range).
             $values = $references
                 ->setMetadata($fields)
                 ->setQuery($facetData)
                 ->setOptions($options)
                 ->list();
 
+            // For facet ranges, the limit and order should be removed.
+            // TODO Add an individual sort_by for numeric facet ranges (currently "alphabetic", that works fine only for years).
+            $optionsFacetRange = $options;
+            $optionsFacetRange['per_page'] = 0;
+            $optionsFacetRange['sort_by'] = 'alphabetic';
+            $optionsFacetRange['sort_order'] = 'asc';
+
+            // TODO Make InternalQuerier and References manage facet ranges (for now via a manual process here and above and in FacetSelectRange).
             foreach (array_keys($fields) as $facetField) {
+                $isFacetRange = $facets[$facetField]['type'] === 'SelectRange';
+                // Like Solr, get all facet values, so all existing values.
+                /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
+                if ($isFacetRange) {
+                    // TODO Remove this double query for facet range when individual options will be managed.
+                    $values = $references
+                        ->setMetadata([$fields[$facetField]])
+                        ->setQuery($facetData)
+                        ->setOptions($optionsFacetRange)
+                        ->list();
+                }
                 foreach ($values[$facetField]['o:references'] ?? [] as $value => $count) {
                     if (empty($facetCountsByField[$facetField][$value])) {
                         $facetCountsByField[$facetField][$value] = [
@@ -919,7 +1001,7 @@ SQL;
     {
         static $users;
 
-        if (is_null($resourceTemplates)) {
+        if (is_null($users)) {
             /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
@@ -963,64 +1045,6 @@ SQL;
     }
 
     /**
-     * Check a property term or id.
-     *
-     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
-     */
-    protected function getPropertyTerm($termOrId): ?string
-    {
-        $ids = $this->getPropertyIds();
-        return is_numeric($termOrId)
-            ? (array_search($termOrId, $ids) ?: null)
-            : (array_key_exists($termOrId, $ids) ? $termOrId : null);
-    }
-
-    /**
-     * Convert a list of terms into a list of property ids.
-     *
-     * @see \Reference\Mvc\Controller\Plugin\References::listPropertyIds()
-     *
-     * @param array $values
-     * @return array Only values that are terms are converted into ids, the
-     * other ones are removed.
-     */
-    protected function listPropertyIds(array $values): array
-    {
-        return array_intersect_key($this->getPropertyIds(), array_fill_keys($values, null));
-    }
-
-    /**
-     * Get all property terms by id, ordered by descendant total values.
-     *
-     * @return array Associative array of terms by ids.
-     */
-    protected function getUsedPropertyByIds(): array
-    {
-        static $properties;
-
-        if (is_null($properties)) {
-            /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->services->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'property.id AS id',
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term'
-                    // 'COUNT(value.id) AS total'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
-                ->groupBy('id')
-                ->orderBy('COUNT(value.id)', 'DESC')
-            ;
-            $properties = $connection->executeQuery($qb)->fetchAllKeyValue();
-        }
-
-        return $properties;
-    }
-
-    /**
      * Get all property terms as terms with "_".
      *
      * This allows to convert some Solr keys like "dcterms_subject_ss" into a
@@ -1035,6 +1059,12 @@ SQL;
         if (is_null($properties)) {
             /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $this->services->get('Omeka\Connection');
+            // For big databases, manage used properties separately.
+            $subQb = $connection->createQueryBuilder();
+            $subQb
+                ->select('DISTINCT property_id')
+                ->from('value', 'value')
+            ;
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
@@ -1043,7 +1073,9 @@ SQL;
                 )
                 ->from('property', 'property')
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
+                // Overflow on big databases, so use subquery.
+                // ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
+                ->where('property.id IN (' . $subQb . ')')
             ;
             $properties = $connection->executeQuery($qb)->fetchAllKeyValue();
         }
@@ -1052,34 +1084,21 @@ SQL;
     }
 
     /**
-     * Get all property ids by term.
-     *
-     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyIds()
+     * Get one or more property ids by JSON-LD terms or by numeric ids.
      *
      * @return array Associative array of ids by term.
      */
-    protected function getPropertyIds(): array
+    protected function getPropertyIds($termsOrIds = null)
     {
-        static $properties;
+        return $this->services->get('ViewHelperManager')->get('easyMeta')->propertyIds($termsOrIds);
+    }
 
-        if (is_null($properties)) {
-            /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->services->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->orderBy('vocabulary.id', 'asc')
-                ->addOrderBy('property.id', 'asc')
-            ;
-            $properties = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
-        }
-
-        return $properties;
+    /**
+     * Get one or more property terms by JSON-LD terms or by numeric ids.
+     */
+    protected function getPropertyTerms($termsOrIds = null)
+    {
+        return $this->services->get('ViewHelperManager')->get('easyMeta')->propertyTerms($termsOrIds);
     }
 
     /**

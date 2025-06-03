@@ -17,9 +17,19 @@ class AbstractFacet extends AbstractHelper
     protected $api;
 
     /**
+     * @var \Omeka\View\Helper\Url
+     */
+    protected $urlHelper;
+
+    /**
      * @var \Laminas\I18n\View\Helper\Translate
      */
     protected $translate;
+
+    /**
+     * @var \Laminas\View\Helper\Partial
+     */
+    protected $partialHelper;
 
     /**
      * @var int
@@ -27,30 +37,45 @@ class AbstractFacet extends AbstractHelper
     protected $siteId;
 
     /**
-     * Create one facet as link, checkbox or button.
+     * @var string
+     */
+    protected $route = '';
+
+    /**
+     * @var array
+     */
+    protected $params = [];
+
+    /**
+     * @var array
+     */
+    protected $queryBase = [];
+
+    /**
+     * Create one facet as link, checkbox, select or button.
      *
      * @param array $facetValues Each facet value has two keys: value and count.
+     * May have more for specific facets, like facet range.
      * @return string|array
      */
-    public function __invoke(string $name, array $facetValues, array $options = [], bool $asData = false)
+    public function __invoke(string $facetField, array $facetValues, array $options = [], bool $asData = false)
     {
         static $facetsData = [];
 
         $view = $this->getView();
         $plugins = $view->getHelperPluginManager();
-        $urlHelper = $plugins->get('url');
-        $partialHelper = $plugins->get('partial');
-
         $this->api = $plugins->get('api');
+        $this->urlHelper = $plugins->get('url');
         $this->translate = $plugins->get('translate');
+        $this->partialHelper = $plugins->get('partial');
 
-        $route = $plugins->get('matchedRouteName')();
-        $params = $view->params()->fromRoute();
-        $queryBase = $view->params()->fromQuery();
+        $this->route = $plugins->get('matchedRouteName')();
+        $this->params = $view->params()->fromRoute();
+        $this->queryBase = $view->params()->fromQuery();
 
         // Keep browsing inside an item set.
-        if (!empty($params['item-set-id'])) {
-            $route = 'site/item-set';
+        if (!empty($this->params['item-set-id'])) {
+            $this->route = 'site/item-set';
         }
 
         $isSiteRequest = $plugins->get('status')->isSiteRequest();
@@ -62,52 +87,64 @@ class AbstractFacet extends AbstractHelper
                 ->id();
         }
 
-        unset($queryBase['page']);
-        // Add url when display is direct, active and label.
-        if (!isset($facetsData[$name])) {
-            $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
-            foreach ($facetValues as /* $facetIndex => */ &$facetValue) {
-                $facetValueValue = (string) $facetValue['value'];
-                $query = $queryBase;
-
-                // The facet value is compared against a string (the query args).
-                $facetValueLabel = (string) $this->facetValueLabel($name, $facetValueValue);
-                if (strlen($facetValueLabel)) {
-                    if (isset($query['facet'][$name]) && array_search($facetValueValue, $query['facet'][$name]) !== false) {
-                        $values = $query['facet'][$name];
-                        $values = array_filter($values, function ($v) use ($facetValueValue) {
-                            return $v !== $facetValueValue;
-                        });
-                        $query['facet'][$name] = $values;
-                        $active = true;
-                    } else {
-                        $query['facet'][$name][] = $facetValueValue;
-                        $active = false;
-                    }
-                    $url = $isFacetModeDirect ? $urlHelper($route, $params, ['query' => $query]) : '';
-                } else {
-                    $active = false;
-                    $url = '';
-                }
-
-                $facetValue['value'] = $facetValueValue;
-                $facetValue['label'] = $facetValueLabel;
-                $facetValue['active'] = $active;
-                $facetValue['url'] = $url;
-            }
-            unset($facetValue);
-            $facetsData[$name] = [
-                'name' => $name,
-                'facetValues' => $facetValues,
-                'options' => $options,
-            ];
+        unset($this->queryBase['page']);
+        if (!isset($facetsData[$facetField])) {
+            $facetsData[$facetField] = $this->prepareFacetData($facetField, $facetValues, $options);
         }
 
         if ($asData) {
-            return $facetsData[$name];
+            return $facetsData[$facetField];
         }
 
-        return $partialHelper($this->partial, $facetsData[$name]);
+        return $this->partialHelper->__invoke($this->partial, $facetsData[$facetField]);
+    }
+
+    /**
+     * Prepare facet values with "url" when display is direct, "active", "label".
+     *
+     * May contain other keys for specific facets, like "from" and "to" for
+     * facet ranges.
+     */
+    protected function prepareFacetData(string $facetField, array $facetValues, array $options): array
+    {
+        $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
+        foreach ($facetValues as /* $facetIndex => */ &$facetValue) {
+            $facetValueValue = (string) $facetValue['value'];
+            $query = $this->queryBase;
+
+            // The facet value is compared against a string (the query args).
+            $facetValueLabel = (string) $this->facetValueLabel($facetField, $facetValueValue);
+            if (strlen($facetValueLabel)) {
+                if (isset($query['facet'][$facetField]) && array_search($facetValueValue, $query['facet'][$facetField]) !== false) {
+                    $values = $query['facet'][$facetField];
+                    // TODO Remove this filter to keep all active facet values?
+                    $values = array_filter($values, function ($v) use ($facetValueValue) {
+                        return $v !== $facetValueValue;
+                    });
+                    $query['facet'][$facetField] = $values;
+                    $active = true;
+                } else {
+                    $query['facet'][$facetField][] = $facetValueValue;
+                    $active = false;
+                }
+                $url = $isFacetModeDirect ? $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query]) : '';
+            } else {
+                $active = false;
+                $url = '';
+            }
+
+            $facetValue['value'] = $facetValueValue;
+            $facetValue['label'] = $facetValueLabel;
+            $facetValue['active'] = $active;
+            $facetValue['url'] = $url;
+        }
+        unset($facetValue);
+
+        return [
+            'name' => $facetField,
+            'facetValues' => $facetValues,
+            'options' => $options,
+        ];
     }
 
     /**
@@ -115,13 +152,13 @@ class AbstractFacet extends AbstractHelper
      *
      * @todo Remove search of facet labels: use values from the response.
      */
-    protected function facetValueLabel(string $name, string $value): ?string
+    protected function facetValueLabel(string $facetField, string $value): ?string
     {
         if (!strlen($value)) {
             return null;
         }
 
-        switch ($name) {
+        switch ($facetField) {
             case 'resource_name':
             case 'resource_type':
                 return $value;

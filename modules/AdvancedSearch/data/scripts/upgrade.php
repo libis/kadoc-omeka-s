@@ -253,3 +253,27 @@ if (version_compare($oldVersion, '3.3.6.12', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.3.6.15', '<')) {
+    $messenger = new Messenger();
+    $message = new Message(
+        'It’s now possible to search resources by multiples properties, and resources without class, template, item set, site or owner.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.3.6.16', '<')) {
+    $messenger = new Messenger();
+    $message = new Message(
+        'It’s now possible to use facet range with a double select (from/to). With internal sql engine, order is alphabetic only for now: it works for strings and simple four digits years or standard dates, not integer or variable dates. With Solr, only numbers and dates are supported. The theme may need to be updated.' // @translate
+    );
+    $messenger->addSuccess($message);
+    $message = new Message(
+        'The property query types lower/greater have been updated to use alphabetic order, no more date-time only. For integer and date-time, use numeric data types.' // @translate
+    );
+    $messenger->addWarning($message);
+    $message = new Message(
+        'Updade your theme to support new features for facets (active facets, button apply facets with id="apply-facets", list of facet values).' // @translate
+    );
+    $messenger->addWarning($message);
+}

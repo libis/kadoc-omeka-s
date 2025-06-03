@@ -4,7 +4,7 @@
  *
  * Manage automatic display of features of the modules in the resource pages.
  *
- * @copyright Daniel Berthereau, 2019-2022
+ * @copyright Daniel Berthereau, 2019-2023
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding
@@ -205,21 +205,14 @@ class Module extends AbstractModule
                 ->setLabel('Blocks Disposition (module config missing)');
         }
 
+        $isV4 = version_compare(\Omeka\Module::VERSION, '4', '>=');
+
         // Hidden doesn't support multiple ordered values in Zend, so a
         // multicheckbox is added. The hidden values are not saved, because Zend
         // wraps the name with the fieldset name.
         // TODO Finalize the js (sort checkbox + enable/disable) so the hidden inputs won't be needed anymore.
         $dataToPopulate = [];
         foreach ($data as $name => $value) {
-            $fieldset->add([
-                'name' => $name . '-hide[]',
-                'type' => \Laminas\Form\Element\Hidden::class,
-                'attributes' => [
-                    'id' => $name,
-                    'value' => '',
-                ],
-            ]);
-
             $values = is_array($value) ? $value : explode(',', $value);
             $values = array_values(array_unique($values));
             $dataToPopulate[$name . '-hide[]'] = json_encode($values);
@@ -227,30 +220,68 @@ class Module extends AbstractModule
             $valueOptions = array_combine($values, $values)
                 + array_combine($modulesByView[substr($name, 18)], $modulesByView[substr($name, 18)]);
 
-            $fieldset->add([
-                'name' => $name,
-                'type' => \Laminas\Form\Element\MultiCheckbox::class,
-                'options' => [
-                    'label' => $blockTitles[$name],
-                    // Set initial order, even if js does it.
-                    'value_options' => $valueOptions,
-                ],
-                'attributes' => [
-                    // No id: it works only on the first, and it's hidden.
-                    'class' => 'module-sort',
-                ],
-            ]);
+            $fieldset
+                ->add([
+                    'name' => $name . '-hide[]',
+                    'type' => \Laminas\Form\Element\Hidden::class,
+                    'options' => [
+                        'element_group' => 'blocksdisposition',
+                    ],
+                    'attributes' => [
+                        'id' => $name,
+                        'value' => $isV4 ? json_encode($values, 320) : '',
+                    ],
+                ]);
+
+            $fieldset
+                ->add([
+                    'name' => $name,
+                    'type' => \Laminas\Form\Element\MultiCheckbox::class,
+                    'options' => [
+                        'element_group' => 'blocksdisposition',
+                        'label' => $blockTitles[$name],
+                        // Set initial order, even if js does it.
+                        'value_options' => $valueOptions,
+                    ],
+                    'attributes' => [
+                        // No id: it works only on the first, and it's hidden.
+                        'class' => 'module-sort',
+                    ],
+                ]);
+
+            // In v4, the fieldsets are skipped and the form cannot have data,
+            // so use first hidden input to store data
+            if ($name === 'blocksdisposition_item_browse') {
+                $fieldset
+                    ->get('blocksdisposition_item_browse-hide[]')
+                    ->setAttribute('data-block-titles', $fieldset->getAttribute('data-block-titles'))
+                    ->setAttribute('data-modules-by-view', $fieldset->getAttribute('data-modules-by-view'));
+            }
         }
 
         $form = $event->getTarget();
-        $form->add($fieldset);
-        $form->get('blocksdisposition')->populateValues($dataToPopulate);
+        if (!$isV4) {
+            $form->add($fieldset);
+            $form->get('blocksdisposition')->populateValues($dataToPopulate);
+        } else {
+            $fieldsetElementGroups = ['blocksdisposition' => 'Blocks disposition'];
+            $form->setOption('element_groups', array_merge($form->getOption('element_groups') ?: [], $fieldsetElementGroups));
+            foreach ($fieldset->getFieldsets() as $subFieldset) {
+                $form->add($subFieldset);
+            }
+            foreach ($fieldset->getElements() as $element) {
+                $form->add($element);
+            }
+            $form->populateValues($data);
+        }
     }
 
     public function handleSiteSettingsFilters(Event $event): void
     {
-        $event->getParam('inputFilter')
-            ->get('blocksdisposition')
+        $inputFilter = version_compare(\Omeka\Module::VERSION, '4', '<')
+            ? $event->getParam('inputFilter')->get('blocksdisposition')
+            : $event->getParam('inputFilter');
+        $inputFilter
             ->add([
                 'name' => 'blocksdisposition_item_browse',
                 'required' => false,

@@ -15,7 +15,7 @@ $displayCount = !empty($options['display_count']);
 ?>
 
 <ul class="search-facet-items">
-    <?php foreach (array_slice($facetValues,0,8) as $facetValue):
+    <?php foreach ($facetValues as $facetValue):
         $escapedValue = $escapeAttr($facetValue['value']);
         $escapedId = $name . '[]' . $escapedValue;
         if($facetValue['label'] == "Yes"):
@@ -39,7 +39,7 @@ $displayCount = !empty($options['display_count']);
         <label for="<?= $escapedId ?>"><?= $label ?></label>
     </li>
     <?php endforeach; ?>
-    <?php if(sizeof($facetValues)>8):?>                
+    <?php /*if(sizeof($facetValues)>8):?>                
         <div class="more-link"><a class="has-text-grey" href=""><i class="fas fa-plus-square"></i><span>Toon meer</span></a></div>
         <div class="more" style="display:none;">
             <?php foreach (array_slice($facetValues,8) as $facetValue):
@@ -56,5 +56,5 @@ $displayCount = !empty($options['display_count']);
             <?php endforeach; ?>
             <div class="less-link"><a class="has-text-grey" href=""><i class="fas fa-minus-square"></i><span>Toon minder</span></a></div>
         </div> 
-    <?php endif;?>    
+    <?php endif;/*?>    
 </ul>

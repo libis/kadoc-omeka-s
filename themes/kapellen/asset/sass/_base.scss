@@ -862,7 +862,7 @@ figcaption{
   .search-facet-items{
     margin-bottom: 0.5rem;
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 
   .more-link, .less-link{

@@ -155,7 +155,12 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
                 if(isset($facets_temp["resource_template_id"])):
                     $title = $itemsCount." ";
                     foreach($facets_temp["resource_template_id"] as $template_label):
-                        $title .= $template_multi[$template_label];
+                        if(in_array($template_label, $template_multi)) {
+                            $title .= $template_multi[$template_label];
+                        }
+                        else {
+                            $title .= "resultaten";
+                        }
                         if ($template_label != end($facets_temp["resource_template_id"])) {
                             $title .= " & ";
                         }

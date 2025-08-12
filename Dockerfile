@@ -45,6 +45,7 @@ RUN unzip -q /var/www/omeka-s.zip -d /var/www/ \
 
 # Content
 COPY .htaccess /var/www/html
+COPY robots.txt /var/www/html
 COPY themes /var/www/html/themes
 COPY modules /var/www/html/modules
 

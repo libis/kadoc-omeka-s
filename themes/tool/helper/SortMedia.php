@@ -16,7 +16,7 @@ class SortMedia extends AbstractHelper
         foreach ($files as $media) {
             $mediaType = $media->mediaType();
             $mediaRenderer = $media->renderer();
-            if (in_array($mediaType, $whitelist) || (strpos($mediaRenderer, 'youtube') !== false)) {
+            if (in_array($mediaType, $whitelist) || (strpos($mediaRenderer, 'youtube') !== false  || (strpos($mediaRenderer, 'embed') !== false))) {
                 $sortedMedia['lightMedia'][$mediaCount]['media'] = $media;
                 if (strpos($mediaType,'video') !== false) {
                     $html5videos[$mediaCount] = pathinfo($media->source(), PATHINFO_FILENAME);

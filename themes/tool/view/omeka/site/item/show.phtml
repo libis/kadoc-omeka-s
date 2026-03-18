@@ -179,7 +179,51 @@ endif;
         <?php $date = date_create($date->asHtml());?>
         <?php echo date_format($date,"d-m-Y");?>
       <?php endif;?>  
-    </div>   
+    </div>  
+<?php elseif($type == 'Vormingen'): ?>
+    <div class="container" style="margin-bottom:2.5rem;">
+      <div class="columns">
+        <?php
+          $itemMedia = $resource->media();
+          $sortedMedia = $this->SortMedia($itemMedia);
+          $lightMedia = (isset($sortedMedia['lightMedia'])) ? $sortedMedia['lightMedia'] : null;
+          $otherMedia = (isset($sortedMedia['otherMedia'])) ? $sortedMedia['otherMedia'] : null;
+        ?>
+
+        <div class="column is-4"> 
+          <?php if (isset($lightMedia)): ?>
+              <?php echo $this->LightGalleryOutput($lightMedia); ?>
+          <?php elseif(isset($otherMedia) && (count($otherMedia) > 0)): ?>       
+            <div id="other-media" class="property">
+                <h4><?php echo $this->translate('Other Media'); ?></h4>
+                <div class="values">
+                    <?php foreach($otherMedia as $media): ?>
+                    <div class="value">
+                        <?php echo $media->linkPretty(); ?>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+          <?php endif; ?>        
+        </div>  
+       
+        <div class="column">
+          <div class="text-box" style="height:100%;margin-bottom:0;">              
+            <?php if($item->value('schema:abstract')):?>
+              <div class="description" style="margin-bottom:1rem;">
+                <?php echo $item->value('schema:abstract');?>  
+                <hr>
+              </div>   
+            <?php elseif($item->value('schema:description')):?>  
+              <div class="description" style="margin-bottom:1rem;">
+                <?php echo $item->value('schema:description');?>  
+                <hr>
+              </div>  
+            <?php endif;?>  
+          </div>
+        </div>
+      </div>
+    </div>
 <?php else:?>
     <div class="container" style="margin-bottom:2.5rem;">
       <div class="columns">

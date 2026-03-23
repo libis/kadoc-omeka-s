@@ -108,6 +108,7 @@ $sitename = $block->page()->site()->title();
                   </h3>
                   <div class="content">              
                     <?php if ($body): ?>
+                      <?php $body = strip_tags($body);?>
                       <p>
                         <?php $trunc = implode(" ", array_slice(explode(" ", $body), 0, 21)); ?>
                         <?php if(strlen($body) != strlen($trunc)):?>

@@ -54,14 +54,14 @@ $formmail = isset($get["mail"]) ? $get['mail'] : '';
             $mail->setBody($body);
             $mail->setFrom("noreply_toon@kuleuven.be", $post["naam"]);
             //mail nodig
-            $mail->addTo("celien.stevens@kuleuven.be");
+            $mail->addTo("info@toon.vlaanderen.be");
             if($formmail && filter_var($formmail, FILTER_VALIDATE_EMAIL)):             
               $mail->addTo($formmail);
             endif;
-            $mail->setSubject("KADOC Erfgoed: ".$post["onderwerp"]);
+            $mail->setSubject("Toon: ".$post["onderwerp"]);
 
             $transport = new Mail\Transport\Sendmail();
-            //$transport->send($mail);
+            $transport->send($mail);
             
             ?>
             <article class="message is-success">

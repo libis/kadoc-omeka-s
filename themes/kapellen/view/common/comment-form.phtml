@@ -116,9 +116,51 @@ function onSubmitComment(token) {
         input.name = 'g-recaptcha-response';
         form.appendChild(input);
     }
-
     input.value = token;
-    form.submit();
+
+    const submitBtn = form.querySelector('button.g-recaptcha');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Verzenden…';
+
+    // Clear any previous flash messages
+    let flash = document.getElementById('comments-flash');
+    if (!flash) {
+        flash = document.createElement('div');
+        flash.id = 'comments-flash';
+        form.parentNode.insertBefore(flash, form);
+    }
+    flash.innerHTML = '';
+
+    fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+    })
+    .then(res => res.json().then(data => ({ status: res.status, data })))
+    .then(({ status, data }) => {
+        if (status === 200 && data.content) {
+            if (data.content.moderation) {
+                flash.innerHTML = '<div class="notification is-info">Uw reactie wacht op goedkeuring.</div>';
+            } else {
+                flash.innerHTML = '<div class="notification is-success">Uw reactie is online.</div>';
+            }
+            form.reset();
+        } else {
+            // Show the error message returned by the controller
+            const msg = data.error || 'Er is een fout opgetreden.';
+            flash.innerHTML = `<div class="notification is-danger">${msg}</div>`;
+        }
+    })
+    .catch(() => {
+        flash.innerHTML = '<div class="notification is-danger">Verbindingsfout. Probeer opnieuw.</div>';
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Verzend';
+        // Reset reCAPTCHA so it can be used again on error
+        if (typeof grecaptcha !== 'undefined') {
+            grecaptcha.reset();
+        }
+    });
 }
 </script>
 

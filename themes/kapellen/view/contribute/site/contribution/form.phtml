@@ -339,7 +339,6 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
                 <?php endif; ?>
                 <?php //echo $formElement($form->get('submit')->setAttribute('class', 'button')->setValue($submitLabel)) ?>
                 <input type="hidden" name="g-recaptcha-response" id="recaptcha-token">
-``
                 <button
                     class="g-recaptcha button"
                     data-sitekey="<?= $this->setting('recaptcha_site_key') ?>"
@@ -394,7 +393,7 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
  <script>
 
 function onSubmitContribute(token) {
-    const form = document.querySelector('.contribute.main-form form');
+    const form = document.querySelector('#edit-resource');
 
     let input = form.querySelector('[name="g-recaptcha-response"]');
     if (!input) {
@@ -403,8 +402,8 @@ function onSubmitContribute(token) {
         input.name = 'g-recaptcha-response';
         form.appendChild(input);
     }
-
     input.value = token;
+
     form.submit();
 }
 

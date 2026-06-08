@@ -630,10 +630,11 @@ class ContributionController extends AbstractActionController
                 $hasError = true;
             }
 
-            if (!$hasError && $isModeWrite && $form->isValid()) {
+            if (!$hasError && $isModeWrite) {
                 // The template cannot be changed once set.
                 $post['template'] = $resourceTemplate->id();
                 $form->setData($post);
+                if ($form->isValid()) {
                 // TODO There is no check currently (html form), except the csrf.
             
                 // $data = $form->getData();
@@ -707,6 +708,7 @@ class ContributionController extends AbstractActionController
                                 : $this->redirectContribution($contribution);
                         }
                     }
+                }
                 }
             }
             $hasError = $isModeWrite;

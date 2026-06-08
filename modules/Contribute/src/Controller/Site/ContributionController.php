@@ -292,77 +292,92 @@ class ContributionController extends AbstractActionController
         $hasError = false;
         if ($this->getRequest()->isPost() && $step !== 'template') {
             $post = $params->fromPost();
-            // The template cannot be changed once set.
-            $post['template'] = $resourceTemplate->id();
-            $form->setData($post);
-            // TODO There is no check currently (html form), except the csrf.
-            if ($form->isValid()) {
-                // TODO There is no validation by the form, except csrf, since elements are added through views. So use form (but includes non-updatable values, etc.).
-                // $data = $form->getData();
-                $data = array_diff_key($post, ['csrf' => null, 'edit-resource-submit' => null]);
-                $data = $this->checkAndIncludeFileData($data);
-                // To simplify process, a direct submission is made with a
-                // create then an update.
-                $allowUpdate = $this->settings()->get('contribute_allow_update');
-                $isDirectSubmission = $allowUpdate === 'no';
-                if (empty($data['has_error'])) {
-                    $proposal = $this->prepareProposal($data);
-                    if ($proposal) {
-                        // When there is a resource, it isn’t updated, but the
-                        // proposition of contribution is saved for moderation.
-                        $data = [
-                            'o:resource' => null,
-                            'o:owner' => $user ? ['o:id' => $user->getId()] : null,
-                            'o-module-contribute:token' => $token ? ['o:id' => $token->id()] : null,
-                            'o:email' => $token ? $token->email() : ($user ? $user->getEmail() : null),
-                            'o-module-contribute:patch' => false,
-                            'o-module-contribute:submitted' => false,
-                            'o-module-contribute:reviewed' => false,
-                            'o-module-contribute:proposal' => $proposal,
-                        ];
-                        $response = $this->api($form)->create('contributions', $data);
-                        if ($response) {
-                            /** @var \Contribute\Api\Representation\ContributionRepresentation $contribution $content */
-                            $contribution = $response->getContent();
-                            // $this->prepareContributionEmail($response->getContent(), 'prepare');
-                            $eventManager = $this->getEventManager();
-                            $eventManager->trigger('contribute.submit', $this, [
-                                'contribution' => $contribution,
-                                'resource' => null,
-                                'data' => $data,
-                            ]);
-                            // For a direct submission, process via the normal
-                            // submission.
-                            // Note that the submission may be invalid for now.
-                            // TODO Process a direct submission without full validation.
-                            if ($isDirectSubmission) {
-                                $params = $this->params()->fromRoute();
-                                $params['controller'] = 'Contribute\Controller\Site\Contribution';
-                                $params['__CONTROLLER__'] = 'contribution';
-                                $params['action'] = 'submit';
-                                $params['resource'] = 'contribution';
-                                $params['id'] = $contribution->id();
-                                $params['space'] = $space;
-                                //die("test");
-                                return $this->redirect()->toUrl("https://kapelletjes.be/page/bedankt");
-                               // return $this->forward()->dispatch('Contribute\Controller\Site\Contribution', $params);
+
+            //recaptcha check
+            if (!$this->isValidRecaptcha($post['g-recaptcha-response'] ?? '')) {
+                $this->messenger()->addError('reCAPTCHA validatie mislukt. Probeer opnieuw.');
+                $hasError = true;
+            }
+
+
+            if (!empty($hasError)) {
+                    // Force fake contribution to refill form
+                    $contribution = $this->fakeContribution($post);
+                } else {
+
+                // The template cannot be changed once set.
+                $post['template'] = $resourceTemplate->id();
+
+                $form->setData($post);
+                // TODO There is no check currently (html form), except the csrf.
+                if ($form->isValid()) {
+                    // TODO There is no validation by the form, except csrf, since elements are added through views. So use form (but includes non-updatable values, etc.).
+                    // $data = $form->getData();
+                    $data = array_diff_key($post, ['csrf' => null, 'edit-resource-submit' => null]);
+                    $data = $this->checkAndIncludeFileData($data);
+                    // To simplify process, a direct submission is made with a
+                    // create then an update.
+                    $allowUpdate = $this->settings()->get('contribute_allow_update');
+                    $isDirectSubmission = $allowUpdate === 'no';
+                    if (empty($data['has_error'])) {
+                        $proposal = $this->prepareProposal($data);
+                        if ($proposal) {
+                            // When there is a resource, it isn’t updated, but the
+                            // proposition of contribution is saved for moderation.
+                            $data = [
+                                'o:resource' => null,
+                                'o:owner' => $user ? ['o:id' => $user->getId()] : null,
+                                'o-module-contribute:token' => $token ? ['o:id' => $token->id()] : null,
+                                'o:email' => $token ? $token->email() : ($user ? $user->getEmail() : null),
+                                'o-module-contribute:patch' => false,
+                                'o-module-contribute:submitted' => false,
+                                'o-module-contribute:reviewed' => false,
+                                'o-module-contribute:proposal' => $proposal,
+                            ];
+                            $response = $this->api($form)->create('contributions', $data);
+                            if ($response) {
+                                /** @var \Contribute\Api\Representation\ContributionRepresentation $contribution $content */
+                                $contribution = $response->getContent();
+                                // $this->prepareContributionEmail($response->getContent(), 'prepare');
+                                $eventManager = $this->getEventManager();
+                                $eventManager->trigger('contribute.submit', $this, [
+                                    'contribution' => $contribution,
+                                    'resource' => null,
+                                    'data' => $data,
+                                ]);
+                                // For a direct submission, process via the normal
+                                // submission.
+                                // Note that the submission may be invalid for now.
+                                // TODO Process a direct submission without full validation.
+                                if ($isDirectSubmission) {
+                                    $params = $this->params()->fromRoute();
+                                    $params['controller'] = 'Contribute\Controller\Site\Contribution';
+                                    $params['__CONTROLLER__'] = 'contribution';
+                                    $params['action'] = 'submit';
+                                    $params['resource'] = 'contribution';
+                                    $params['id'] = $contribution->id();
+                                    $params['space'] = $space;
+                                    //die("test");
+                                    return $this->redirect()->toUrl("https://kapelletjes.be/page/bedankt");
+                                // return $this->forward()->dispatch('Contribute\Controller\Site\Contribution', $params);
+                                }
+                                $message = $this->settings()->get('contribute_message_add');
+                                if ($message) {
+                                    $this->messenger()->addSuccess($message);
+                                } else {
+                                    $this->messenger()->addSuccess('Contribution successfully saved!'); // @translate
+                                    $this->messenger()->addWarning('Review it before its submission.'); // @translate
+                                }
+                                //die($contribution->resource());
+                                return $contribution->resource()
+                                    ? $this->redirect()->toUrl("https://kapelletjes.be/page/bedankt")
+                                    : $this->redirectContribution($contribution);
                             }
-                            $message = $this->settings()->get('contribute_message_add');
-                            if ($message) {
-                                $this->messenger()->addSuccess($message);
-                            } else {
-                                $this->messenger()->addSuccess('Contribution successfully saved!'); // @translate
-                                $this->messenger()->addWarning('Review it before its submission.'); // @translate
-                            }
-                            //die($contribution->resource());
-                            return $contribution->resource()
-                                ? $this->redirect()->toUrl("https://kapelletjes.be/page/bedankt")
-                                : $this->redirectContribution($contribution);
                         }
                     }
                 }
-            }
-            $hasError = true;
+                $hasError = true;
+            }    
         }
 
         if ($hasError) {
@@ -608,11 +623,19 @@ class ContributionController extends AbstractActionController
             
         
             $post = $params->fromPost();
-            // The template cannot be changed once set.
-            $post['template'] = $resourceTemplate->id();
-            $form->setData($post);
-            // TODO There is no check currently (html form), except the csrf.
-            if ($isModeWrite && $form->isValid()) {
+
+            // ✅ reCAPTCHA validation
+            if (!$this->isValidRecaptcha($post['g-recaptcha-response'] ?? '')) {
+                $this->messenger()->addError('reCAPTCHA validatie mislukt. Probeer opnieuw.');
+                $hasError = true;
+            }
+
+            if (!$hasError && $isModeWrite && $form->isValid()) {
+                // The template cannot be changed once set.
+                $post['template'] = $resourceTemplate->id();
+                $form->setData($post);
+                // TODO There is no check currently (html form), except the csrf.
+            
                 // $data = $form->getData();
                 $data = array_diff_key($post, ['csrf' => null, 'edit-resource-submit' => null]);
                 $data = $this->checkAndIncludeFileData($data);
@@ -1688,4 +1711,48 @@ class ContributionController extends AbstractActionController
         return $view
             ->setTemplate('error/403');
     }
+
+    protected function isValidRecaptcha(string $token): bool
+{
+    if (empty($token)) {
+        return false;
+    }
+
+    $secretKey = $this->settings()->get('recaptcha_secret_key');
+
+    if (!$secretKey) {
+        $this->logger()->err('Missing reCAPTCHA secret key.');
+        return false;
+    }
+
+    $postdata = http_build_query([
+        'secret'   => $secretKey,
+        'response' => $token,
+        'remoteip' => $_SERVER['REMOTE_ADDR'] ?? null,
+    ]);
+
+    $context = stream_context_create([
+        'http' => [
+            'method'  => 'POST',
+            'header'  => "Content-Type: application/x-www-form-urlencoded",
+            'content' => $postdata,
+        ]
+    ]);
+
+    $result = file_get_contents(
+        'https://www.google.com/recaptcha/api/siteverify',
+        false,
+        $context
+    );
+
+    if (!$result) {
+        return false;
+    }
+
+    $json = json_decode($result);
+
+    return isset($json->success)
+        && $json->success === true
+        && ($json->score ?? 0) >= 0.5; // ✅ v3 score check
+}
 }

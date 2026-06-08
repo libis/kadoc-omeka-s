@@ -31,6 +31,11 @@ abstract class AbstractCommentController extends AbstractActionController
 
         $data = $this->params()->fromPost();
 
+        if (!$this->isValidRecaptcha($data['g-recaptcha-response'] ?? '')) {
+            return $this->jsonError('reCAPTCHA validation failed.', Response::STATUS_CODE_403);
+        }
+
+
         if (!empty($data['o-module-comment:check'])) {
             return $this->jsonError('Unauthorized access.', Response::STATUS_CODE_403); // @translate
         }
@@ -325,4 +330,46 @@ abstract class AbstractCommentController extends AbstractActionController
         }
         return new JsonModel($output);
     }
+
+    protected function isValidRecaptcha(string $token): bool
+{
+    if (empty($token)) {
+        return false;
+    }
+
+    $secretKey = $this->settings()->get('recaptcha_secret_key');
+
+    if (!$secretKey) {
+        $this->logger()->err('Missing reCAPTCHA secret key.');
+        return false;
+    }
+
+    $postdata = http_build_query([
+        'secret'   => $secretKey,
+        'response' => $token,
+        'remoteip' => $this->getClientIp(),
+    ]);
+
+    $context = stream_context_create([
+        'http' => [
+            'method'  => 'POST',
+            'header'  => "Content-Type: application/x-www-form-urlencoded",
+            'content' => $postdata,
+        ]
+    ]);
+
+    $result = file_get_contents(
+        'https://www.google.com/recaptcha/api/siteverify',
+        false,
+        $context
+    );
+
+    if (!$result) {
+        return false;
+    }
+
+    $json = json_decode($result);
+
+    return isset($json->success) && $json->success === true;
+}
 }

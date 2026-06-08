@@ -337,7 +337,16 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
                     ['class' => 'button button-cancel', 'role' => 'button'])
                 ?>
                 <?php endif; ?>
-                <?= $formElement($form->get('submit')->setAttribute('class', 'button')->setValue($submitLabel)) ?>
+                <?php //echo $formElement($form->get('submit')->setAttribute('class', 'button')->setValue($submitLabel)) ?>
+                <input type="hidden" name="g-recaptcha-response" id="recaptcha-token">
+``
+                <button
+                    class="g-recaptcha button"
+                    data-sitekey="<?= $this->setting('recaptcha_site_key') ?>"
+                    data-callback="onSubmitContribute"
+                    data-action="submit">
+                    <?= $submitLabel ?>
+                </button>
             </div>
 
         <?= $this->form()->closeTag() ?>
@@ -366,9 +375,7 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
             </fieldset>
         </div>
         <?php endif; // End template media. ?>
-
     </div>
-
     <?php endif; // End isMainForm. ?>
     </div>
   </div>  
@@ -384,3 +391,12 @@ $disabled = $mode === 'read' ? ' disabled="disabled"' : '';
     });
 
  </script>
+ <script>
+function onSubmitContribute(token) {
+    document.querySelector('.contribute.main-form form').submit();
+}
+
+
+</script>
+
+<script src="https://www.google.com/recaptcha/api.js"></script>

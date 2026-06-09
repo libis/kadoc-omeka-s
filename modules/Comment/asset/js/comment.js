@@ -158,7 +158,8 @@ $(document).ready(function() {
     $('.comment-flag').click(Comment.flag);
     $('.comment-unflag').click(Comment.unflag);
 
-    $('.comment-form button').on('click', function(e) {
+    //use own code for recaptcha
+    /*$('.comment-form button').on('click', function(e) {
         e.preventDefault();
         Comment.validate($(this).closest('form'));
     });
@@ -166,5 +167,5 @@ $(document).ready(function() {
     $('.comment-form').submit(function(e) {
         e.preventDefault();
         Comment.validate($(this));
-    });
+    });*/
 });

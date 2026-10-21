@@ -1,4 +1,4 @@
-FROM php:8.0.25-apache
+FROM php:8.2-apache
 
 RUN a2enmod rewrite
 
@@ -7,8 +7,8 @@ ENV DEBIAN_FRONTEND noninteractive
 # Bullseye hit EOL (2026-08-31): deb.debian.org no longer serves bullseye at
 # all, and bullseye-security hasn't been archived yet, so drop it and pull
 # main/updates from the archive instead.
-RUN sed -i -e '/bullseye-security/d' -e 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list \
-    && echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+#RUN sed -i -e '/bullseye-security/d' -e 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list \
+#    && echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
 
 RUN apt-get -qq update && apt-get -qq -y upgrade
 RUN apt-get -qq update && apt-get -qq -y --no-install-recommends install \
@@ -57,13 +57,10 @@ COPY themes /var/www/html/themes
 COPY modules /var/www/html/modules
 COPY OEmbed.php /var/www/html/application/src/Media/Ingester/OEmbed.php
 
-
-COPY php.ini-development /usr/local/etc/php
-
 COPY extra.ini /usr/local/etc/php/conf.d/
 COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
-RUN sed -i 's/^.*policy.*coder.*none.*PDF.*//' /etc/ImageMagick-6/policy.xml
+RUN find /etc -name policy.xml -exec sed -i 's/^.*policy.*coder.*none.*PDF.*//' {} \;
 
 # Mail config
 COPY update-exim4.conf.conf /etc/exim4/update-exim4.conf.conf
